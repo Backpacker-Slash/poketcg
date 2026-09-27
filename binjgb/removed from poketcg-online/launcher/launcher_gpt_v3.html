@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCG RAM-Sync Launcher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Fira Code', monospace; }
+        canvas { 
+            image-rendering: pixelated; 
+            width: 480px; 
+            height: 432px; 
+            background: #000; 
+            border: 4px solid #334155;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            outline: none;
+        }
+        canvas:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
+        }
+        .log-line { border-left: 2px solid #3b82f6; padding-left: 8px; margin-bottom: 4px; font-size: 0.75rem; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center min-h-screen">
+
+    <div class="w-full max-w-6xl flex justify-between items-center mb-6 bg-slate-800 p-4 rounded-lg border border-slate-700">
+        <div>
+            <h1 class="text-xl font-bold text-blue-400">TCG RAM-SYNC <span class="text-xs text-slate-500 font-normal">v0.4.2</span></h1>
+            <div class="text-sm">STATUS: <span id="conn-status" class="text-yellow-500 font-bold uppercase">Disconnected</span></div>
+        </div>
+        <div class="flex gap-3 items-center">
+            <div class="text-right">
+                <div class="text-[10px] text-slate-400">ROOM CODE</div>
+                <div id="room-code" class="text-sm font-bold text-white tracking-widest select-all">------</div>
+            </div>
+            <button id="btn-host" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-1 rounded text-sm font-bold transition">HOST</button>
+            <input type="text" id="remote-id" placeholder="ROOM CODE" maxlength="6" class="bg-slate-900 border border-slate-600 px-3 py-1 rounded text-sm uppercase tracking-widest focus:outline-none focus:border-blue-500 w-32">
+            <button id="btn-connect" class="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded text-sm font-bold transition">JOIN</button>
+        </div>
+    </div>
+
+    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <div class="lg:col-span-3 flex flex-col gap-4">
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-tighter">File Management</h3>
+                
+                <div class="space-y-2">
+                    <label class="block">
+                        <span class="text-[10px] text-slate-500 uppercase block mb-1">1. Choose ROM</span>
+                        <input type="file" id="rom-upload" accept=".gbc,.gb" class="text-xs w-full block text-slate-400 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-slate-200 hover:file:bg-slate-600">
+                    </label>
+
+                    <label class="block">
+                        <span class="text-[10px] text-slate-500 uppercase block mb-1">2. Choose Save (.sav)</span>
+                        <input type="file" id="sav-upload" accept=".sav" class="text-xs w-full block text-slate-400 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-slate-200 hover:file:bg-slate-600">
+                    </label>
+
+                    <button id="btn-start" class="w-full bg-blue-600 hover:bg-blue-500 py-2 rounded text-xs font-bold mt-2 transition-all">START ENGINE</button>
+                    <button id="btn-download-sav" class="w-full bg-emerald-700 hover:bg-emerald-600 py-2 rounded text-xs font-bold disabled:opacity-30 disabled:cursor-not-allowed" disabled>DOWNLOAD CURRENT SAVE</button>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex-1 flex flex-col overflow-hidden max-h-[400px]">
+                <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-tighter">System Log</h3>
+                <div id="system-logs" class="overflow-y-auto flex-1 font-mono text-slate-300 hide-scroll">
+                    <div class="log-line">Ready to load files...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-6 flex flex-col items-center">
+            <div class="relative group">
+                <canvas id="gb-canvas" width="160" height="144" tabindex="0"></canvas>
+                <div id="focus-overlay" class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center cursor-pointer transition-opacity z-20 hidden">
+                    <span class="text-white font-bold text-sm bg-blue-600 px-6 py-3 rounded-full shadow-2xl mb-2">CLICK TO RESUME AUDIO</span>
+                </div>
+            </div>
+            
+            <div class="mt-4 grid grid-cols-4 gap-4 w-full text-center text-[10px] text-slate-500">
+                <div>ARROWS: D-PAD</div>
+                <div>X: A / Z: B</div>
+                <div>ENTER: START</div>
+                <div>TAB: SELECT</div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 flex flex-col gap-4">
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                <h3 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-tighter">RAM Sync Status</h3>
+                <div class="flex justify-between items-center bg-slate-900 p-2 rounded mb-1">
+                    <span class="text-[10px]">P1_READY ($C5FD)</span>
+                    <span id="p1-flag" class="w-3 h-3 rounded-full bg-slate-700"></span>
+                </div>
+                <div class="flex justify-between items-center bg-slate-900 p-2 rounded">
+                    <span class="text-[10px]">P2_READY ($C5FE)</span>
+                    <span id="p2-flag" class="w-3 h-3 rounded-full bg-slate-700"></span>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex-1 flex flex-col overflow-hidden max-h-[400px]">
+                <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-tighter">Link Chat</h3>
+                <div id="chat-box" class="flex-1 overflow-y-auto text-[11px] mb-2 space-y-1 hide-scroll"></div>
+                <div class="flex gap-2">
+                    <input type="text" id="chat-input" placeholder="Say something..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs focus:outline-none">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="binjgb.js"></script>
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const log = (msg) => {
+            const div = document.createElement('div');
+            div.className = 'log-line';
+            div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            $('system-logs').appendChild(div);
+            $('system-logs').scrollTop = $('system-logs').scrollHeight;
+        };
+
+        // RAM Memory Offsets relative to base address 0xC000
+        const OFFSET_PLAYER_NAME = 0x1D52;   // $DD52 - $C000
+        const OFFSET_OPPONENT_NAME = 0x1D62; // $DD62 - $C000 wOpponentName_:: ; dd60
+        const NAME_BUFFER_LENGTH = 0x10; // 16 bytes
+        const TX_FULLWIDTH3 = 0x09;
+        const OFFSET_PLAYER_DECK = 0x0400;   // $C400 - $C000
+        const OFFSET_OPPONENT_DECK = 0x0480; // $C480 - $C000
+        const DECK_SIZE = 0x80;              // 128 bytes
+        const OFFSET_SERIAL_OP = 0x0B74; // $CB74 - $C000 (wSerialOp)
+        const OFFSET_SERIAL_SEND_TOGGLE = 0x0B7E; // $cb7e
+        const OFFSET_SERIAL_SEND_BUF    = 0x0B81; 
+        const OFFSET_SERIAL_RECV_COUNT  = 0x0BA2;
+        // const OFFSET_SERIAL_RECV_READ   = 0x0BA3;
+        // const OFFSET_SERIAL_RECV_WRITE  = 0x0BA4;
+        const OFFSET_SERIAL_RECV_BUF    = 0x0BA5;
+        const OFFSET_SERIAL_FLAGS       = 0x0B75; // $CB75 - $C000 (wSerialFlags)
+
+        // Packet handshake states
+        const PACKET_IDLE             = 0;
+        const PACKET_SENT_TO_OPP      = 1;
+        const PACKET_CONSUMED         = 2;
+        const PACKET_RECEIVED_BY_OPP  = 3;
+
+        let isHost = false;
+        let deckSynced = false;
+        let module = null, emulatorPtr = null, audio = null, joypadPtr = null, keyFuncs = {}, animationFrameReq = null, wramCachedPtr = null;
+        let lastP1State = null;
+        let peer = null, connection = null, myRoomCode = null;
+        let remotePlayerName = "OPPONENT";
+
+        // Full character map derived from charmaps.asm & TCG GBC naming keyboard
+        const GBC_FULLWIDTH_MAP = {
+            // Uppercase 'A'-'Z' ($30 - $49)
+            'A': 0x30, 'B': 0x31, 'C': 0x32, 'D': 0x33, 'E': 0x34, 'F': 0x35, 'G': 0x36, 'H': 0x37,
+            'I': 0x38, 'J': 0x39, 'K': 0x3a, 'L': 0x3b, 'M': 0x3c, 'N': 0x3d, 'O': 0x3e, 'P': 0x3f,
+            'Q': 0x40, 'R': 0x41, 'S': 0x42, 'T': 0x43, 'U': 0x44, 'V': 0x45, 'W': 0x46, 'X': 0x47,
+            'Y': 0x48, 'Z': 0x49,
+
+            // Lowercase 'a'-'z' (FULLWIDTH3 non-contiguous mapping)
+            'a': 0x64, 'b': 0x65, 'c': 0x4b, 'd': 0x66, 'e': 0x67, 'f': 0x68, 'g': 0x4a, 'h': 0x69,
+            'i': 0x6a, 'j': 0x6b, 'k': 0x6c, 'l': 0x6d, 'm': 0x4c, 'n': 0x6e, 'o': 0x6f, 'p': 0x70,
+            'q': 0x71, 'r': 0x8e, 's': 0x72, 't': 0x73, 'u': 0x74, 'v': 0x75, 'w': 0x76, 'x': 0x77,
+            'y': 0x78, 'z': 0x79,
+
+            // Digits '0'-'9' ($60 - $69) & Space ($70)
+            '0': 0x60, '1': 0x61, '2': 0x62, '3': 0x63, '4': 0x64, '5': 0x65, '6': 0x66, '7': 0x67,
+            '8': 0x68, '9': 0x69, ' ': 0x70,
+
+            // Symbols on the Naming Keyboard
+            '!': 0x6e, '?': 0x6f, '&': 0x5d, '+': 0x6a, '-': 0x6b, '.': 0x77, '·': 0x77
+        };
+
+        const REVERSE_GBC_MAP = Object.fromEntries(
+            Object.entries(GBC_FULLWIDTH_MAP).map(([k, v]) => [v, k])
+        );
+
+        function getExport(name) {
+            if (!module) return null;
+            const names = [
+                name, 
+                `_${name}`, 
+                `emulator_${name}`, 
+                `_emulator_${name}`,
+                name.replace('emulator_', '')
+            ];
+            for (let n of names) {
+                if (typeof module[n] === 'function') return module[n];
+                if (module.asm && typeof module.asm[n] === 'function') return module.asm[n];
+            }
+            return null;
+        }
+
+        function makeWasmBuffer(ptr, size) {
+            return new Uint8Array(module.HEAP8.buffer, ptr, size);
+        }
+
+        class GameAudio {
+            constructor(m, e) {
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                this.module = m;
+                const getPtr = getExport('get_audio_buffer_ptr');
+                const getCap = getExport('get_audio_buffer_capacity');
+                if (getPtr && getCap) {
+                    this.ptr = getPtr(e);
+                    this.capacity = getCap(e);
+                    this.buffer = new Uint8Array(this.module.HEAP8.buffer, this.ptr, this.capacity);
+                }
+                this.startSec = 0;
+            }
+            push() {
+                if (!this.ctx || this.ctx.state === 'suspended') return;
+                const nowSec = this.ctx.currentTime;
+                const latency = 0.1;
+                this.startSec = (this.startSec || nowSec + latency);
+                if (this.startSec < nowSec) this.startSec = nowSec + latency;
+                const frames = 4096;
+                const buffer = this.ctx.createBuffer(2, frames, this.ctx.sampleRate);
+                const c0 = buffer.getChannelData(0), c1 = buffer.getChannelData(1);
+                for (let i = 0; i < frames; i++) {
+                    c0[i] = (this.buffer[2 * i] / 255) * 0.4;
+                    c1[i] = (this.buffer[2 * i + 1] / 255) * 0.4;
+                }
+                const source = this.ctx.createBufferSource();
+                source.buffer = buffer; source.connect(this.ctx.destination);
+                source.start(this.startSec);
+                this.startSec += frames / this.ctx.sampleRate;
+            }
+        }
+
+        async function initEmulator(romBuffer, savBuffer = null) {
+            if (animationFrameReq) cancelAnimationFrame(animationFrameReq);
+            log("Booting WASM...");
+            module = await Binjgb();
+            wramCachedPtr = null;
+
+            const size = (romBuffer.byteLength + 0x7fff) & ~0x7fff;
+            const malloc = getExport('malloc');
+            const romDataPtr = malloc(size);
+            makeWasmBuffer(romDataPtr, size).fill(0).set(new Uint8Array(romBuffer));
+
+            const eNew = getExport('emulator_new_simple');
+            emulatorPtr = eNew(romDataPtr, size, 44100, 4096, 2);
+
+            // SAVE LOADING (Using stable ext_ram path)
+            if (savBuffer && savBuffer.byteLength > 0) {
+                const extRamFileNew = getExport('ext_ram_file_data_new');
+                const getFileDataPtr = getExport('get_file_data_ptr');
+                const getFileDataSize = getExport('get_file_data_size');
+                const readExtRam = getExport('emulator_read_ext_ram');
+                const fileDataDelete = getExport('file_data_delete');
+
+                if (extRamFileNew && readExtRam) {
+                    const fileDataPtr = extRamFileNew(emulatorPtr);
+                    const bufPtr = getFileDataPtr(fileDataPtr);
+                    const bufSize = getFileDataSize(fileDataPtr);
+                    const saveArray = new Uint8Array(savBuffer);
+                    
+                    if (saveArray.length <= bufSize) {
+                        makeWasmBuffer(bufPtr, bufSize).set(saveArray);
+                        readExtRam(emulatorPtr, fileDataPtr);
+                        log(`SRAM Loaded: ${saveArray.length} bytes.`);
+                    }
+                    fileDataDelete(fileDataPtr);
+                }
+            }
+
+            const jNew = getExport('joypad_new'), jSet = getExport('emulator_set_default_joypad_callback');
+            if (jNew && jSet) {
+                joypadPtr = jNew();
+                jSet(emulatorPtr, joypadPtr);
+                setupInput();
+            }
+
+            audio = new GameAudio(module, emulatorPtr);
+            $('btn-download-sav').disabled = false;
+            tick();
+        }
+
+        function setupInput() {
+            const binds = { 'ArrowDown': 'set_joyp_down', 'ArrowLeft': 'set_joyp_left', 'ArrowRight': 'set_joyp_right', 'ArrowUp': 'set_joyp_up', 'KeyZ': 'set_joyp_B', 'KeyX': 'set_joyp_A', 'Enter': 'set_joyp_start', 'Tab': 'set_joyp_select' };
+            Object.keys(binds).forEach(c => {
+                const fn = getExport(binds[c]);
+                if (fn) keyFuncs[c] = (v) => fn(emulatorPtr, v);
+            });
+        }
+
+        function getWram() {
+            if (!module || !emulatorPtr) return null;
+            if (wramCachedPtr && wramCachedPtr.buffer && wramCachedPtr.buffer.byteLength > 0) {
+                return wramCachedPtr;
+            }
+            
+            const getW = getExport('get_wram_ptr') || getExport('get_wram');
+            if (getW) {
+                const ptr = getW(emulatorPtr);
+                if (ptr) { 
+                    wramCachedPtr = new Uint8Array(module.HEAP8.buffer, ptr, 0x8000); 
+                    return wramCachedPtr; 
+                }
+            }
+            return null;
+        }
+
+        function getLocalPlayerName() {
+            const name = readGbcString(OFFSET_PLAYER_NAME);
+            return (name && name.length > 0) ? name : "YOU";
+        }
+
+        // Reads 2-byte sequences, filtering out 0x09 control bytes
+        function readGbcString(offset, maxBytes = 16) {
+            const wram = getWram();
+            if (!wram) return "";
+            let name = "";
+            
+            for (let i = 0; i < maxBytes; i++) {
+                const byte = wram[offset + i];
+                if (byte === 0x50 || byte === 0x00) break; // $50 string terminator
+                if (byte === TX_FULLWIDTH3) continue;      // Skip 0x09 prefix byte
+                
+                name += REVERSE_GBC_MAP[byte] || '';
+            }
+            return name.trim();
+        }
+
+        function decodeGbcName(bytes) {
+            let name = '';
+
+            for (const byte of bytes) {
+                name += REVERSE_GBC_MAP[byte] || '';
+            }
+
+            return name;
+        }
+
+        // Writes 2-byte [0x09, charCode] pairs into WRAM followed by $50
+        function writeGbcString(offset, str, maxChars = 7) {
+            const wram = getWram();
+            if (!wram) return;
+            
+            let ptr = offset;
+            const cleanStr = str.slice(0, maxChars);
+            
+            for (let i = 0; i < cleanStr.length; i++) {
+                const char = cleanStr[i];
+                const charCode = GBC_FULLWIDTH_MAP[char] || 0x70; // Default to space ($70)
+                
+                wram[ptr++] = TX_FULLWIDTH3; // 0x09 prefix byte
+                wram[ptr++] = charCode;      // Fullwidth char code
+            }
+            
+            wram[ptr] = 0x50; // $50 string terminator
+        }
+
+        function tick() {
+            if (!module || !emulatorPtr) return;
+            const runUntil = getExport('emulator_run_until_f64');
+            const getTicks = getExport('emulator_get_ticks_f64');
+            let target = getTicks(emulatorPtr) + 70224;
+            while (getTicks(emulatorPtr) < target) {
+                const res = runUntil(emulatorPtr, target);
+                if ((res & 2) && audio) audio.push();
+                if (res & 4) break;
+            }
+            const getFb = getExport('get_frame_buffer_ptr');
+            if (getFb) {
+                const fbPtr = getFb(emulatorPtr);
+                const frameData = new Uint8ClampedArray(module.HEAPU8.buffer, fbPtr, 160 * 144 * 4);
+                $('gb-canvas').getContext('2d').putImageData(new ImageData(frameData, 160, 144), 0, 0);
+            }
+            syncRamLogic();
+            handleSerialSendQueue();
+            handleSerialPacketState();
+            animationFrameReq = requestAnimationFrame(tick);
+            updateDebugOverlay();
+        }
+
+        function syncRamLogic() {
+            const wram = getWram();
+            if (!wram) return;
+
+            // $C5FD - $C000 = 0x05FD (Local P1 Flag)
+            // $C5FE - $C000 = 0x05FE (Remote P2 Flag)
+            const p1 = wram[0x5FD];
+            const p2 = wram[0x5FE];
+
+            $('p1-flag').className = `w-3 h-3 rounded-full ${p1 > 0 ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-slate-700'}`;
+            $('p2-flag').className = `w-3 h-3 rounded-full ${p2 > 0 ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-slate-700'}`;
+
+            if (p1 !== lastP1State) {
+                lastP1State = p1;
+                log(`Local P1_READY state changed to: ${p1}`);
+                if (connection?.open) {
+                    connection.send({ type: 'p1_ready_sync', ready: p1 });
+                }
+            }
+
+            // Trigger deck exchange & turn determination when both players are ready
+            if (p1 > 0 && p2 > 0 && !deckSynced && connection?.open) {
+                deckSynced = true;
+
+                // Read local player's deck from $C400
+                const myDeck = Array.from(wram.subarray(OFFSET_PLAYER_DECK, OFFSET_PLAYER_DECK + DECK_SIZE));
+
+                // Host performs deterministic coin flip (0 = Host starts, 1 = Joiner starts)
+                const coinFlip = isHost ? (Math.random() < 0.5 ? 0 : 1) : null;
+
+                if (isHost) {
+                    // Set local wSerialOp for Host
+                    wram[OFFSET_SERIAL_OP] = (coinFlip === 0) ? 0x29 : 0x00;
+                    log(`Host initialized wSerialOp = 0x${wram[OFFSET_SERIAL_OP].toString(16)}`);
+                }
+
+                log("Both players ready! Sending deck to opponent...");
+                connection.send({
+                    type: 'deck_exchange',
+                    deck: myDeck,
+                    firstPlayer: coinFlip
+                });
+            }
+
+            // Reset sync state when readiness clears
+            if (p1 === 0 && p2 === 0) {
+                deckSynced = false;
+            }
+        }
+
+        function handleSerialPacketState() {
+            const wram = getWram();
+            if (!wram || !connection?.open) return;
+
+            const state = wram[OFFSET_SERIAL_FLAGS];
+
+            // Game has consumed the received packet.
+            // Tell the opponent that its packet was received/consumed,
+            // then release our local flag back to IDLE.
+            if (state === PACKET_CONSUMED) {
+                connection.send({
+                    type: 'packet_received_by_opp'
+                });
+
+                wram[OFFSET_SERIAL_FLAGS] = PACKET_IDLE;
+
+                log('Packet consumed. Sent PACKET_RECEIVED_BY_OPP.');
+            }
+        }        
+
+        function handleSerialSendQueue() {
+            const wram = getWram();
+            if (!wram || !connection?.open) return;
+
+            const bytesToSend = wram[OFFSET_SERIAL_SEND_TOGGLE];
+            if (bytesToSend > 0) {
+                // Read full packet out of outgoing buffer
+                const packet = Array.from(wram.subarray(OFFSET_SERIAL_SEND_BUF, OFFSET_SERIAL_SEND_BUF + bytesToSend));
+                
+                // Reset send toggle so ASM doesn't keep queued bytes
+                wram[OFFSET_SERIAL_SEND_TOGGLE] = 0;
+
+                connection.send({ type: 'serial_packet', payload: packet });
+                log(`Packet sent (${packet.length} bytes): [${packet.join(', ')}]`);
+            }
+        }
+
+
+        $('btn-start').onclick = async () => {
+            const romFile = $('rom-upload').files[0], savFile = $('sav-upload').files[0];
+            if (!romFile) return log("Select ROM first.");
+            const romBuf = await romFile.arrayBuffer();
+            const savBuf = savFile ? await savFile.arrayBuffer() : null;
+            await initEmulator(romBuf, savBuf);
+            $('focus-overlay').classList.remove('hidden');
+        };
+
+        $('btn-download-sav').onclick = () => {
+            const extRamFileNew = getExport('ext_ram_file_data_new'), writeExtRam = getExport('emulator_write_ext_ram'), getFileDataPtr = getExport('get_file_data_ptr'), getFileDataSize = getExport('get_file_data_size'), fileDataDelete = getExport('file_data_delete');
+            const fileDataPtr = extRamFileNew(emulatorPtr);
+            writeExtRam(emulatorPtr, fileDataPtr);
+            const ptr = getFileDataPtr(fileDataPtr), size = getFileDataSize(fileDataPtr);
+            if (size > 0) {
+                const blob = new Blob([new Uint8Array(module.HEAP8.buffer, ptr, size)], { type: 'application/octet-stream' });
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'game.sav'; a.click();
+            }
+            fileDataDelete(fileDataPtr);
+        };
+
+        function makeRoomCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+            return code;
+        }
+
+        function setConnectionStatus(text, cls = 'text-yellow-500 font-bold uppercase') {
+            $('conn-status').innerText = text;
+            $('conn-status').className = cls;
+        }
+
+        const peerOptions = {
+            debug: 3,
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    {
+                        urls: 'turn:openrelay.metered.ca:80',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    {
+                        urls: 'turn:openrelay.metered.ca:443',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    {
+                        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    }
+                ]
+            }
+        };
+
+        function updateDebugOverlay() {
+            const wram = getWram();
+            if (!wram) return;
+
+            let debugEl = $('debug-overlay');
+            if (!debugEl) {
+                debugEl = document.createElement('div');
+                debugEl.id = 'debug-overlay';
+                debugEl.className = 'fixed bottom-4 right-4 bg-black/80 text-green-400 font-mono text-[10px] p-3 rounded border border-slate-700 pointer-events-none z-50 space-y-1';
+                document.body.appendChild(debugEl);
+            }
+
+            debugEl.innerHTML = `
+                <div>wSerialOp : 0x${wram[OFFSET_SERIAL_OP].toString(16).padStart(2, '0')}</div>
+                <div>P1_READY  : ${wram[0x05FD]}</div>
+                <div>P2_READY  : ${wram[0x05FE]}</div>
+                <div>SEND_QUEUE: ${wram[0x0B7E]} bytes</div>
+                <div>RECV_QUEUE: ${wram[0x0BA2]} bytes</div>
+                <div>SERIAL_FLAG: ${wram[OFFSET_SERIAL_FLAGS]}</div>
+            `;
+        }
+
+        function createHost() {
+            if (peer) {
+                log('Already have a PeerJS session.');
+                return;
+            }
+
+            myRoomCode = makeRoomCode();
+            $('room-code').innerText = myRoomCode;
+            setConnectionStatus('CREATING ROOM');
+            log('Creating PeerJS Cloud room ' + myRoomCode + '...');
+
+            peer = new Peer(myRoomCode, peerOptions);
+            
+            peer.on('open', id => {
+                setConnectionStatus('WAITING FOR PLAYER');
+                log('Room ready. Give the other player code: ' + id);
+            });
+
+            peer.on('connection', c => {
+                log('Player joined room.');
+                setupConnection(c);
+            });
+
+            peer.on('error', err => {
+                console.error('PeerJS host error:', err);
+                log('PeerJS ERROR: ' + (err.type || 'unknown') + (err.message ? ' - ' + err.message : ''));
+                setConnectionStatus('LOBBY ERROR', 'text-red-500 font-bold uppercase');
+            });
+
+            isHost = true;
+
+        }
+
+        function joinRoom() {
+            const code = $('remote-id').value.trim().toUpperCase();
+            if (!/^[A-Z2-9]{6}$/.test(code)) {
+                log('Enter a valid 6-character room code.');
+                return;
+            }
+            if (peer) {
+                log('Already have a PeerJS session.');
+                return;
+            }
+
+            myRoomCode = code;
+            $('room-code').innerText = code;
+            setConnectionStatus('CONNECTING');
+            log('Connecting to room ' + code + '...');
+
+            peer = new Peer(peerOptions);
+
+            peer.on('open', () => {
+                const c = peer.connect(code, { serialization: 'json' });
+                setupConnection(c);
+            });
+            peer.on('error', err => {
+                console.error('PeerJS join error:', err);
+                log('PeerJS ERROR: ' + (err.type || 'unknown') + (err.message ? ' - ' + err.message : ''));
+                setConnectionStatus('LOBBY ERROR', 'text-red-500 font-bold uppercase');
+            });
+
+            isHost = false;
+        }
+
+        $('btn-host').onclick = createHost;
+        $('btn-connect').onclick = joinRoom;
+
+        function setupConnection(conn) {
+            connection = conn;
+
+            if (conn.peerConnection) {
+                const pc = conn.peerConnection;
+
+                log(
+                    `WebRTC initial state: ` +
+                    `ICE=${pc.iceConnectionState}, ` +
+                    `connection=${pc.connectionState}, ` +
+                    `signaling=${pc.signalingState}`
+                );
+
+                pc.addEventListener('iceconnectionstatechange', () => {
+                    log(`ICE state: ${pc.iceConnectionState} | connection: ${pc.connectionState}`);
+                });
+
+                pc.addEventListener('connectionstatechange', () => {
+                    log(`WebRTC connection state: ${pc.connectionState}`);
+                });
+
+                pc.addEventListener('icegatheringstatechange', () => {
+                    log(`ICE gathering: ${pc.iceGatheringState}`);
+                });
+
+                pc.addEventListener('signalingstatechange', () => {
+                    log(`Signaling state: ${pc.signalingState}`);
+                });
+            }
+
+            setConnectionStatus('CONNECTING');
+            log('Peer connection created with ' + conn.peer + '. Waiting for WebRTC...');
+
+            conn.on('open', () => {
+                setConnectionStatus('LINKED', 'text-green-500 font-bold uppercase');
+                log('WebRTC data connection OPEN.');
+                addChatMessage('SYSTEM', 'Peer connection established.');
+                
+                const myName = getLocalPlayerName();
+                conn.send({ type: 'hello', room: myRoomCode, name: myName });
+                conn.send({ type: 'player_info', name: myName }); 
+
+                const wram = getWram();
+
+                const myNameBytes = wram
+                    ? Array.from(wram.subarray(
+                        OFFSET_PLAYER_NAME,
+                        OFFSET_PLAYER_NAME + NAME_BUFFER_LENGTH
+                    ))
+                    : [];
+
+                conn.send({
+                    type: 'player_info',
+                    nameData: myNameBytes
+                });
+
+            });
+
+            conn.on('data', (d) => {
+                if (!d?.type) return;
+
+                if (d.type === 'hello' || d.type === 'player_info') {
+                    if (d.name) {
+                        remotePlayerName = d.name;
+                        writeGbcString(OFFSET_OPPONENT_NAME, remotePlayerName);
+                        log(`Partner connected as: ${remotePlayerName}`);
+                    }
+                    if (d.type === 'hello') {
+                        const wram = getWram();
+                        if (wram && wram[0x5FD] > 0) {
+                            conn.send({ type: 'p1_ready_sync', ready: wram[0x5FD] });
+                        }
+                    }
+                    return;
+                }
+
+                if (d.type === 'player_info') {
+                    const wram = getWram();
+
+                    if (wram && Array.isArray(d.nameData)) {
+                        // 1. Raw game data: exact byte-for-byte copy
+                        wram.set(d.nameData, OFFSET_OPPONENT_NAME);
+
+                        // 2. Browser representation: decode for UI/chat
+                        const nameBytes = new Uint8Array(d.nameData);
+                        const end = nameBytes.indexOf(0);
+                        const cleanBytes = end >= 0 ? nameBytes.subarray(0, end) : nameBytes;
+
+                        remotePlayerName = decodeGbcName(cleanBytes);
+
+                        log(`Partner connected as: ${remotePlayerName}`);
+                    }
+
+                    return;
+                }
+
+                if (d.type === 'chat') {
+                    const sender = d.name || remotePlayerName || "PARTNER";
+                    addChatMessage(sender, d.msg);
+                    return;
+                }
+
+                if (d.type === 'p1_ready_sync') {
+                    const wram = getWram();
+                    if (wram) {
+                        wram[0x5FE] = d.ready;
+                        log(`Received remote ready signal: ${d.ready}`);
+                    }
+                    return;
+                }
+
+                if (d.type === 'ram_sync') {
+                    const wram = getWram();
+                    if (wram) {
+                        wram.set(d.payload, d.address - 0xC000);
+                    }
+                    return;
+                }
+
+                if (d.type === 'deck_exchange') {
+                    const wram = getWram();
+                    if (wram && d.deck) {
+                        // Load opponent's deck into wOpponentDeck ($C480)
+                        wram.set(new Uint8Array(d.deck), OFFSET_OPPONENT_DECK);
+                        log("Opponent deck received and stored in $C480.");
+
+                        if (!isHost && d.firstPlayer !== null && d.firstPlayer !== undefined) {
+                            // Joiner sets local wSerialOp: 0x29 if firstPlayer === 1, else 0x00
+                            const joinerGoesFirst = (d.firstPlayer === 1);
+                            wram[OFFSET_SERIAL_OP] = joinerGoesFirst ? 0x29 : 0x00;
+
+                            const starterText = joinerGoesFirst ? "YOU GO FIRST!" : "OPPONENT GOES FIRST!";
+                            log(`Coin flip result received: ${starterText}`);
+                            addChatMessage('SYSTEM', `Match starting! ${starterText}`);
+                        } else if (isHost) {
+                            // Host checks local wSerialOp set earlier in syncRamLogic (0x29 = Host goes first)
+                            const hostGoesFirst = (wram[OFFSET_SERIAL_OP] === 0x29);
+                            const starterText = hostGoesFirst ? "YOU GO FIRST!" : "OPPONENT GOES FIRST!";
+                            addChatMessage('SYSTEM', `Match starting! ${starterText}`);
+                        }
+                    }
+                    return;
+                }
+
+                if (d.type === 'packet_received_by_opp') {
+                    const wram = getWram();
+
+                    if (wram) {
+                        wram[OFFSET_SERIAL_FLAGS] = PACKET_RECEIVED_BY_OPP;
+                        log('Opponent consumed our packet. PACKET_RECEIVED_BY_OPP.');
+                    }
+
+                    return;
+                }
+
+                if (d.type === 'serial_packet') {
+                    const wram = getWram();
+                    if (wram && d.payload) {
+                        const bytes = new Uint8Array(d.payload);
+                        
+                        // Copy directly into incoming buffer
+                        wram.set(bytes, OFFSET_SERIAL_RECV_BUF);
+                        // wram[OFFSET_SERIAL_RECV_READ]  = 0;            // Read index = 0
+                        // wram[OFFSET_SERIAL_RECV_WRITE] = bytes.length; // Write index = len
+                        wram[OFFSET_SERIAL_RECV_COUNT] = bytes.length; // Counter = len
+                        
+                        log(`Packet injected (${bytes.length} bytes). Game ready to read.`);
+                    }
+                }
+
+            });
+
+            conn.on('close', () => {
+                if (connection === conn) connection = null;
+                setConnectionStatus('PARTNER DISCONNECTED', 'text-orange-400 font-bold uppercase');
+                log('P2P connection closed.');
+                addChatMessage('SYSTEM', 'Peer connection closed.');
+            });
+
+            conn.on('error', err => {
+                console.error('PeerJS DataConnection error:', err);
+                log('DataConnection ERROR: ' + (err.type || 'unknown') + (err.message ? ' - ' + err.message : ''));
+                setConnectionStatus('CONNECTION ERROR', 'text-red-500 font-bold uppercase');
+            });
+        }
+
+        function addChatMessage(sender, text) {
+            const chatBox = $('chat-box');
+            if (!chatBox) return;
+
+            // Assign distinct Tailwind color classes per sender category
+            let colorClass = 'text-purple-400'; // Partner / Remote player
+            const localName = getLocalPlayerName();
+
+            if (sender === 'SYSTEM') {
+                colorClass = 'text-amber-400 font-semibold';
+            } else if (sender === localName || sender === 'YOU') {
+                colorClass = 'text-emerald-400';
+            }
+
+            const msgEl = document.createElement('div');
+            msgEl.className = 'chat-message my-1';
+            msgEl.innerHTML = `<span class="font-bold ${colorClass}">${escapeHtml(sender)}:</span> <span>${escapeHtml(text)}</span>`;
+            
+            chatBox.appendChild(msgEl);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[m]));
+        }
+
+        $('chat-input').onkeydown = e => {
+            if (e.key === 'Enter' && e.target.value.trim() && connection?.open) {
+                const myName = getLocalPlayerName();
+                const msgText = e.target.value.trim();
+
+                connection.send({ type: 'chat', name: myName, msg: msgText });
+                addChatMessage(myName, msgText);
+                e.target.value = '';
+            }
+        };
+
+        $('focus-overlay').onclick = () => { audio?.ctx.resume(); $('gb-canvas').focus(); $('focus-overlay').classList.add('hidden'); };
+        window.addEventListener('keydown', e => { if (keyFuncs[e.code] && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); keyFuncs[e.code](true); } });
+        window.addEventListener('keyup', e => { if (keyFuncs[e.code] && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); keyFuncs[e.code](false); } });
+    </script>
+</body>
+</html>

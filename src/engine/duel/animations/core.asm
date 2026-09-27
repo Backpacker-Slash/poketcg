@@ -1,3 +1,13 @@
+; ResetAnimationQueue::
+; 	ldh a, [hBankROM]
+; 	push af
+; 	ld a, BANK(_ResetAnimationQueue)
+; 	call BankswitchROM
+; 	call _ResetAnimationQueue
+; 	pop af
+; 	call BankswitchROM
+; 	ret
+
 _ResetAnimationQueue::
 	push hl
 	push bc
@@ -24,6 +34,24 @@ _ResetAnimationQueue::
 	pop bc
 	pop hl
 	ret
+
+; FinishQueuedAnimations::
+; 	ldh a, [hBankROM]
+; 	push af
+; 	; ld a, BANK(ClearAndDisableQueuedAnimations)
+; 	; call BankswitchROM
+; 	call ClearAndDisableQueuedAnimations
+; 	jr c, .skip_clear_frame_func
+; 	xor a
+; 	ld [wDoFrameFunction + 0], a
+; 	ld [wDoFrameFunction + 1], a
+; .skip_clear_frame_func
+; 	call ZeroObjectPositions
+; 	ld a, 1
+; 	ld [wVBlankOAMCopyToggle], a
+; 	pop af
+; 	; call BankswitchROM
+; 	ret
 
 PlayLoadedDuelAnimation::
 	ld a, [wDoFrameFunction + 0]
@@ -122,12 +150,13 @@ PlayLoadedDuelAnimation::
 	ld [wAnimationQueue], a ; push an animation to the queue
 
 	xor a
-	ld [wWhichOBP], a ; OBP0
-	ld [wWhichOBPalIndex], a ; palette index 0
-	ld a, [hli] ; ANIM_PALETTE_ID
-	farcall LoadOBPalette
+	ld [wVRAMTileOffset], a
+	ld [wd4cb], a
 
+	ld a, [hli] ; ANIM_PALETTE_ID
+	farcall LoadPaletteData
 	ld a, [hli] ; ANIM_SPRITE_ANIM_ID
+
 	push af
 	ld a, [hli] ; ANIM_SPRITE_ANIM_FLAGS
 	ld [wAnimFlags], a
@@ -240,6 +269,7 @@ AnimationCoordinatesIndex:
 ; animations in the Opponent's Play Area, for each Play Area Pokemon
 	db $09, $0a, $0b, $0c, $0d, $0e ; player
 	db $09, $0a, $0b, $0c, $0d, $0e ; opponent
+
 
 AnimationCoordinates:
 ; x coord, y coord, animation flags
@@ -496,10 +526,11 @@ Func_1cb5e:
 
 	xor a
 	ld [wDamageCharAnimDelay], a
-	ld [wWhichOBP], a ; OBP0
-	ld [wWhichOBPalIndex], a ; palette index 0
-	ld a, PALETTE_DAMAGE
-	farcall LoadOBPalette
+	ld [wVRAMTileOffset], a
+	ld [wd4cb], a
+
+	ld a, PALETTE_37
+	farcall LoadPaletteData
 
 	call DrawDamageAnimationNumbers
 	ld hl, wDuelAnimEffectiveness

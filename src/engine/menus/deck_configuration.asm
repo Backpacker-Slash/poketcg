@@ -1,25 +1,25 @@
 ; goes through whole deck in hl
 ; for each card ID, goes to its corresponding
 ; entry in sCardCollection and decrements its count
-DecrementDeckCardsInCollection:
-	push hl
-	ld b, $0
-	ld d, DECK_SIZE
-.loop_deck
-	ld a, [hli]
-	or a
-	jr z, .done
-	ld c, a
-	push hl
-	ld hl, sCardCollection
-	add hl, bc
-	dec [hl]
-	pop hl
-	dec d
-	jr nz, .loop_deck
-.done
-	pop hl
-	ret
+; DecrementDeckCardsInCollection:
+; 	push hl
+; 	ld b, $0
+; 	ld d, DECK_SIZE
+; .loop_deck
+; 	ld a, [hli]
+; 	or a
+; 	jr z, .done
+; 	ld c, a
+; 	push hl
+; 	ld hl, sCardCollection
+; 	add hl, bc
+; 	dec [hl]
+; 	pop hl
+; 	dec d
+; 	jr nz, .loop_deck
+; .done
+; 	pop hl
+; 	ret
 
 ; like AddDeckToCollection, but takes care to
 ; check if increasing the collection count would
@@ -28,68 +28,68 @@ DecrementDeckCardsInCollection:
 ; so we cannot assume that the deck configuration
 ; won't make it go over MAX_AMOUNT_OF_CARD
 ; hl = deck configuration, with cards to add
-AddGiftCenterDeckCardsToCollection:
-	push hl
-	ld b, $0
-	ld d, DECK_SIZE
-.loop_deck
-	ld a, [hli]
-	or a
-	jr z, .done
-	ld c, a
-	push hl
-	push de
-	push bc
-	ld a, ALL_DECKS
-	call CreateCardCollectionListWithDeckCards
-	pop bc
-	pop de
-	ld hl, wTempCardCollection
-	add hl, bc
-	ld a, [hl]
-	cp MAX_AMOUNT_OF_CARD
-	jr z, .next_card ; capped
-	call EnableSRAM ; no DisableSRAM
-	ld hl, sCardCollection
-	add hl, bc
-	ld a, [hl]
-	cp CARD_NOT_OWNED
-	jr nz, .incr
-	; not owned
-	xor a
-	ld [hl], a
-.incr
-	inc [hl]
-.next_card
-	pop hl
-	dec d
-	jr nz, .loop_deck
-.done
-	pop hl
-	ret
+; AddGiftCenterDeckCardsToCollection:
+; 	push hl
+; 	ld b, $0
+; 	ld d, DECK_SIZE
+; .loop_deck
+; 	ld a, [hli]
+; 	or a
+; 	jr z, .done
+; 	ld c, a
+; 	push hl
+; 	push de
+; 	push bc
+; 	ld a, ALL_DECKS
+; 	call CreateCardCollectionListWithDeckCards
+; 	pop bc
+; 	pop de
+; 	ld hl, wTempCardCollection
+; 	add hl, bc
+; 	ld a, [hl]
+; 	cp MAX_AMOUNT_OF_CARD
+; 	jr z, .next_card ; capped
+; 	call EnableSRAM ; no DisableSRAM
+; 	ld hl, sCardCollection
+; 	add hl, bc
+; 	ld a, [hl]
+; 	cp CARD_NOT_OWNED
+; 	jr nz, .incr
+; 	; not owned
+; 	xor a
+; 	ld [hl], a
+; .incr
+; 	inc [hl]
+; .next_card
+; 	pop hl
+; 	dec d
+; 	jr nz, .loop_deck
+; .done
+; 	pop hl
+; 	ret
 
-; adds all cards in deck in hl to player's collection
-; assumes SRAM is enabled
-; hl = pointer to deck cards
-AddDeckToCollection:
-	push hl
-	ld b, $0
-	ld d, DECK_SIZE
-.loop_deck
-	ld a, [hli]
-	or a
-	jr z, .done
-	ld c, a
-	push hl
-	ld hl, sCardCollection
-	add hl, bc
-	inc [hl]
-	pop hl
-	dec d
-	jr nz, .loop_deck
-.done
-	pop hl
-	ret
+; ; adds all cards in deck in hl to player's collection
+; ; assumes SRAM is enabled
+; ; hl = pointer to deck cards
+; AddDeckToCollection:
+; 	push hl
+; 	ld b, $0
+; 	ld d, DECK_SIZE
+; .loop_deck
+; 	ld a, [hli]
+; 	or a
+; 	jr z, .done
+; 	ld c, a
+; 	push hl
+; 	ld hl, sCardCollection
+; 	add hl, bc
+; 	inc [hl]
+; 	pop hl
+; 	dec d
+; 	jr nz, .loop_deck
+; .done
+; 	pop hl
+; 	ret
 
 ; draws the screen which shows the player's current
 ; deck configurations
@@ -404,7 +404,7 @@ HandleDeckBuildScreen:
 	ldh a, [hDPadHeld]
 	and PAD_START
 	jr z, .no_start_btn_1
-	ld a, MENU_CONFIRM
+	ld a, $01
 	call PlaySFXConfirmOrCancel
 	call ConfirmDeckConfiguration
 	ld a, [wCurCardTypeFilter]
@@ -436,7 +436,7 @@ HandleDeckBuildScreen:
 	call HandleCardSelectionInput
 	jr nc, .wait_input
 	ld a, [hffb3]
-	cp MENU_CANCEL ; operation cancelled?
+	cp $ff ; operation cancelled?
 	jp z, OpenDeckConfigurationMenu
 
 ; input was made to jump to the card list
@@ -472,7 +472,7 @@ HandleDeckBuildScreen:
 	ldh a, [hDPadHeld]
 	and PAD_START
 	jr z, .no_start_btn_2
-	ld a, MENU_CONFIRM
+	ld a, $01
 	call PlaySFXConfirmOrCancel
 
 	; temporarily store current cursor position
@@ -491,7 +491,7 @@ HandleDeckBuildScreen:
 	jr .loop_input
 
 .open_card_page
-	ld a, MENU_CONFIRM
+	ld a, $01
 	call PlaySFXConfirmOrCancel
 	ld a, [wCardListNumCursorPositions]
 	ld [wTempCardListNumCursorPositions], a
@@ -527,7 +527,7 @@ HandleDeckBuildScreen:
 	ld a, [wCardListCursorPos]
 	ld [wTempCardListCursorPos], a
 	ld a, [hffb3]
-	cp MENU_CANCEL
+	cp $ff
 	jr nz, .open_card_page
 	; cancelled
 	ld hl, FiltersCardSelectionParams
@@ -565,13 +565,13 @@ HandleDeckConfigurationMenu:
 	call PlaceTextItems
 
 .do_frame
-	ld a, TRUE
+	ld a, $1
 	ld [wVBlankOAMCopyToggle], a
 	call DoFrame
 	call YourOrOppPlayAreaScreen_HandleInput
 	jr nc, .do_frame
 	ld [wced6], a
-	cp MENU_CANCEL
+	cp $ff
 	jr nz, .asm_94b5
 .draw_icons
 	call DrawCardTypeIconsAndPrintCardCounts
@@ -584,7 +584,7 @@ HandleDeckConfigurationMenu:
 .asm_94b5
 	push af
 	call YourOrOppPlayAreaScreen_HandleInput.draw_cursor
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	pop af
 	ld hl, .func_table
@@ -710,7 +710,7 @@ DismantleDeck:
 	ld a, NAME_BUFFER_LENGTH
 	call ClearMemory_Bank2
 	call GetPointerToDeckCards
-	call AddDeckToCollection
+	;call AddDeckToCollection
 	ld a, DECK_SIZE
 	call ClearMemory_Bank2
 .done_dismantle
@@ -1048,9 +1048,9 @@ CreateFilteredCardList:
 
 ; clear wOwnedCardsCountList and wFilteredCardList
 	push af
-	ld a, DECK_SIZE
-	ld hl, wOwnedCardsCountList
-	call ClearMemory_Bank2
+	; ld a, DECK_SIZE
+	; ld hl, wOwnedCardsCountList
+	; call ClearMemory_Bank2
 	ld a, DECK_SIZE
 	ld hl, wFilteredCardList
 	call ClearMemory_Bank2
@@ -1087,22 +1087,22 @@ CreateFilteredCardList:
 	ld bc, wFilteredCardList
 	add hl, bc
 	ld [hl], e
-	ld hl, wTempCardCollection
+	ld hl, CardList;wTempCardCollection
 	add hl, de
 	ld a, [hl]
 	pop hl
-	cp CARD_NOT_OWNED
-	jr z, .next_card ; jump if never seen card
-	or a
-	jr nz, .ok ; has at least 1
-	call IsCardInAnyDeck
-	jr c, .next_card ; jump if not in any deck
-.ok
-	push hl
-	ld bc, wOwnedCardsCountList
-	add hl, bc
-	ld [hl], a
-	pop hl
+; 	cp CARD_NOT_OWNED
+; 	jr z, .next_card ; jump if never seen card
+; 	or a
+; 	jr nz, .ok ; has at least 1
+; 	call IsCardInAnyDeck
+; 	jr c, .next_card ; jump if not in any deck
+; .ok
+	; push hl
+	; ld bc, wOwnedCardsCountList
+	; add hl, bc
+	; ld [hl], a
+	; pop hl
 	inc l
 .next_card
 	pop bc
@@ -1118,10 +1118,10 @@ CreateFilteredCardList:
 	ld hl, wFilteredCardList
 	add hl, bc
 	ld [hl], a ; $00
-	ld a, $ff
-	ld hl, wOwnedCardsCountList
-	add hl, bc
-	ld [hl], a ; $ff
+	; ld a, $ff
+	; ld hl, wOwnedCardsCountList
+	; add hl, bc
+	; ld [hl], a ; $ff
 	pop hl
 	pop de
 	pop bc
@@ -1175,6 +1175,7 @@ IsCardInAnyDeck:
 	or a
 	ret
 
+
 ; zeroes a bytes starting from hl.
 ; this function is identical to 'ClearMemory_Bank5',
 ; 'ClearMemory_Bank6' and 'ClearMemory_Bank8'.
@@ -1221,29 +1222,32 @@ GetCountOfCardInCurDeck:
 ; then uses the index to retrieve the count
 ; value from wOwnedCardsCountList
 GetOwnedCardCount:
-	push hl
-	ld hl, wFilteredCardList
-	ld d, -1
-.loop
-	inc d
-	ld a, [hli]
-	or a
-	jr z, .not_found
-	cp e
-	jr nz, .loop
-	ld hl, wOwnedCardsCountList
-	push de
-	ld e, d
-	ld d, $00
-	add hl, de
-	pop de
-	ld a, [hl]
-	pop hl
+	ld a, 4
 	ret
-.not_found
-	xor a
-	pop hl
-	ret
+
+; 	push hl
+; 	ld hl, wFilteredCardList
+; 	ld d, -1
+; .loop
+; 	inc d
+; 	ld a, [hli]
+; 	or a
+; 	jr z, .not_found
+; 	cp e
+; 	jr nz, .loop
+; 	ld hl, wOwnedCardsCountList
+; 	push de
+; 	ld e, d
+; 	ld d, $00
+; 	add hl, de
+; 	pop de
+; 	ld a, [hl]
+; 	pop hl
+; 	ret
+; .not_found
+; 	xor a
+; 	pop hl
+; 	ret
 
 ; appends text "X/Y", where X is the number of included cards
 ; and Y is the total number of cards in storage of a given card ID
@@ -1436,12 +1440,14 @@ PrintFilteredCardList:
 	push af
 
 ; copy sCardCollection to wTempCardCollection
-	call EnableSRAM
-	ld hl, sCardCollection
+	ld hl, CardList
+
+	; call EnableSRAM
+	; ld hl, sCardCollection
 	ld de, wTempCardCollection
 	ld b, CARD_COLLECTION_SIZE - 1
 	call CopyNBytesFromHLToDE
-	call DisableSRAM
+	; call DisableSRAM
 
 	ld a, [wIncludeCardsInDeck]
 	or a
@@ -1724,7 +1730,7 @@ HandleCardSelectionInput:
 	and PAD_A
 	jr nz, ConfirmSelectionAndReturnCarry
 	; b button
-	ld a, MENU_CANCEL
+	ld a, $ff
 	ld [hffb3], a
 	call PlaySFXConfirmOrCancel
 	scf
@@ -1733,7 +1739,7 @@ HandleCardSelectionInput:
 ; outputs cursor position in e and selection in a
 ConfirmSelectionAndReturnCarry:
 	call DrawHorizontalListCursor_Visible
-	ld a, MENU_CONFIRM
+	ld a, $01
 	call PlaySFXConfirmOrCancel
 	ld a, [wCardListCursorPos]
 	ld e, a
@@ -1750,11 +1756,10 @@ HandleCardSelectionCursorBlink:
 	ld hl, wCheckMenuCursorBlinkCounter
 	ld a, [hl]
 	inc [hl]
-	and CURSOR_BLINK_PERIOD_MASK
+	and $0f
 	ret nz
-
 	ld a, [wVisibleCursorTile]
-	bit B_CURSOR_BLINK_PERIOD, [hl]
+	bit 4, [hl]
 	jr z, DrawHorizontalListCursor
 
 DrawHorizontalListCursor_Invisible:
@@ -1903,7 +1908,7 @@ HandleDeckCardSelectionList:
 
 .select_card
 	call DrawListCursor_Visible
-	ld a, MENU_CONFIRM
+	ld a, $01
 	call PlaySFXConfirmOrCancel
 	ld a, [wCardListCursorPos]
 	ld e, a
@@ -1917,7 +1922,7 @@ HandleDeckCardSelectionList:
 	jr z, .check_sfx
 	and PAD_A
 	jr nz, .select_card
-	ld a, MENU_CANCEL
+	ld a, $ff
 	ld [hffb3], a
 	call PlaySFXConfirmOrCancel
 	scf
@@ -1932,10 +1937,10 @@ HandleDeckCardSelectionList:
 	ld hl, wCheckMenuCursorBlinkCounter
 	ld a, [hl]
 	inc [hl]
-	and CURSOR_BLINK_PERIOD_MASK
+	and $0f
 	ret nz
 	ld a, [wVisibleCursorTile]
-	bit B_CURSOR_BLINK_PERIOD, [hl]
+	bit 4, [hl]
 	jr z, DrawListCursor
 ;	fallthrough
 
@@ -2082,7 +2087,7 @@ OpenCardPageFromCardList:
 	jp .handle_input
 
 .exit
-	ld a, TRUE
+	ld a, $1
 	ld [wVBlankOAMCopyToggle], a
 	ld a, [wCardListCursorPos]
 	ld [wTempCardListCursorPos], a
@@ -2099,10 +2104,10 @@ Func_9ced: ; unreferenced
 	inc hl
 	ld d, [hl]
 	call LoadCardDataToBuffer1_FromCardID
-	lb de, $38, $9f
+	ld de, $389f
 	call SetupText
 	bank1call OpenCardPage_FromHand
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	ret
 
@@ -2148,23 +2153,23 @@ TryAddCardToDeck:
 	pop de
 	ret c ; cannot add more cards with this name
 
-	push de
-	call GetCountOfCardInCurDeck
-	ld b, a
-	ld hl, wOwnedCardsCountList
-	ld d, $0
-	ld a, [wCardListVisibleOffset]
-	ld e, a
-	add hl, de
-	ld a, [wCardListCursorPos]
-	ld e, a
-	add hl, de
-	ld d, [hl]
-	ld a, b
-	cp d
-	pop de
-	scf
-	ret z ; cannot add because player doesn't own more copies
+	; push de
+	; call GetCountOfCardInCurDeck
+	; ld b, a
+	; ld hl, wOwnedCardsCountList
+	; ld d, $0
+	; ld a, [wCardListVisibleOffset]
+	; ld e, a
+	; add hl, de
+	; ld a, [wCardListCursorPos]
+	; ld e, a
+	; add hl, de
+	; ld d, [hl]
+	; ld a, b
+	; cp d
+	; pop de
+	; scf
+	; ret z ; cannot add because player doesn't own more copies
 
 	ld a, SFX_CURSOR
 	call PlaySFX
@@ -2406,7 +2411,7 @@ HandleDeckConfirmationMenu:
 	jr z, .loop_input
 
 .selected_card
-	ld a, MENU_CONFIRM
+	ld a, $01
 	call PlaySFXConfirmOrCancel
 	ld a, [wCardListCursorPos]
 	ld [wced7], a
@@ -2423,7 +2428,7 @@ HandleDeckConfirmationMenu:
 
 .selection_made
 	ld a, [hffb3]
-	cp MENU_CANCEL
+	cp $ff
 	ret z ; operation cancelled
 	jr .selected_card
 
@@ -2544,7 +2549,7 @@ ShowDeckInfoHeaderAndWaitForBButton:
 	ldh a, [hKeysPressed]
 	and PAD_B
 	jr z, .wait_input
-	ld a, MENU_CANCEL
+	ld a, $ff
 	call PlaySFXConfirmOrCancel
 	ret
 
@@ -3028,13 +3033,13 @@ HandleSendDeckConfigurationMenu:
 	ld a, $ff
 	ld [wDuelInitialPrizesUpperBitsSet], a
 .loop_input
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	call DoFrame
 	call YourOrOppPlayAreaScreen_HandleInput
 	jr nc, .loop_input
 	ld [wced6], a
-	cp MENU_CANCEL
+	cp $ff
 	jr nz, .asm_a23b
 	call DrawCardTypeIconsAndPrintCardCounts
 	ld a, [wTempCardListCursorPos]
@@ -3133,7 +3138,7 @@ HandlePlayersCardsScreen:
 	call HandleCardSelectionInput
 	jr nc, .wait_input
 	ld a, [hffb3]
-	cp MENU_CANCEL ; operation cancelled
+	cp $ff ; operation cancelled
 	jr nz, .jump_to_list
 	ret
 
@@ -3173,7 +3178,7 @@ HandlePlayersCardsScreen:
 	; start btn pressed
 
 .open_card_page
-	ld a, MENU_CONFIRM
+	ld a, $01
 	call PlaySFXConfirmOrCancel
 	ld a, [wCardListNumCursorPositions]
 	ld [wTempCardListNumCursorPositions], a
@@ -3210,7 +3215,7 @@ HandlePlayersCardsScreen:
 	ld a, [wCardListCursorPos]
 	ld [wTempCardListCursorPos], a
 	ld a, [hffb3]
-	cp MENU_CANCEL
+	cp $ff
 	jr nz, .open_card_page
 	ld hl, FiltersCardSelectionParams
 	call InitCardSelectionParams
@@ -3266,38 +3271,38 @@ PrintFilteredCardSelectionList:
 CreateCardCollectionListWithDeckCards:
 	ld [hffb5], a
 ; copies sCardCollection to wTempCardCollection
-	ld hl, sCardCollection
+	ld hl, CardList;sCardCollection
 	ld de, wTempCardCollection
 	ld b, CARD_COLLECTION_SIZE - 1
-	call EnableSRAM
+	; call EnableSRAM
 	call CopyNBytesFromHLToDE
-	call DisableSRAM
-
-; deck_1
-	ld a, [hffb5] ; should be ldh
-	bit DECK_1_F, a
-	jr z, .deck_2
-	ld de, sDeck1Cards
-	call IncrementDeckCardsInTempCollection
-.deck_2
-	ld a, [hffb5] ; should be ldh
-	bit DECK_2_F, a
-	jr z, .deck_3
-	ld de, sDeck2Cards
-	call IncrementDeckCardsInTempCollection
-.deck_3
-	ld a, [hffb5] ; should be ldh
-	bit DECK_3_F, a
-	jr z, .deck_4
-	ld de, sDeck3Cards
-	call IncrementDeckCardsInTempCollection
-.deck_4
-	ld a, [hffb5] ; should be ldh
-	bit DECK_4_F, a
-	ret z
-	ld de, sDeck4Cards
-	call IncrementDeckCardsInTempCollection
+	; call DisableSRAM
 	ret
+; deck_1
+; 	ld a, [hffb5] ; should be ldh
+; 	bit DECK_1_F, a
+; 	jr z, .deck_2
+; 	ld de, sDeck1Cards
+; 	call IncrementDeckCardsInTempCollection
+; .deck_2
+; 	ld a, [hffb5] ; should be ldh
+; 	bit DECK_2_F, a
+; 	jr z, .deck_3
+; 	ld de, sDeck2Cards
+; 	call IncrementDeckCardsInTempCollection
+; .deck_3
+; 	ld a, [hffb5] ; should be ldh
+; 	bit DECK_3_F, a
+; 	jr z, .deck_4
+; 	ld de, sDeck3Cards
+; 	call IncrementDeckCardsInTempCollection
+; .deck_4
+; 	ld a, [hffb5] ; should be ldh
+; 	bit DECK_4_F, a
+; 	ret z
+; 	ld de, sDeck4Cards
+; 	call IncrementDeckCardsInTempCollection
+	; ret
 
 ; goes through cards in deck in de
 ; and for each card ID, increments its corresponding

@@ -3,10 +3,10 @@ SetMainSGBBorder:
 	cp CONSOLE_SGB
 	ret nz ; exit if not SGB
 	ld b, $1
-	ld a, EVENT_RECEIVED_LEGENDARY_CARDS
-	farcall GetEventValue
-	or a
-	jr z, .asm_70013
+	; ld a, EVENT_RECEIVED_LEGENDARY_CARDS
+	; farcall GetEventValue
+	; or a
+	; jr z, .asm_70013
 	ld b, $2
 .asm_70013
 	ld a, b
@@ -170,7 +170,7 @@ SetMainSGBBorderPalsAndMap:
 	call PrepareBGMapForSendingSGBBorder
 
 	pop hl ; input hl
-	call FillSGBBorderMedalSlots
+	;call FillSGBBorderMedalSlots
 	ld hl, PctTrnPacket
 	call SendSGBBorder
 	pop de
@@ -317,54 +317,54 @@ PrepareBGMapForSendingSGBBorder:
 	jr nz, .asm_70208
 	ret
 
-; iterates all the medals obtained by the player
-; and fills the corresponding medal slot in the SGB border
-FillSGBBorderMedalSlots:
-; exit if not SGBData_BorderMedals5
-	ld a, l
-	cp LOW(SGBData_BorderMedals5)
-	ret nz
-	ld a, h
-	cp HIGH(SGBData_BorderMedals5)
-	ret nz
+; ; iterates all the medals obtained by the player
+; ; and fills the corresponding medal slot in the SGB border
+; FillSGBBorderMedalSlots:
+; ; exit if not SGBData_BorderMedals5
+; 	ld a, l
+; 	cp LOW(SGBData_BorderMedals5)
+; 	ret nz
+; 	ld a, h
+; 	cp HIGH(SGBData_BorderMedals5)
+; 	ret nz
 
-	ld hl, .SGBBorderMedalTiles
-	ld a, EVENT_MEDAL_FLAGS
-	farcall GetEventValue
-	ld c, NUM_MEDALS
-.loop_medals
-	push bc
-	push hl
-	push af
-	bit 7, a
-	jr z, .next_medal
+; 	ld hl, .SGBBorderMedalTiles
+; 	ld a, EVENT_MEDAL_FLAGS
+; 	farcall GetEventValue
+; 	ld c, NUM_MEDALS
+; .loop_medals
+; 	push bc
+; 	push hl
+; 	push af
+; 	bit 7, a
+; 	jr z, .next_medal
 
-	ld c, 3 * 3
-.loop_tiles
-	push bc
-	ld e, [hl]
-	inc hl
-	ld d, [hl]
-	inc hl
-	ld a, [hli]
-	ld [de], a
-	inc de
-	ld a, [hli]
-	ld [de], a
-	pop bc
-	dec c
-	jr nz, .loop_tiles
+; 	ld c, 3 * 3
+; .loop_tiles
+; 	push bc
+; 	ld e, [hl]
+; 	inc hl
+; 	ld d, [hl]
+; 	inc hl
+; 	ld a, [hli]
+; 	ld [de], a
+; 	inc de
+; 	ld a, [hli]
+; 	ld [de], a
+; 	pop bc
+; 	dec c
+; 	jr nz, .loop_tiles
 
-.next_medal
-	pop af
-	rlca
-	pop hl
-	ld bc, 3 * 3 * 4
-	add hl, bc
-	pop bc
-	dec c
-	jr nz, .loop_medals
-	ret
+; .next_medal
+; 	pop af
+; 	rlca
+; 	pop hl
+; 	ld bc, 3 * 3 * 4
+; 	add hl, bc
+; 	pop bc
+; 	dec c
+; 	jr nz, .loop_medals
+; 	ret
 
 MACRO border_medal_tile
 	dw \1 ; VRAM address
@@ -372,156 +372,156 @@ MACRO border_medal_tile
 	db \3 ; pal (?)
 ENDM
 
-.SGBBorderMedalTiles
-	table_width 4 * 9
+; .SGBBorderMedalTiles
+; 	table_width 4 * 9
 
-; GRASS_MEDAL
-	border_medal_tile v0Tiles1 + $182, $3f, $10
-	border_medal_tile v0Tiles1 + $184, $40, $10
-	border_medal_tile v0Tiles1 + $186, $41, $10
-	border_medal_tile v0Tiles1 + $1c2, $42, $10
-	border_medal_tile v0Tiles1 + $1c4, $43, $10
-	border_medal_tile v0Tiles1 + $1c6, $44, $10
-	border_medal_tile v0Tiles1 + $202, $45, $10
-	border_medal_tile v0Tiles1 + $204, $46, $10
-	border_medal_tile v0Tiles1 + $206, $47, $10
+; ; GRASS_MEDAL
+; 	border_medal_tile v0Tiles1 + $182, $3f, $10
+; 	border_medal_tile v0Tiles1 + $184, $40, $10
+; 	border_medal_tile v0Tiles1 + $186, $41, $10
+; 	border_medal_tile v0Tiles1 + $1c2, $42, $10
+; 	border_medal_tile v0Tiles1 + $1c4, $43, $10
+; 	border_medal_tile v0Tiles1 + $1c6, $44, $10
+; 	border_medal_tile v0Tiles1 + $202, $45, $10
+; 	border_medal_tile v0Tiles1 + $204, $46, $10
+; 	border_medal_tile v0Tiles1 + $206, $47, $10
 
-; SCIENCE_MEDAL
-	border_medal_tile v0Tiles1 + $282, $48, $10
-	border_medal_tile v0Tiles1 + $284, $49, $10
-	border_medal_tile v0Tiles1 + $286, $4a, $10
-	border_medal_tile v0Tiles1 + $2c2, $4b, $10
-	border_medal_tile v0Tiles1 + $2c4, $4c, $10
-	border_medal_tile v0Tiles1 + $2c6, $4d, $10
-	border_medal_tile v0Tiles1 + $302, $4e, $10
-	border_medal_tile v0Tiles1 + $304, $4f, $10
-	border_medal_tile v0Tiles1 + $306, $50, $10
+; ; SCIENCE_MEDAL
+; 	border_medal_tile v0Tiles1 + $282, $48, $10
+; 	border_medal_tile v0Tiles1 + $284, $49, $10
+; 	border_medal_tile v0Tiles1 + $286, $4a, $10
+; 	border_medal_tile v0Tiles1 + $2c2, $4b, $10
+; 	border_medal_tile v0Tiles1 + $2c4, $4c, $10
+; 	border_medal_tile v0Tiles1 + $2c6, $4d, $10
+; 	border_medal_tile v0Tiles1 + $302, $4e, $10
+; 	border_medal_tile v0Tiles1 + $304, $4f, $10
+; 	border_medal_tile v0Tiles1 + $306, $50, $10
 
-; FIRE_MEDAL
-	border_medal_tile v0Tiles1 + $382, $51, $10
-	border_medal_tile v0Tiles1 + $384, $52, $10
-	border_medal_tile v0Tiles1 + $386, $53, $10
-	border_medal_tile v0Tiles1 + $3c2, $54, $10
-	border_medal_tile v0Tiles1 + $3c4, $55, $10
-	border_medal_tile v0Tiles1 + $3c6, $56, $10
-	border_medal_tile v0Tiles1 + $402, $57, $10
-	border_medal_tile v0Tiles1 + $404, $58, $10
-	border_medal_tile v0Tiles1 + $406, $59, $10
+; ; FIRE_MEDAL
+; 	border_medal_tile v0Tiles1 + $382, $51, $10
+; 	border_medal_tile v0Tiles1 + $384, $52, $10
+; 	border_medal_tile v0Tiles1 + $386, $53, $10
+; 	border_medal_tile v0Tiles1 + $3c2, $54, $10
+; 	border_medal_tile v0Tiles1 + $3c4, $55, $10
+; 	border_medal_tile v0Tiles1 + $3c6, $56, $10
+; 	border_medal_tile v0Tiles1 + $402, $57, $10
+; 	border_medal_tile v0Tiles1 + $404, $58, $10
+; 	border_medal_tile v0Tiles1 + $406, $59, $10
 
-; WATER_MEDAL
-	border_medal_tile v0Tiles1 + $482, $5a, $10
-	border_medal_tile v0Tiles1 + $484, $5b, $10
-	border_medal_tile v0Tiles1 + $486, $5c, $10
-	border_medal_tile v0Tiles1 + $4c2, $5d, $10
-	border_medal_tile v0Tiles1 + $4c4, $5e, $10
-	border_medal_tile v0Tiles1 + $4c6, $5f, $10
-	border_medal_tile v0Tiles1 + $502, $60, $10
-	border_medal_tile v0Tiles1 + $504, $61, $10
-	border_medal_tile v0Tiles1 + $506, $62, $10
+; ; WATER_MEDAL
+; 	border_medal_tile v0Tiles1 + $482, $5a, $10
+; 	border_medal_tile v0Tiles1 + $484, $5b, $10
+; 	border_medal_tile v0Tiles1 + $486, $5c, $10
+; 	border_medal_tile v0Tiles1 + $4c2, $5d, $10
+; 	border_medal_tile v0Tiles1 + $4c4, $5e, $10
+; 	border_medal_tile v0Tiles1 + $4c6, $5f, $10
+; 	border_medal_tile v0Tiles1 + $502, $60, $10
+; 	border_medal_tile v0Tiles1 + $504, $61, $10
+; 	border_medal_tile v0Tiles1 + $506, $62, $10
 
-; LIGHTNING_MEDAL
-	border_medal_tile v0Tiles1 + $1b8, $63, $10
-	border_medal_tile v0Tiles1 + $1ba, $64, $10
-	border_medal_tile v0Tiles1 + $1bc, $65, $10
-	border_medal_tile v0Tiles1 + $1f8, $66, $10
-	border_medal_tile v0Tiles1 + $1fa, $67, $10
-	border_medal_tile v0Tiles1 + $1fc, $68, $10
-	border_medal_tile v0Tiles1 + $238, $69, $10
-	border_medal_tile v0Tiles1 + $23a, $6a, $10
-	border_medal_tile v0Tiles1 + $23c, $6b, $10
+; ; LIGHTNING_MEDAL
+; 	border_medal_tile v0Tiles1 + $1b8, $63, $10
+; 	border_medal_tile v0Tiles1 + $1ba, $64, $10
+; 	border_medal_tile v0Tiles1 + $1bc, $65, $10
+; 	border_medal_tile v0Tiles1 + $1f8, $66, $10
+; 	border_medal_tile v0Tiles1 + $1fa, $67, $10
+; 	border_medal_tile v0Tiles1 + $1fc, $68, $10
+; 	border_medal_tile v0Tiles1 + $238, $69, $10
+; 	border_medal_tile v0Tiles1 + $23a, $6a, $10
+; 	border_medal_tile v0Tiles1 + $23c, $6b, $10
 
-; PSYCHIC_MEDAL
-	border_medal_tile v0Tiles1 + $2b8, $7e, $10
-	border_medal_tile v0Tiles1 + $2ba, $7f, $10
-	border_medal_tile v0Tiles1 + $2bc, $80, $10
-	border_medal_tile v0Tiles1 + $2f8, $81, $10
-	border_medal_tile v0Tiles1 + $2fa, $82, $10
-	border_medal_tile v0Tiles1 + $2fc, $83, $10
-	border_medal_tile v0Tiles1 + $338, $84, $10
-	border_medal_tile v0Tiles1 + $33a, $85, $10
-	border_medal_tile v0Tiles1 + $33c, $86, $10
+; ; PSYCHIC_MEDAL
+; 	border_medal_tile v0Tiles1 + $2b8, $7e, $10
+; 	border_medal_tile v0Tiles1 + $2ba, $7f, $10
+; 	border_medal_tile v0Tiles1 + $2bc, $80, $10
+; 	border_medal_tile v0Tiles1 + $2f8, $81, $10
+; 	border_medal_tile v0Tiles1 + $2fa, $82, $10
+; 	border_medal_tile v0Tiles1 + $2fc, $83, $10
+; 	border_medal_tile v0Tiles1 + $338, $84, $10
+; 	border_medal_tile v0Tiles1 + $33a, $85, $10
+; 	border_medal_tile v0Tiles1 + $33c, $86, $10
 
-; ROCK_MEDAL
-	border_medal_tile v0Tiles1 + $3b8, $75, $10
-	border_medal_tile v0Tiles1 + $3ba, $76, $10
-	border_medal_tile v0Tiles1 + $3bc, $77, $10
-	border_medal_tile v0Tiles1 + $3f8, $78, $10
-	border_medal_tile v0Tiles1 + $3fa, $79, $10
-	border_medal_tile v0Tiles1 + $3fc, $7a, $10
-	border_medal_tile v0Tiles1 + $438, $7b, $10
-	border_medal_tile v0Tiles1 + $43a, $7c, $10
-	border_medal_tile v0Tiles1 + $43c, $7d, $10
+; ; ROCK_MEDAL
+; 	border_medal_tile v0Tiles1 + $3b8, $75, $10
+; 	border_medal_tile v0Tiles1 + $3ba, $76, $10
+; 	border_medal_tile v0Tiles1 + $3bc, $77, $10
+; 	border_medal_tile v0Tiles1 + $3f8, $78, $10
+; 	border_medal_tile v0Tiles1 + $3fa, $79, $10
+; 	border_medal_tile v0Tiles1 + $3fc, $7a, $10
+; 	border_medal_tile v0Tiles1 + $438, $7b, $10
+; 	border_medal_tile v0Tiles1 + $43a, $7c, $10
+; 	border_medal_tile v0Tiles1 + $43c, $7d, $10
 
-; FIGHTING_MEDAL
-	border_medal_tile v0Tiles1 + $4b8, $6c, $10
-	border_medal_tile v0Tiles1 + $4ba, $6d, $10
-	border_medal_tile v0Tiles1 + $4bc, $6e, $10
-	border_medal_tile v0Tiles1 + $4f8, $6f, $10
-	border_medal_tile v0Tiles1 + $4fa, $70, $10
-	border_medal_tile v0Tiles1 + $4fc, $71, $10
-	border_medal_tile v0Tiles1 + $538, $72, $10
-	border_medal_tile v0Tiles1 + $53a, $73, $10
-	border_medal_tile v0Tiles1 + $53c, $74, $10
-	assert_table_length NUM_MEDALS
+; ; FIGHTING_MEDAL
+; 	border_medal_tile v0Tiles1 + $4b8, $6c, $10
+; 	border_medal_tile v0Tiles1 + $4ba, $6d, $10
+; 	border_medal_tile v0Tiles1 + $4bc, $6e, $10
+; 	border_medal_tile v0Tiles1 + $4f8, $6f, $10
+; 	border_medal_tile v0Tiles1 + $4fa, $70, $10
+; 	border_medal_tile v0Tiles1 + $4fc, $71, $10
+; 	border_medal_tile v0Tiles1 + $538, $72, $10
+; 	border_medal_tile v0Tiles1 + $53a, $73, $10
+; 	border_medal_tile v0Tiles1 + $53c, $74, $10
+; 	assert_table_length NUM_MEDALS
 
 ; decompresses palette data depending on wCurMapSGBPals
 ; then sends it as SGB packet
-SetSGB2AndSGB3MapPalette:
-	ld a, [wConsole]
-	cp CONSOLE_SGB
-	ret nz ; return if not SGB
-	ld a, [wCurMapSGBPals]
-	or a
-	ret z ; not valid
+; SetSGB2AndSGB3MapPalette:
+; 	ld a, [wConsole]
+; 	cp CONSOLE_SGB
+; 	ret nz ; return if not SGB
+; 	ld a, [wCurMapSGBPals]
+; 	or a
+; 	ret z ; not valid
 
-	push hl
-	push bc
-	push de
-	ld a, [wCurMapSGBPals]
-	add a
-	ld c, a
-	ld b, $0
-	ld hl, .pal_data_pointers
-	add hl, bc
-	ld a, [hli]
-	ld h, [hl]
-	ld l, a
-	call DecompressSGBPalette
+; 	push hl
+; 	push bc
+; 	push de
+; 	ld a, [wCurMapSGBPals]
+; 	add a
+; 	ld c, a
+; 	ld b, $0
+; 	ld hl, .pal_data_pointers
+; 	add hl, bc
+; 	ld a, [hli]
+; 	ld h, [hl]
+; 	ld l, a
+; 	call DecompressSGBPalette
 
-	; load palettes to wTempSGBPacket
-	ld hl, wDecompressionBuffer
-	ld de, wTempSGBPacket + 1 ; PAL Packet color #0 (PAL23's SGB2)
-	ld bc, 8 ; pal size
-	call CopyDataHLtoDE
-	ld hl, wDecompressionBuffer + 34
-	ld de, wTempSGBPacket + 9 ; PAL Packet color #4 (PAL23's SGB3)
-	ld bc, 6
-	call CopyDataHLtoDE
+; 	; load palettes to wTempSGBPacket
+; 	ld hl, wDecompressionBuffer
+; 	ld de, wTempSGBPacket + 1 ; PAL Packet color #0 (PAL23's SGB2)
+; 	ld bc, 8 ; pal size
+; 	call CopyDataHLtoDE
+; 	ld hl, wDecompressionBuffer + 34
+; 	ld de, wTempSGBPacket + 9 ; PAL Packet color #4 (PAL23's SGB3)
+; 	ld bc, 6
+; 	call CopyDataHLtoDE
 
-	xor a
-	ld [wTempSGBPacket + 15], a
-	ld hl, wTempSGBPacket
-	ld a, PAL01 << 3 + 1
-	ld [hl], a
-	call Func_704c7
-	call SendSGB
-	pop de
-	pop bc
-	pop hl
-	ret
+; 	xor a
+; 	ld [wTempSGBPacket + 15], a
+; 	ld hl, wTempSGBPacket
+; 	ld a, PAL01 << 3 + 1
+; 	ld [hl], a
+; 	call Func_704c7
+; 	call SendSGB
+; 	pop de
+; 	pop bc
+; 	pop hl
+; 	ret
 
-.pal_data_pointers
-	dw SGBData_MapPals1  ; unused
-	dw SGBData_MapPals1  ; MAP_SGB_PALS_1
-	dw SGBData_MapPals2  ; MAP_SGB_PALS_2
-	dw SGBData_MapPals3  ; MAP_SGB_PALS_3
-	dw SGBData_MapPals4  ; MAP_SGB_PALS_4
-	dw SGBData_MapPals5  ; MAP_SGB_PALS_5
-	dw SGBData_MapPals6  ; MAP_SGB_PALS_6
-	dw SGBData_MapPals7  ; MAP_SGB_PALS_7
-	dw SGBData_MapPals8  ; MAP_SGB_PALS_8
-	dw SGBData_MapPals9  ; MAP_SGB_PALS_9
-	dw SGBData_MapPals10 ; MAP_SGB_PALS_10
+; .pal_data_pointers
+; 	dw SGBData_MapPals1  ; unused
+; 	dw SGBData_MapPals1  ; MAP_SGB_PALS_1
+; 	dw SGBData_MapPals2  ; MAP_SGB_PALS_2
+; 	dw SGBData_MapPals3  ; MAP_SGB_PALS_3
+; 	dw SGBData_MapPals4  ; MAP_SGB_PALS_4
+; 	dw SGBData_MapPals5  ; MAP_SGB_PALS_5
+; 	dw SGBData_MapPals6  ; MAP_SGB_PALS_6
+; 	dw SGBData_MapPals7  ; MAP_SGB_PALS_7
+; 	dw SGBData_MapPals8  ; MAP_SGB_PALS_8
+; 	dw SGBData_MapPals9  ; MAP_SGB_PALS_9
+; 	dw SGBData_MapPals10 ; MAP_SGB_PALS_10
 
 Func_703cb:
 	ld a, [wConsole]
@@ -586,14 +586,14 @@ SendSGBPortraitPalettes:
 	push hl
 	ld hl, SGBData_PlayerPortraitPals
 	call DecompressSGBPalette
-	ld hl, wDecompressionBuffer
+	ld hl, wLoadedPalData
 	ld de, wTempSGBPacket + $1
 	ld bc, $8
 	call CopyDataHLtoDE
 
 	pop hl
 	call DecompressSGBPalette
-	ld hl, wDecompressionBuffer + 2
+	ld hl, wLoadedPalData + 2
 	ld de, wTempSGBPacket + $9
 	ld bc, $6
 	call CopyDataHLtoDE
@@ -774,45 +774,45 @@ SGBData_BorderMedals4:
 	dw $60 ; length
 	INCBIN "data/sgb_data/border_medals_4.bin.lz"
 
-SGBData_MapPals1:
-	dw $20 ; length
-	INCBIN "data/sgb_data/map_pals_1.bin.lz"
+; SGBData_MapPals1:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/map_pals_1.bin.lz"
 
-SGBData_MapPals2:
-	dw $20 ; length
-	INCBIN "data/sgb_data/map_pals_2.bin.lz"
+; SGBData_MapPals2:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/map_pals_2.bin.lz"
 
-SGBData_MapPals3:
-	dw $20 ; length
-	INCBIN "data/sgb_data/map_pals_3.bin.lz"
+; SGBData_MapPals3:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/map_pals_3.bin.lz"
 
-SGBData_MapPals4:
-	dw $20 ; length
-	INCBIN "data/sgb_data/map_pals_4.bin.lz"
+; SGBData_MapPals4:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/map_pals_4.bin.lz"
 
-SGBData_MapPals5:
-	dw $20 ; length
-	INCBIN "data/sgb_data/map_pals_5.bin.lz"
+; SGBData_MapPals5:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/map_pals_5.bin.lz"
 
-SGBData_MapPals6:
-	dw $20 ; length
-	INCBIN "data/sgb_data/map_pals_6.bin.lz"
+; SGBData_MapPals6:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/map_pals_6.bin.lz"
 
-SGBData_MapPals7:
-	dw $20 ; length
-	INCBIN "data/sgb_data/map_pals_7.bin.lz"
+; SGBData_MapPals7:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/map_pals_7.bin.lz"
 
-SGBData_MapPals8:
-	dw $20 ; length
-	INCBIN "data/sgb_data/map_pals_8.bin.lz"
+; SGBData_MapPals8:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/map_pals_8.bin.lz"
 
-SGBData_MapPals9:
-	dw $20 ; length
-	INCBIN "data/sgb_data/map_pals_9.bin.lz"
+; SGBData_MapPals9:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/map_pals_9.bin.lz"
 
-SGBData_MapPals10:
-	dw $20 ; length
-	INCBIN "data/sgb_data/map_pals_10.bin.lz"
+; SGBData_MapPals10:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/map_pals_10.bin.lz"
 
 SGBData_CharizardIntro:
 	dw $20 ; length
@@ -826,21 +826,21 @@ SGBData_AerodactylIntro:
 	dw $20 ; length
 	INCBIN "data/sgb_data/aerodactyl_intro_pals.bin.lz"
 
-SGBData_ColosseumBooster:
-	dw $20 ; length
-	INCBIN "data/sgb_data/colosseum_booster_pals.bin.lz"
+; SGBData_ColosseumBooster:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/colosseum_booster_pals.bin.lz"
 
-SGBData_EvolutionBooster:
-	dw $20 ; length
-	INCBIN "data/sgb_data/evolution_booster_pals.bin.lz"
+; SGBData_EvolutionBooster:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/evolution_booster_pals.bin.lz"
 
-SGBData_MysteryBooster:
-	dw $20 ; length
-	INCBIN "data/sgb_data/mystery_booster_pals.bin.lz"
+; SGBData_MysteryBooster:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/mystery_booster_pals.bin.lz"
 
-SGBData_LaboratoryBooster:
-	dw $20 ; length
-	INCBIN "data/sgb_data/laboratory_booster_pals.bin.lz"
+; SGBData_LaboratoryBooster:
+; 	dw $20 ; length
+; 	INCBIN "data/sgb_data/laboratory_booster_pals.bin.lz"
 
 SGBData_PlayerPortraitPals:
 	dw $20 ; length
@@ -1014,13 +1014,13 @@ SGBData_GameBoyLink:
 	dw $40 ; length
 	INCBIN "data/sgb_data/gameboy_link_pals.bin.lz"
 
-SGBData_CardPop:
-	dw $40 ; length
-	INCBIN "data/sgb_data/card_pop_pals.bin.lz"
+; SGBData_CardPop:
+; 	dw $40 ; length
+; 	INCBIN "data/sgb_data/card_pop_pals.bin.lz"
 
-SGBData_GameBoyPrinter:
-	dw $40 ; length
-	INCBIN "data/sgb_data/gameboy_printer_pals.bin.lz"
+; SGBData_GameBoyPrinter:
+; 	dw $40 ; length
+; 	INCBIN "data/sgb_data/gameboy_printer_pals.bin.lz"
 
 SGBData_TitleScreen:
 	dw $40 ; length

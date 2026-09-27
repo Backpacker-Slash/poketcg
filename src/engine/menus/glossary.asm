@@ -15,7 +15,7 @@ OpenGlossaryScreen:
 	xor a
 	ld [wCheckMenuCursorBlinkCounter], a
 .next
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	call DoFrame
 	ldh a, [hKeysPressed]
@@ -46,7 +46,7 @@ OpenGlossaryScreen:
 	jr .next
 
 .on_select
-	ld a, MENU_CONFIRM
+	ld a, $01
 	farcall PlaySFXConfirmOrCancel
 .change_page
 	ld a, [wGlossaryPageNo]
@@ -60,7 +60,7 @@ OpenGlossaryScreen:
 	xor a
 	ld [wTileMapFill], a
 	call ZeroObjectPositions
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	call DoFrame
 	call EmptyScreen
@@ -185,7 +185,7 @@ OpenGlossaryScreen:
 	and PAD_B
 	jr z, .loop
 
-	ld a, MENU_CANCEL
+	ld a, -1
 	farcall PlaySFXConfirmOrCancel
 	ret
 

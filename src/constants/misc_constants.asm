@@ -14,19 +14,19 @@ DEF FLUSH_ALL_PALS_F EQU 6
 
 ; Game event constants (wGameEvent)
 	const_def
-	const GAME_EVENT_OVERWORLD         ; $0
+	;const GAME_EVENT_OVERWORLD         ; $0
 	const GAME_EVENT_DUEL              ; $1
 	const GAME_EVENT_BATTLE_CENTER     ; $2
-	const GAME_EVENT_GIFT_CENTER       ; $3
-	const GAME_EVENT_CREDITS           ; $4
+	;const GAME_EVENT_GIFT_CENTER       ; $3
+	;const GAME_EVENT_CREDITS           ; $4
 	const GAME_EVENT_CONTINUE_DUEL     ; $5
 	const GAME_EVENT_CHALLENGE_MACHINE ; $6
 DEF NUM_GAME_EVENTS EQU const_value
 
-DEF OWMODE_MAP            EQU 0
-DEF OWMODE_MOVE           EQU 1
-DEF OWMODE_START_SCRIPT   EQU 2
-DEF OWMODE_SCRIPT         EQU 3
+; DEF OWMODE_MAP            EQU 0
+; DEF OWMODE_MOVE           EQU 1
+; DEF OWMODE_START_SCRIPT   EQU 2
+; DEF OWMODE_SCRIPT         EQU 3
 
 ; overworld NPC flag constants (see wOverworldNPCFlags)
 DEF AUTO_CLOSE_TEXTBOX       EQU 0
@@ -71,9 +71,5 @@ DEF NULL EQU $0000
 DEF FALSE EQU 0
 DEF TRUE  EQU 1
 
-; RNGs
-RSRESET
-DEF RNGVARS_RNG_1       RB ; 0
-DEF RNGVARS_RNG_2       RB ; 1
-DEF RNGVARS_RNG_COUNTER RB ; 2
-DEF RNGVARS_SIZE EQU _RS ; 3
+DEF VARS_RECEIVED  EQU 2
+DEF START_DUEL     EQU 3

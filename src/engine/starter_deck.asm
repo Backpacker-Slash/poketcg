@@ -5,59 +5,59 @@
 ;   $0 = Charmander
 ;   $1 = Squirtle
 ;   $2 = Bulbasaur
-_AddStarterDeck:
-	add a
-	ld e, a
-	ld d, 0
-	ld hl, .StarterCardIDs
-	add hl, de
-	ld a, PLAYER_TURN
-	ldh [hWhoseTurn], a
-	ld a, [hli] ; main deck
-	add 2
-	push hl
-	ld hl, sDeck1
-	call CopyDeckNameAndCards
-	pop hl
-	call SwapTurn
-	ld a, [hli] ; extra deck
-	add 2
-	call LoadDeck
-	call SwapTurn
+; _AddStarterDeck:
+; 	add a
+; 	ld e, a
+; 	ld d, 0
+; 	ld hl, .StarterCardIDs
+; 	add hl, de
+; 	ld a, PLAYER_TURN
+; 	ldh [hWhoseTurn], a
+; 	ld a, [hli] ; main deck
+; 	add 2
+; 	push hl
+; 	ld hl, sDeck1
+; 	call CopyDeckNameAndCards
+; 	pop hl
+; 	call SwapTurn
+; 	ld a, [hli] ; extra deck
+; 	add 2
+; 	call LoadDeck
+; 	call SwapTurn
 
-; wPlayerDeck = main starter deck
-; wOpponentDeck = extra cards
-	call EnableSRAM
-	ld h, HIGH(sCardCollection)
-	ld de, wPlayerDeck
-	ld c, DECK_SIZE
-.loop_main_cards
-	ld a, [de]
-	inc de
-	ld l, a
-	res CARD_NOT_OWNED_F, [hl]
-	dec c
-	jr nz, .loop_main_cards
+; ; wPlayerDeck = main starter deck
+; ; wOpponentDeck = extra cards
+; 	call EnableSRAM
+; 	ld h, HIGH(sCardCollection)
+; 	ld de, wPlayerDeck
+; 	ld c, DECK_SIZE
+; .loop_main_cards
+; 	ld a, [de]
+; 	inc de
+; 	ld l, a
+; 	res CARD_NOT_OWNED_F, [hl]
+; 	dec c
+; 	jr nz, .loop_main_cards
 
-	ld h, HIGH(sCardCollection)
-	ld de, wOpponentDeck
-	ld c, 30 ; number of extra cards
-.loop_extra_cards
-	ld a, [de]
-	inc de
-	ld l, a
-	res CARD_NOT_OWNED_F, [hl]
-	inc [hl]
-	dec c
-	jr nz, .loop_extra_cards
-	call DisableSRAM
-	ret
+; 	ld h, HIGH(sCardCollection)
+; 	ld de, wOpponentDeck
+; 	ld c, 30 ; number of extra cards
+; .loop_extra_cards
+; 	ld a, [de]
+; 	inc de
+; 	ld l, a
+; 	res CARD_NOT_OWNED_F, [hl]
+; 	inc [hl]
+; 	dec c
+; 	jr nz, .loop_extra_cards
+; 	call DisableSRAM
+; 	ret
 
-.StarterCardIDs
-	; main deck, extra cards
-	db CHARMANDER_AND_FRIENDS_DECK_ID, CHARMANDER_EXTRA_DECK_ID
-	db SQUIRTLE_AND_FRIENDS_DECK_ID,   SQUIRTLE_EXTRA_DECK_ID
-	db BULBASAUR_AND_FRIENDS_DECK_ID,  BULBASAUR_EXTRA_DECK_ID
+; .StarterCardIDs
+; 	; main deck, extra cards
+; 	db CHARMANDER_AND_FRIENDS_DECK_ID, CHARMANDER_EXTRA_DECK_ID
+; 	db SQUIRTLE_AND_FRIENDS_DECK_ID,   SQUIRTLE_EXTRA_DECK_ID
+; 	db BULBASAUR_AND_FRIENDS_DECK_ID,  BULBASAUR_EXTRA_DECK_ID
 
 ; clears saved data (card Collection/saved decks/Card Pop! data/etc)
 ; then adds the starter decks as saved decks
@@ -90,18 +90,18 @@ InitSaveData:
 
 ; marks all cards in Collection to not owned
 	call EnableSRAM
-	ld hl, sCardCollection
-	ld a, CARD_NOT_OWNED
-.loop_collection
-	ld [hl], a
-	inc l
-	jr nz, .loop_collection
+; 	ld hl, sCardCollection
+; 	ld a, CARD_NOT_OWNED
+; .loop_collection
+; 	ld [hl], a
+; 	inc l
+; 	jr nz, .loop_collection
 
 	ld hl, sCurrentDuel
 	xor a
-	ld [hli], a ; sCurrentDuelValid
+	ld [hli], a
 	ld [hli], a ; sCurrentDuelChecksum
-	ld [hl], a  ; sCurrentDuelChecksum
+	ld [hl], a
 
 ; clears Card Pop! names
 	ld hl, sCardPopNameList
@@ -118,6 +118,7 @@ InitSaveData:
 	ld [sPrinterContrastLevel], a
 	ld a, TEXT_SPEED_3
 	ld [sTextSpeed], a
+	; ld a, TEXT_SPEED_5
 	ld [wTextSpeed], a
 
 ; miscellaneous data

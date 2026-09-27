@@ -3,7 +3,7 @@ INCLUDE "constants.asm"
 
 INCLUDE "vram.asm"
 
-SECTION "WRAM", WRAM0
+SECTION "WRAM0", WRAM0
 
 UNION
 
@@ -12,9 +12,7 @@ wTempCardCollection:: ; c000
 
 NEXTU
 
-; used in DrawLabeledTextBox to draw the top border
-; of a label text box (with top border symbols and NPC name)
-wLabeledTextBoxTopBorder:: ; c000
+wc000:: ; c000
 	ds $100
 
 NEXTU
@@ -50,7 +48,7 @@ ENDU
 
 	ds $100
 
-SECTION "WRAM Duels 1", WRAM0
+SECTION "WRAM0 Duels 1", WRAM0
 
 ; this union spans from c200 to c3ff
 UNION
@@ -112,7 +110,6 @@ wNameBuffer:: ; c500
 ; this holds an $ff-terminated list of card deck indexes (e.g. cards in hand or in bench)
 ; or (less often) the attack list of a Pokemon card
 wDuelTempList:: ; c510
-	vc_hook Unknown_disable_menu_3
 	ds $80
 
 UNION
@@ -120,10 +117,6 @@ UNION
 ; this is kept updated with some default text that is used
 ; when the text printing functions are called with text id $0000
 wDefaultText:: ; c590
-	vc_hook Disable_Lightning_Club_Card_Pop_bookcase
-	vc_hook Disable_Ishiharas_house_Phantom_Card_bookcase
-	vc_hook Disable_Gift_Center_clerk
-	vc_hook Disable_Battle_Center_clerk
 	ds $3c
 
 NEXTU
@@ -158,9 +151,21 @@ wOtherIRCommunicationParams:: ; c5ef
 wCardPopNameSearchResult:: ; c5f3
 	ds $1
 
-	ds $c
 
-SECTION "WRAM Text Engine", WRAM0
+
+	
+	ds $9;$c
+
+wP1_Ready:: ;WRA0 C5FD
+	ds $1
+
+wP2_Ready:: ;WRA0 C5FE
+	ds $1
+
+wSkipAnimations::
+	ds $1
+
+SECTION "WRAM0 Text Engine", WRAM0
 
 wc600:: ; c600
 	ds $100
@@ -168,13 +173,14 @@ wc600:: ; c600
 wc700:: ; c700
 	ds $100
 
+wSerialSendBuf::
 wc800:: ; c800
 	ds $100
-
+wSerialRecvBuf::
 wc900:: ; c900
 	ds $100
 
-SECTION "WRAM 1", WRAM0
+SECTION "WRAM0 1", WRAM0
 
 wOAM:: ; ca00
 	ds OAM_SIZE
@@ -270,7 +276,6 @@ wPlayTimeCounterEnable:: ; cac4
 wPlayTimeCounter:: ; cac5
 	ds $5
 
-wRNGVars::
 wRNG1:: ; caca
 	ds $1
 
@@ -358,15 +363,15 @@ wObjectPalettesCGB:: ; cb30
 wListPointer:: ; cb72
 	ds $2
 
-SECTION "WRAM Serial Transfer", WRAM0
+SECTION "WRAM0 Serial Transfer", WRAM0
 
 wSerialOp:: ; cb74
 	ds $1
 
-wSerialFlags:: ; cb75
+wSerialSendState::;wSerialFlags:: ; cb75
 	ds $1
 
-wSerialCounter:: ; cb76
+wSerialRecvState::;wSerialCounter:: ; cb76
 	ds $1
 
 wSerialCounter2:: ; cb77
@@ -375,47 +380,45 @@ wSerialCounter2:: ; cb77
 wSerialTimeoutCounter:: ; cb78
 	ds $1
 
-; stores a stack pointer to be used with wSerialReturnAddress
-wSerialReturnSP:: ; cb79
+wcb79:: ; cb79
 	ds $2
 
-; stores a return address to be used with wSerialReturnSP
-wSerialReturnAddress:: ; cb7b
+wcb7b:: ; cb7b
 	ds $2
 
-wSerialSendSave:: ; cb7d
+; wSerialSendSave:: ; cb7d // no longer used and free
 	ds $1
 
 wSerialSendBufToggle:: ; cb7e
 	ds $1
 
-wSerialSendBufIndex:: ; cb7f
+; wSerialSendBufIndex:: ; cb7f // no longer used and free
 	ds $1
 
-wcb80:: ; cb80
+; wcb80:: ; cb80 / no longer used // free
 	ds $1
 
-wSerialSendBuf:: ; cb81
+; wSerialSendBuf:: ; cb81
 	ds $20
 
-wSerialLastReadCA:: ; cba1
+; wSerialLastReadCA:: ; cba1 // no longer used // free
 	ds $1
 
 wSerialRecvCounter:: ; cba2
 	ds $1
 
-wcba3:: ; cba3
+; WSerialbufferReadIndex:: ; cba3 // no longer used // free
 	ds $1
 
-wSerialRecvIndex:: ; cba4
+; wSerialRecvIndex:: ; cba4 // no longer used // free
 	ds $1
 
-wSerialRecvBuf:: ; cba5
+; wSerialRecvBuf:: ; cba5
 	ds $20
 
 wSerialEnd:: ; cbc5
 
-SECTION "WRAM Duels 2", WRAM0
+SECTION "WRAM0 Duels 2", WRAM0
 
 	ds $1
 
@@ -544,7 +547,6 @@ wEnergyDiscardPlayAreaLocation:: ; cbe0
 wOpponentTurnEnded:: ; cbe1
 	ds $1
 
-wOppRNGVars::
 wOppRNG1:: ; cbe2
 	ds $1
 
@@ -629,8 +631,6 @@ wPokemonLengthPrintOffset:: ; cc03
 wAttackPageNumber:: ; cc04
 	ds $1
 
-wDuelStates:: ; cc05
-
 ; the value of hWhoseTurn gets loaded here at the beginning of each duelist's turn.
 ; more reliable than hWhoseTurn, as hWhoseTurn may change temporarily in order to handle status
 ; conditions or other events of the non-turn duelist. used mostly between turns (to check which
@@ -678,7 +678,7 @@ wDuelistType:: ; cc0d
 wOpponentDeckID:: ; cc0e
 	ds $1
 
-wUnused_cc0f:: ; cc0f
+wcc0f:: ; cc0f
 	ds $1
 
 ; index (0-1) of the attack or Pokemon Power being used by the player's arena card
@@ -720,8 +720,6 @@ wNPCDuelDeckID:: ; cc19
 wDuelTheme:: ; cc1a
 	ds $1
 
-wDuelStatesEnd::
-
 ; holds the energies attached to a given pokemon card. 1 byte for each of the
 ; 8 energy types (includes the unused one that shares byte with the colorless energy)
 wAttachedEnergies:: ; cc1b
@@ -755,9 +753,8 @@ wAIMinDamage:: ; ccbb
 wAIMaxDamage:: ; ccbc
 	ds $1
 
-; holds amount of HP recovered in ApplyAndAnimateHPRecovery
-; only written to, never read
-wUnused_HPRecoverAmount:: ; ccbd
+; only written, never read
+wccbd:: ; ccbd
 	ds $2
 
 ; damage dealt by an attack to a target
@@ -779,8 +776,7 @@ wTempNonTurnDuelistCardID:: ; ccc4
 	ds $1
 
 ; the status condition of the defending Pokemon is loaded here after an attack
-; only written to, never read
-wUnused_DefendingPkmnStatus:: ; ccc5
+wccc5:: ; ccc5
 	ds $1
 
 ; *_ATTACK constants for selected attack
@@ -822,8 +818,7 @@ wStatusConditionQueue:: ; ccce
 wIsDamageToSelf:: ; cce6
 	ds $1
 
-; set to 0, never used
-wUnused_cce7:: ; cce7
+wcce7:: ; cce7
 	ds $1
 
 wDuelFinishParam:: ; cce8
@@ -837,10 +832,7 @@ wDeckName:: ; cce9
 wTempPlayAreaLocation_cceb:: ; cceb
 	ds $1
 
-; when sending attack data to opponent, is set to TRUE
-; seems to be used to avoid sending duplicate data
-; when using an attack through Metronome
-wSentAttackDataToLinkOpponent:: ; ccec
+wccec:: ; ccec
 	ds $1
 
 ; used by the effect functions to return the cause of an effect to fail
@@ -874,7 +866,7 @@ wNoEffectFromWhichStatus:: ; ccf1
 wSkipDelayAllowed:: ; ccf2
 	ds $1
 
-SECTION "WRAM 2", WRAM0
+SECTION "WRAM0 2", WRAM0
 
 ; on CGB, attributes of the text box borders. (values 0-7 seem to be used, which only affect palette)
 ; on SGB, colorize text box border with SGB1 if non-0
@@ -1205,8 +1197,7 @@ wAIRetreatFlags:: ; cdda
 wAITriedAttack:: ; cddb
 	ds $1
 
-; set to 0, never used
-wUnused_cddc:: ; cddc
+wcddc:: ; cddc
 	ds $1
 
 ; used to temporarily backup wPlayAreaAIScore values.
@@ -1624,16 +1615,8 @@ wce98:: ; ce98
 wPrinterContrastLevel:: ; ce99
 	ds $1
 
-UNION
-
-wPrinterStartCardID:: ; ce9a
-	ds $1
-
-NEXTU
 wPrizeCardSelectionFrameCounter:: ; ce9a
 	ds $1
-
-ENDU
 
 ; related to printer serial stuff
 wPrinterNumberLineFeeds:: ; ce9b
@@ -1830,6 +1813,7 @@ wCurDeckCards:: ; cf17
 
 wCurDeckCardsEnd::
 
+
 ; list of all the different cards in a deck configuration
 wUniqueDeckCardList:: ; cf68
 
@@ -1932,6 +1916,7 @@ wNamingScreenBuffer:: ; cfe7
 wNamingScreenBufferLength:: ; cfff
 	ds $1
 
+SECTION "WRAM1", WRAMX
 wNamingScreenDestPointer:: ; d000
 	ds $2
 
@@ -2143,17 +2128,17 @@ wConfigCursorYPos:: ; d11b
 wCursorBlinkTimer:: ; d11c
 	ds $1
 
-wPCPackSelection:: ; d11d
+; wPCPackSelection:: ; d11d
 	ds $1
 
 ; 7th bit of each pack corresponds to whether or not it's been read
-wPCPacks:: ; d11e
-	ds NUM_PC_PACKS
+; wPCPacks:: ; d11e
+	ds $f;NUM_PC_PACKS
 
 wPCLastDirectionPressed:: ; d12d
 	ds $1
 
-wSelectedPCPack:: ; d12e
+; wSelectedPCPack:: ; d12e
 	ds $1
 
 wBGMapWidth:: ; d12f
@@ -2225,15 +2210,19 @@ wBGMapCGBMode:: ; d23c
 wBGMapBank:: ; d23d
 	ds $1
 
+UNION
+
 ; palette loaded from Palette* data
 wLoadedPalData:: ; d23e
+	ds $50
 
-; temporary frame data loaded in HandleAnimationFrame
-wLoadedFrameData:: ; d23e
+NEXTU
 
 ; where BG map data or other compressed data is decompressed
 wDecompressionBuffer:: ; d23e
-	ds $50
+	ds $40
+
+ENDU
 
 wDecompressionRowWidth:: ; d28e
 	ds $1
@@ -2305,10 +2294,10 @@ wNumLoadedFramesetSubgroups:: ; d322
 
 ; holds the current state of each event
 ; each corresponding to a MAP_EVENT_* constant
-; if FALSE, doors are closed / deck machines are deactivated
-; if TRUE, doors are open / deck machines are activated
-wOWMapEvents:: ; d323
-	ds NUM_MAP_EVENTS
+; if $0, doors are closed / deck machines are deactivated
+; if $1, doors are open / deck machines are activated
+; wOWMapEvents:: ; d323
+; 	ds NUM_MAP_EVENTS
 
 ; the OWMAP_* value for the current overworld map selection
 wOverworldMapSelection:: ; d32e
@@ -2470,10 +2459,10 @@ wNumSRAMValidationErrors:: ; d3c7
 wPlayTimeHourMinutes:: ; d3c8
 	ds $3
 
-wCurOverworldMap:: ; d3cb
+; wCurOverworldMap:: ; d3cb
 	ds $1
 
-wMedalCount:: ; d3cc
+; wMedalCount:: ; d3cc
 	ds $1
 
 ; total number of cards the player has collected
@@ -2683,29 +2672,12 @@ wGeneralSaveDataByteCount:: ; d4c8
 ; stores tile offset in VRAM
 wVRAMTileOffset:: ; d4ca
 
-; for LoadOBPalette
-; which object palette to load to (DMG)
-wWhichOBP:: ; d4ca
-
-; temporary storage of variables when
-; calculating booster chances of cards
-wTempBoosterChances:: ; d4ca
-
-; current frame to load when processing an animation
-wWhichAnimationFrame:: ; d4ca
+wd4ca:: ; d4ca
 	ds $1
 
-; for LoadOBPalette
-; which object palette index to load to (CGB)
-wWhichOBPalIndex:: ; d4cb
-
-; for LoadBGPalette
-; which background palette index to load to (CGB)
-wWhichBGPalIndex:: ; d4cb
-
-; stores which VRAM bank to draw certain gfx
+; bottom bit stores which VRAM bank to draw certain gfx
 ; $0 = VRAM0, $1 = VRAM1
-wWhichVRAMBank:: ; d4cb
+wd4cb:: ; d4cb
 	ds $1
 
 	ds $3
@@ -2842,7 +2814,9 @@ wStartMenuChoice:: ; d628
 wTitleScreenSprites:: ; d629
 	ds $7
 
-	ds $1
+wPlayerPortrait:: ;D625
+	ds $1	
+	; ds $1
 
 ; pointer to commands used by opening and credits sequence
 ; (see IntroSequence and CreditsSequence)
@@ -2945,12 +2919,12 @@ wBoosterData_RareAmount:: ; d670
 
 ; how many cards of each type are available of a certain rarity in the booster pack's set
 wBoosterAmountOfCardTypeTable:: ; d671
-	ds NUM_BOOSTER_CARD_TYPES
+	ds $08;NUM_BOOSTER_CARD_TYPES
 
 ; holds information similar to wBoosterData_TypeChances, except that it contains 00 on any type
 ; of which there are no cards remaining in the set for the current rarity
 wBoosterTempTypeChancesTable:: ; d67a
-	ds NUM_BOOSTER_CARD_TYPES
+	ds $08;NUM_BOOSTER_CARD_TYPES
 
 ; properties of the card being currently processed by the booster pack engine functions
 wBoosterCurrentCardType:: ; d683
@@ -2967,7 +2941,7 @@ wBoosterData_Set:: ; d686
 wBoosterData_EnergyFunctionPointer:: ; d687
 	ds $2
 wBoosterData_TypeChances:: ; d689
-	ds NUM_BOOSTER_CARD_TYPES
+	ds $08;NUM_BOOSTER_CARD_TYPES
 
 ; index into ChallengeMachine_OpponentDeckIDs
 ; not the typical NPC duelist ID
@@ -2992,9 +2966,21 @@ wCardReceived:: ; d697
 wd698:: ; d698
 	ds $4
 
-	ds $6e4
+	ds $6c3;ds $6e4
 
-SECTION "WRAM Audio", WRAM0
+; 1764 - 32 = 1732
+wLinkOpponentAvatar:: ; dd51
+	ds $1
+
+wPlayerName_:: ; dd52
+	ds NAME_BUFFER_LENGTH ;EQU $10
+
+wOpponentName_:: ; dd62
+	ds NAME_BUFFER_LENGTH ;EQU $10	
+
+
+
+SECTION "WRAM1 Audio", WRAMX
 
 ; bit 7 is set once the song has been started
 wCurSongID:: ; dd80

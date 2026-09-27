@@ -6,47 +6,47 @@ SendDeckConfiguration:
 	farcall _SendDeckConfiguration
 	ret
 
-ReceiveCard:
-	farcall _ReceiveCard
-	ret
+; ReceiveCard:
+; 	farcall _ReceiveCard
+; 	ret
 
-SendCard:
-	farcall _SendCard
-	ret
+; SendCard:
+; 	farcall _SendCard
+; 	ret
 
 ; handles all the Card Pop! functionality
-DoCardPop:
-	farcall _DoCardPop
-	ret
+; DoCardPop:
+; 	farcall _DoCardPop
+; 	ret
 
-AddStarterDeck:
-	farcall _AddStarterDeck
-	ret
+; AddStarterDeck:
+; 	farcall _AddStarterDeck
+; 	ret
 
-PreparePrinterConnection:
-	farcall _PreparePrinterConnection
-	ret
+; PreparePrinterConnection:
+; 	farcall _PreparePrinterConnection
+; 	ret
 
-PrintDeckConfiguration:
-	farcall _PrintDeckConfiguration
-	ret
+; PrintDeckConfiguration:
+; 	farcall _PrintDeckConfiguration
+; 	ret
 
-PrintCardList:
-	farcall _PrintCardList
-	ret
+; PrintCardList:
+; 	farcall _PrintCardList
+; 	ret
 
-RequestToPrintCard:
-	farcall _RequestToPrintCard
-	ret
+; RequestToPrintCard:
+; 	farcall _RequestToPrintCard
+; 	ret
 
 SetUpAndStartLinkDuel::
 	farcall _SetUpAndStartLinkDuel
 	ret
 
-ShowPromotionalCardScreen:
-	farcall _ShowPromotionalCardScreen
-	ret
+; ShowPromotionalCardScreen:
+; 	farcall _ShowPromotionalCardScreen
+; 	ret
 
-OpenBoosterPack:
-	farcall _OpenBoosterPack
-	ret
+; OpenBoosterPack:
+; 	farcall _OpenBoosterPack
+; 	ret

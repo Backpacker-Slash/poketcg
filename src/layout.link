@@ -38,19 +38,19 @@ ROMX $01
 ROMX $02
 	"Menus 1"
 ROMX $03
-	"Overworld Scripting"
+	"Card List";"Overworld Scripting"
 ROMX $04
 	"Menus 2"
 	"Color"
-	"Gift Center Menu"
-	"Overworld Map"
+	;"Gift Center Menu"
+	;"Overworld Map"
 	"Save"
-	"Map Scripts"
+	;"Map Scripts"
 	"Menus 3"
 	"Sprite Animations"
 	"Scenes"
 	"Challenge Machine"
-	"Map Objects"
+	;"Map Objects"
 ROMX $05
 	"AI Logic 1"
 ROMX $06
@@ -59,21 +59,21 @@ ROMX $06
 	"Animation Commands"
 	"IR Communications Core"
 	"Sprite Animations VBlank"
-	"Starter Deck"
+	;"Starter Deck"
 	"Link Functions"
-	"Promotional Card"
-	"Booster Pack Menu"
-	"Unused Save Validation"
+	;"Promotional Card"
+	;"Booster Pack Menu"
+	;"Unused Save Validation"
 	"Input Name"
 	"Auto Deck Machines"
 ROMX $07
-	"Bank 7"
+	;"Bank 7"
 	"Duel Animations"
 	"Start Menu"
 	"Intro Sequence"
-	"Unused Copyright"
-	"Credits Sequence"
-	"Booster Packs"
+	;"Unused Copyright"
+	;"Credits Sequence"
+	;"Booster Packs"
 ROMX $08
 	"AI Logic 2"
 ROMX $0b
@@ -114,7 +114,7 @@ ROMX $1d
 ROMX $1e
 	"Gfx 2"
 ROMX $20
-	"Load Gfx"
+	"Bank 20"
 	"Gfx"
 ROMX $21
 	"Gfx 3"
@@ -175,14 +175,16 @@ ROMX $3e
 ROMX $3f
 	"Audio 3"
 WRAM0
-	"WRAM"
-	"WRAM Duels 1"
-	"WRAM Text Engine"
-	"WRAM 1"
-	"WRAM Serial Transfer"
-	"WRAM Duels 2"
-	"WRAM 2"
-	"WRAM Audio"
+	"WRAM0"
+	"WRAM0 Duels 1"
+	"WRAM0 Text Engine"
+	"WRAM0 1"
+	"WRAM0 Serial Transfer"
+	"WRAM0 Duels 2"
+	"WRAM0 2"
+WRAMX 1
+	"WRAM1"
+	"WRAM1 Audio"
 VRAM $00
 	"VRAM0"
 VRAM $01

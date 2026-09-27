@@ -29,6 +29,32 @@ TossCoin::
 	pop hl
 	ret
 
+; TossCoin_Heads::
+; 	push hl
+; 	ld hl, wCoinTossScreenTextID
+; 	ld [hl], e
+; 	inc hl
+; 	ld [hl], d
+; 	ld a, 1
+; 	bank1call _TossCoin_Heads
+; 	ld hl, wDuelDisplayedScreen
+; 	ld [hl], 0
+; 	pop hl
+; 	ret
+
+; TossCoin_Tails::
+; 	push hl
+; 	ld hl, wCoinTossScreenTextID
+; 	ld [hl], e
+; 	inc hl
+; 	ld [hl], d
+; 	ld a, 1
+; 	bank1call _TossCoin_Tails
+; 	ld hl, wDuelDisplayedScreen
+; 	ld [hl], 0
+; 	pop hl
+; 	ret
+
 ; cp de, bc
 CompareDEtoBC::
 	ld a, d

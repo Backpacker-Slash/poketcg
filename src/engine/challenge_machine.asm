@@ -69,7 +69,7 @@ ChallengeMachine_Start::
 	call EnableSRAM
 	xor a
 	ld [sPlayerInChallengeMachine], a
-	bank1call ClearSavedDuel
+	bank1call DiscardSavedDuelData
 	call DisableSRAM
 	call ChallengeMachine_GetCurrentOpponent
 	call ChallengeMachine_RecordDuelResult
@@ -233,6 +233,21 @@ ChallengeMachine_RecordDuelResult:
 	ld [hl], a
 	call DisableSRAM
 	ret
+
+; increment the 16-bit value at hl
+; without going above 9999
+Profile_IncrementHLMax9999::
+    call EnableSRAM
+
+    inc hl
+    ld a, [hld]
+    cp HIGH(9999)
+    jr nz, ChallengeMachine_IncrementHLMax999.increment
+
+    ld a, [hl]
+    cp LOW(9999)
+    jr z, ChallengeMachine_IncrementHLMax999.skip
+	jr  ChallengeMachine_IncrementHLMax999.increment
 
 ; increment the value at hl
 ; without going above 999

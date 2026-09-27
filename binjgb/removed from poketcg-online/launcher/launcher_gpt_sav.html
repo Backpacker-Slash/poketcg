@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCG RAM-Sync Launcher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use working PeerJS host -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Fira Code', monospace; }
+        canvas { 
+            image-rendering: pixelated; 
+            width: 480px; 
+            height: 432px; 
+            background: #000; 
+            border: 4px solid #334155;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            outline: none;
+        }
+        canvas:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
+        }
+        .crt-overlay {
+            pointer-events: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            z-index: 10;
+        }
+        .log-line { border-left: 2px solid #3b82f6; padding-left: 8px; margin-bottom: 4px; font-size: 0.75rem; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center min-h-screen">
+
+    <div class="w-full max-w-6xl flex justify-between items-center mb-6 bg-slate-800 p-4 rounded-lg border border-slate-700">
+        <div>
+            <h1 class="text-xl font-bold text-blue-400">TCG RAM-SYNC <span class="text-xs text-slate-500 font-normal">v0.2.8</span></h1>
+            <div class="text-sm">STATUS: <span id="conn-status" class="text-yellow-500 font-bold uppercase">Disconnected</span></div>
+        </div>
+        <div class="flex gap-4 items-center">
+            <div class="text-right">
+                <div class="text-[10px] text-slate-400">MY ID</div>
+                <div id="my-id" class="text-sm font-bold text-white tracking-widest">----</div>
+            </div>
+            <input type="text" id="remote-id" placeholder="PARTNER ID" class="bg-slate-900 border border-slate-600 px-3 py-1 rounded text-sm focus:outline-none focus:border-blue-500">
+            <button id="btn-connect" class="bg-blue-600 hover:bg-blue-500 px-4 py-1 rounded text-sm font-bold transition">CONNECT</button>
+        </div>
+    </div>
+
+    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-3 flex flex-col gap-4">
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-tighter">ROM & Save</h3>
+                <input type="file" id="rom-upload" class="hidden" accept=".gb,.gbc">
+                <button onclick="document.getElementById('rom-upload').click()" class="w-full bg-slate-700 hover:bg-slate-600 py-2 rounded text-xs font-bold mb-2">Upload ROM</button>
+
+                <input type="file" id="sav-upload" class="hidden" accept=".sav">
+                <button onclick="document.getElementById('sav-upload').click()" class="w-full bg-slate-700 hover:bg-slate-600 py-2 rounded text-xs font-bold mb-2">Load .SAV</button>
+
+                <button id="btn-reload" class="w-full bg-purple-700 hover:bg-purple-600 py-2 rounded text-xs font-bold mb-2" disabled>Reload with Save</button>
+
+                <button id="btn-save-sav" class="w-full bg-green-700 hover:bg-green-600 py-2 rounded text-xs font-bold" disabled>Save .SAV</button>
+
+                <div id="rom-info" class="text-[10px] text-slate-500 italic text-center mt-2">No ROM loaded</div>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex-1 flex flex-col overflow-hidden max-h-[400px]">
+                <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-tighter">System Log</h3>
+                <div id="system-logs" class="overflow-y-auto flex-1 font-mono text-slate-300 hide-scroll">
+                    <div class="log-line">System initialized...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-6 flex flex-col items-center">
+            <div class="relative group">
+                <canvas id="gb-canvas" width="160" height="144" tabindex="0"></canvas>
+                <div id="focus-overlay" class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center cursor-pointer opacity-100 transition-opacity z-20">
+                    <span class="text-white font-bold text-sm bg-blue-600 px-6 py-3 rounded-full shadow-2xl mb-2">CLICK TO START ENGINE</span>
+                    <span class="text-[10px] text-slate-400">Keyboard input requires focus</span>
+                </div>
+                <div class="crt-overlay"></div>
+            </div>
+            
+            <div class="mt-4 grid grid-cols-4 gap-4 w-full text-center text-[10px] text-slate-500">
+                <div>ARROWS: D-PAD</div>
+                <div>X: A / Z: B</div>
+                <div>ENTER: START</div>
+                <div>TAB: SELECT</div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 flex flex-col gap-4">
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                <h3 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-tighter">RAM Sync Status</h3>
+                <div class="flex justify-between items-center bg-slate-900 p-2 rounded mb-1">
+                    <span class="text-[10px]">P1_READY ($C2FF)</span>
+                    <span id="p1-flag" class="w-3 h-3 rounded-full bg-slate-700"></span>
+                </div>
+                <div class="flex justify-between items-center bg-slate-900 p-2 rounded">
+                    <span class="text-[10px]">P2_READY ($C3FF)</span>
+                    <span id="p2-flag" class="w-3 h-3 rounded-full bg-slate-700"></span>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex-1 flex flex-col overflow-hidden max-h-[400px]">
+                <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-tighter">Link Chat</h3>
+                <div id="chat-box" class="flex-1 overflow-y-auto text-[11px] mb-2 space-y-1 hide-scroll"></div>
+                <div class="flex gap-2">
+                    <input type="text" id="chat-input" placeholder="Say something..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs focus:outline-none">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="binjgb.js"></script>
+
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const log = (msg, color = '') => {
+            const div = document.createElement('div');
+            div.className = 'log-line' + (color ? ` text-${color}-400` : '');
+            div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            $('system-logs').appendChild(div);
+            $('system-logs').scrollTop = $('system-logs').scrollHeight;
+        };
+
+        let module = null;
+        let emulatorPtr = null;
+        let audio = null;
+        let joypadPtr = null;
+        let keyFuncs = {};
+        let currentRomBuffer = null;
+        let currentRomName = '';
+        let pendingSavBuffer = null;
+        let rafId = null;
+
+        class GameAudio {
+            constructor(m, e) {
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                this.module = m;
+                this.ptr = this.module._get_audio_buffer_ptr(e);
+                this.capacity = this.module._get_audio_buffer_capacity(e);
+                this.buffer = new Uint8Array(this.module.HEAP8.buffer, this.ptr, this.capacity);
+                this.startSec = 0;
+            }
+            push() {
+                if (this.ctx.state === 'suspended') return;
+                const nowSec = this.ctx.currentTime;
+                const latency = 0.1;
+                this.startSec = (this.startSec || nowSec + latency);
+                if (this.startSec < nowSec) this.startSec = nowSec + latency;
+                const frames = 4096;
+                const buffer = this.ctx.createBuffer(2, frames, this.ctx.sampleRate);
+                const c0 = buffer.getChannelData(0);
+                const c1 = buffer.getChannelData(1);
+                for (let i = 0; i < frames; i++) {
+                    c0[i] = (this.buffer[2 * i] / 255) * 0.5;
+                    c1[i] = (this.buffer[2 * i + 1] / 255) * 0.5;
+                }
+                const source = this.ctx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(this.ctx.destination);
+                source.start(this.startSec);
+                this.startSec += frames / this.ctx.sampleRate;
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code in keyFuncs && document.activeElement.tagName !== 'INPUT') {
+                keyFuncs[e.code](true);
+                e.preventDefault();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.code in keyFuncs && document.activeElement.tagName !== 'INPUT') {
+                keyFuncs[e.code](false);
+                e.preventDefault();
+            }
+        });
+
+        // ── Networking ──
+        let peer = null;
+        let connection = null;
+
+        function initPeer() {
+            // Use working public PeerJS server
+            peer = new Peer({ host: 'peerjs.cloudflare.com', secure: true, port: 443 });
+            peer.on('open', (id) => {
+                $('my-id').innerText = id;
+                log(`Signaling ready. ID: ${id}`, 'green');
+            });
+            peer.on('connection', (c) => {
+                connection = c;
+                $('conn-status').innerText = "LINKED";
+                $('conn-status').className = "text-green-500 font-bold uppercase";
+                log(`Partner linked: ${c.peer}`, 'green');
+                c.on('data', (data) => {
+                    if (data.type === 'chat') addChatMessage('PARTNER', data.msg);
+                    if (data.type === 'ram_sync') applyRemoteRam(data.address, data.payload);
+                });
+            });
+            peer.on('error', (err) => log(`PeerJS error: ${err.type} - ${err.message}`, 'red'));
+        }
+
+        $('btn-connect').onclick = () => {
+            const id = $('remote-id').value.trim();
+            if (id) {
+                const conn = peer.connect(id);
+                connection = conn;
+                conn.on('open', () => {
+                    log(`Connected to ${id}`, 'green');
+                });
+            }
+        };
+
+        // ── RAM Sync ──
+        function getWramArray() {
+            if (!module || !emulatorPtr) return null;
+            try {
+                const ptr = module._emulator_get_wram_ptr?.(emulatorPtr);
+                if (ptr) return new Uint8Array(module.HEAP8.buffer, ptr, 0x2000);
+            } catch {}
+            return null;
+        }
+
+        function checkRamFlags() {
+            const wram = getWramArray();
+            if (!wram) return;
+            const p1 = wram[0x2FF];
+            const p2 = wram[0x3FF];
+            $('p1-flag').className = `w-3 h-3 rounded-full ${p1 > 0 ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-slate-700'}`;
+            $('p2-flag').className = `w-3 h-3 rounded-full ${p2 > 0 ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-slate-700'}`;
+            if (p1 > 0 && connection?.open) {
+                const payload = Array.from(wram.slice(0x200, 0x300));
+                connection.send({ type: 'ram_sync', address: 0xC200, payload });
+            }
+        }
+
+        function applyRemoteRam(address, payload) {
+            const wram = getWramArray();
+            if (wram) wram.set(payload, address - 0xC000);
+        }
+
+        function addChatMessage(sender, msg) {
+            const div = document.createElement('div');
+            div.innerHTML = `<span class="${sender === 'YOU' ? 'text-blue-400' : 'text-pink-400'} font-bold">${sender}:</span> ${msg}`;
+            $('chat-box').appendChild(div);
+            $('chat-box').scrollTop = $('chat-box').scrollHeight;
+        }
+
+        $('chat-input').onkeydown = (e) => {
+            if (e.key === 'Enter' && e.target.value.trim() && connection?.open) {
+                connection.send({ type: 'chat', msg: e.target.value });
+                addChatMessage('YOU', e.target.value);
+                e.target.value = '';
+            }
+        };
+
+        // ── Emulator ──
+        function tick() {
+            if (!module || !emulatorPtr) return;
+
+            const ticksPerFrame = 70224;
+            const target = module._emulator_get_ticks_f64(emulatorPtr) + ticksPerFrame;
+
+            while (module._emulator_get_ticks_f64(emulatorPtr) < target) {
+                const event = module._emulator_run_until_f64(emulatorPtr, target);
+                if (event & 2) audio?.push();
+                if (event & 4) break;
+            }
+
+            const canvas = $('gb-canvas');
+            const ctx = canvas.getContext('2d');
+            const fbPtr = module._get_frame_buffer_ptr(emulatorPtr);
+            const data = new Uint8ClampedArray(module.HEAPU8.buffer, fbPtr, 160 * 144 * 4);
+            ctx.putImageData(new ImageData(data, 160, 144), 0, 0);
+
+            checkRamFlags();
+            rafId = requestAnimationFrame(tick);
+        }
+
+        function destroyEmulator() {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = null;
+
+            if (joypadPtr && module?._joypad_delete) module._joypad_delete(joypadPtr);
+            joypadPtr = null;
+
+            if (emulatorPtr && module?._emulator_delete) module._emulator_delete(emulatorPtr);
+            emulatorPtr = null;
+
+            audio = null;
+            keyFuncs = {};
+        }
+
+        async function startOrReload(sav = pendingSavBuffer) {
+            destroyEmulator();
+
+            if (!currentRomBuffer) {
+                log("No ROM loaded — cannot start/reload", 'yellow');
+                return;
+            }
+
+            log("Starting emulator...");
+
+            try {
+                // Re-init module every time (mimics demo page reload)
+                const res = await fetch('binjgb.wasm');
+                if (!res.ok) throw new Error("Failed to fetch wasm");
+                const wasmBinary = await res.arrayBuffer();
+                module = await Binjgb({ wasmBinary });
+
+                const size = (currentRomBuffer.byteLength + 0x7fff) & ~0x7fff;
+                const romPtr = module._malloc(size);
+                new Uint8Array(module.HEAP8.buffer, romPtr, size).set(new Uint8Array(currentRomBuffer));
+
+                emulatorPtr = module._emulator_new_simple(romPtr, size, 44100, 4096, 2);
+                if (!emulatorPtr) throw new Error("emulator_new_simple failed");
+
+                // Apply save early
+                if (sav) {
+                    const fd = module._ext_ram_file_data_new(emulatorPtr);
+                    const ptr = module._get_file_data_ptr(fd);
+                    const cap = module._get_file_data_size(fd);
+                    const len = Math.min(sav.byteLength, cap);
+                    new Uint8Array(module.HEAP8.buffer, ptr, len).set(new Uint8Array(sav, 0, len));
+                    module._emulator_write_ext_ram(emulatorPtr, fd);
+                    log(`Save applied early (${len}/${cap} bytes)`, 'green');
+
+                    if (module._ext_ram_file_data_delete) module._ext_ram_file_data_delete(fd);
+                    else log("No delete function — cleanup skipped", 'yellow');
+
+                    pendingSavBuffer = null;
+                }
+
+                audio = new GameAudio(module, emulatorPtr);
+
+                joypadPtr = module._joypad_new?.();
+                module._emulator_set_default_joypad_callback?.(emulatorPtr, joypadPtr);
+
+                keyFuncs = {};
+                const binds = {
+                    ArrowDown: '_set_joyp_down',
+                    ArrowLeft: '_set_joyp_left',
+                    ArrowRight: '_set_joyp_right',
+                    ArrowUp: '_set_joyp_up',
+                    KeyZ: '_set_joyp_B',
+                    KeyX: '_set_joyp_A',
+                    Enter: '_set_joyp_start',
+                    Tab: '_set_joyp_select'
+                };
+                for (const [code, name] of Object.entries(binds)) {
+                    if (module[name]) keyFuncs[code] = module[name].bind(null, emulatorPtr);
+                }
+
+                $('btn-save-sav').disabled = false;
+                $('btn-reload').disabled = false;
+
+                log("Emulator ready — check title screen for Continue", 'green');
+                rafId = requestAnimationFrame(tick);
+            } catch (err) {
+                log(`Start/reload failed: ${err.message}`, 'red');
+                console.error(err);
+            }
+        }
+
+        // ── File handlers ──
+        $('rom-upload').onchange = e => {
+            const f = e.target.files[0];
+            if (!f) return;
+            currentRomName = f.name;
+            const r = new FileReader();
+            r.onload = ev => {
+                currentRomBuffer = ev.target.result;
+                startOrReload();
+            };
+            r.readAsArrayBuffer(f);
+        };
+
+        $('sav-upload').onchange = e => {
+            const f = e.target.files[0];
+            if (!f) return;
+            const r = new FileReader();
+            r.onload = ev => {
+                pendingSavBuffer = ev.target.result;
+                log(".SAV queued — click Reload with Save", 'blue');
+                if (currentRomBuffer) $('btn-reload').disabled = false;
+            };
+            r.readAsArrayBuffer(f);
+        };
+
+        $('btn-reload').onclick = () => startOrReload();
+
+        $('btn-save-sav').onclick = () => {
+            if (!emulatorPtr) return log("Engine not running", 'yellow');
+            try {
+                const fd = module._ext_ram_file_data_new(emulatorPtr);
+                module._emulator_read_ext_ram(emulatorPtr, fd);
+                const ptr = module._get_file_data_ptr(fd);
+                const sz = module._get_file_data_size(fd);
+                const bytes = new Uint8Array(module.HEAP8.buffer, ptr, sz).slice();
+
+                if (module._ext_ram_file_data_delete) module._ext_ram_file_data_delete(fd);
+
+                const blob = new Blob([bytes]);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = currentRomName.replace(/\.[^/.]+$/, '') + '.sav' || 'game.sav';
+                a.click();
+                URL.revokeObjectURL(url);
+                log(`Saved ${sz} bytes`, 'green');
+            } catch (err) {
+                log(`Save failed: ${err.message}`, 'red');
+            }
+        };
+
+        $('gb-canvas').onclick = () => $('gb-canvas').focus();
+        $('focus-overlay').onclick = () => {
+            audio?.ctx?.resume();
+            $('gb-canvas').focus();
+            $('focus-overlay').classList.add('hidden');
+        };
+
+        initPeer();
+    </script>
+</body>
+</html>

@@ -372,7 +372,7 @@ CheckIfSelectedAttackIsUnusable:
 ; and checks if there is enough energy to execute the selected attack
 ; input:
 ;	[hTempPlayAreaLocation_ff9d] = location of Pokémon card
-;	[wSelectedAttack]            = selected attack to examine
+;	[wSelectedAttack]         = selected attack to examine
 ; output:
 ;	b = basic energy still needed
 ;	c = colorless energy still needed
@@ -855,7 +855,7 @@ CheckEnergyNeededForAttackAfterDiscard:
 	farcall AIPickEnergyCardToDiscard
 	call LoadCardDataToBuffer1_FromDeckIndex
 	cp DOUBLE_COLORLESS_ENERGY
-	jr z, .double_colorless
+	jr z, .colorless
 
 ; color energy
 ; decrease respective attached energy by 1.
@@ -867,10 +867,9 @@ CheckEnergyNeededForAttackAfterDiscard:
 	dec [hl]
 	ld hl, wTotalAttachedEnergies
 	dec [hl]
-	jr .decremented_energy
-
-.double_colorless
+	jr .asm_1570c
 ; decrease attached colorless by 2.
+.colorless
 	ld hl, wAttachedEnergies + COLORLESS
 	dec [hl]
 	dec [hl]
@@ -878,7 +877,7 @@ CheckEnergyNeededForAttackAfterDiscard:
 	dec [hl]
 	dec [hl]
 
-.decremented_energy
+.asm_1570c
 	bank1call HandleEnergyBurn
 	xor a
 	ld [wTempLoadedAttackEnergyCost], a
@@ -1378,31 +1377,33 @@ CheckIfActiveCardCanKnockOut:
 	or a
 	ret
 
-; return carry if the Arena Pokémon has any attack that is
-; usable and non-residual
-CanArenaCardUseNonResidualAttack:
+; outputs carry if any of the active Pokémon attacks
+; can be used and are not residual
+CheckIfActivePokemonCanUseAnyNonResidualAttack:
 	xor a ; PLAY_AREA_ARENA
 	ldh [hTempPlayAreaLocation_ff9d], a
+; first atk
 	ld [wSelectedAttack], a ; FIRST_ATTACK_OR_PKMN_POWER
 	call CheckIfSelectedAttackIsUnusable
-	jr c, .check_second_attack
+	jr c, .next_atk
 	ld a, [wLoadedAttackCategory]
 	and RESIDUAL
-	jr z, .set_carry ; not Residual
-.check_second_attack
+	jr z, .ok
+
+.next_atk
+; second atk
 	ld a, SECOND_ATTACK
 	ld [wSelectedAttack], a
 	call CheckIfSelectedAttackIsUnusable
-	jr c, .no_carry
+	jr c, .fail
 	ld a, [wLoadedAttackCategory]
 	and RESIDUAL
-	jr z, .set_carry ; not Residual
-.no_carry
-	; either both are Residual or
-	; all non-Residual attacks are unusable
+	jr z, .ok
+.fail
 	or a
 	ret
-.set_carry
+
+.ok
 	scf
 	ret
 

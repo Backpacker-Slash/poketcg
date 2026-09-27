@@ -434,10 +434,10 @@ ShufflesTheDeckText:
 	text "<RAMNAME> shuffles the Deck."
 	done
 
-ThisIsJustPracticeDoNotShuffleText:
-	text "Since this is just practice,"
-	line "Do not shuffle the Deck."
-	done
+; ThisIsJustPracticeDoNotShuffleText:
+; 	text "Since this is just practice,"
+; 	line "Do not shuffle the Deck."
+; 	done
 
 EachPlayerShuffleOpponentsDeckText:
 	text "Each player will"
@@ -1149,4 +1149,4 @@ DamageCheckIfHeadsXDamageText:
 	line "If Heads, x <RAMNUM> damage!!"
 	done
 
-	ds $d
+	ds $1

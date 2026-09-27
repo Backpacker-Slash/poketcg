@@ -39,6 +39,8 @@ SECTION "timer", ROM0
 	jp TimerHandler
 	ds 5
 SECTION "serial", ROM0
+    ; reti
+    ; ds 7
 	jp SerialHandler
 	ds 5
 SECTION "joypad", ROM0
@@ -95,7 +97,7 @@ INCLUDE "home/load_deck.asm"
 INCLUDE "home/damage.asm"
 INCLUDE "home/coin_toss.asm"
 INCLUDE "home/duel_menus.asm"
-INCLUDE "home/printer.asm"
+; INCLUDE "home/printer.asm"
 INCLUDE "home/substatus.asm"
 INCLUDE "home/card_color.asm"
 INCLUDE "home/sound.asm"
@@ -110,4 +112,5 @@ INCLUDE "home/division.asm"
 INCLUDE "home/play_song.asm"
 INCLUDE "home/load_animation.asm"
 INCLUDE "home/scroll.asm"
+INCLUDE "home/labels.asm"
 INCLUDE "home/audio_callback.asm"

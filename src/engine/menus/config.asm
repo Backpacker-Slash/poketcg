@@ -133,6 +133,7 @@ SaveConfigSettings:
 	call EnableSRAM
 	ld a, [hl]
 	ld [sTextSpeed], a
+	; ld a, TEXT_SPEED_5
 	ld [wTextSpeed], a
 	call DisableSRAM
 	ret
@@ -232,9 +233,27 @@ ConfigScreenHandleDPadInput:
 	ldh a, [hDPadHeld]
 	and PAD_CTRL_PAD
 	ret z
-	farcall GetDirectionFromDPad
+	call GetDirectionFromDPad
 	ld hl, ConfigScreenDPadHandlers
 	jp JumpToFunctionInTable
+
+GetDirectionFromDPad:
+	push hl
+	ld hl, KeypadDirectionMap
+	or a
+	jr z, .get_direction
+.loop
+	rlca
+	jr c, .get_direction
+	inc hl
+	jr .loop
+.get_direction
+	ld a, [hl]
+	pop hl
+	ret
+
+KeypadDirectionMap:
+	db 0, 1, 2, 3;SOUTH, NORTH, WEST, EAST
 
 ConfigScreenDPadHandlers:
 	dw ConfigScreenDPadUp ; up

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCG RAM-Sync Launcher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Fira Code', monospace; }
+        canvas { 
+            image-rendering: pixelated; 
+            width: 480px; 
+            height: 432px; 
+            background: #000; 
+            border: 4px solid #334155;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            outline: none;
+        }
+        canvas:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
+        }
+        .crt-overlay {
+            pointer-events: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            z-index: 10;
+        }
+        .log-line { border-left: 2px solid #3b82f6; padding-left: 8px; margin-bottom: 4px; font-size: 0.75rem; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center min-h-screen">
+
+    <div class="w-full max-w-6xl flex justify-between items-center mb-6 bg-slate-800 p-4 rounded-lg border border-slate-700">
+        <div>
+            <h1 class="text-xl font-bold text-blue-400">TCG RAM-SYNC <span class="text-xs text-slate-500 font-normal">v0.2.2</span></h1>
+            <div class="text-sm">STATUS: <span id="conn-status" class="text-yellow-500 font-bold uppercase">Disconnected</span></div>
+        </div>
+        <div class="flex gap-4 items-center">
+            <div class="text-right">
+                <div class="text-[10px] text-slate-400">MY ID</div>
+                <div id="my-id" class="text-sm font-bold text-white tracking-widest">----</div>
+            </div>
+            <input type="text" id="remote-id" placeholder="PARTNER ID" class="bg-slate-900 border border-slate-600 px-3 py-1 rounded text-sm focus:outline-none focus:border-blue-500">
+            <button id="btn-connect" class="bg-blue-600 hover:bg-blue-500 px-4 py-1 rounded text-sm font-bold transition">CONNECT</button>
+        </div>
+    </div>
+
+    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <div class="lg:col-span-3 flex flex-col gap-4">
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-tighter">ROM Management</h3>
+                <input type="file" id="rom-upload" class="hidden" accept=".gbc,.gb">
+                <button onclick="document.getElementById('rom-upload').click()" class="w-full bg-slate-700 hover:bg-slate-600 py-2 rounded text-xs font-bold mb-2">UPLOAD ROM</button>
+                <div id="rom-info" class="text-[10px] text-slate-500 italic text-center">No ROM loaded</div>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex-1 flex flex-col overflow-hidden max-h-[400px]">
+                <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-tighter">System Log</h3>
+                <div id="system-logs" class="overflow-y-auto flex-1 font-mono text-slate-300 hide-scroll">
+                    <div class="log-line">System initialized...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-6 flex flex-col items-center">
+            <div class="relative group">
+                <canvas id="gb-canvas" width="160" height="144" tabindex="0"></canvas>
+                <div id="focus-overlay" class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center cursor-pointer opacity-100 transition-opacity z-20">
+                    <span class="text-white font-bold text-sm bg-blue-600 px-6 py-3 rounded-full shadow-2xl mb-2">CLICK TO START ENGINE</span>
+                    <span class="text-[10px] text-slate-400">Keyboard input requires focus</span>
+                </div>
+                <div class="crt-overlay"></div>
+            </div>
+            
+            <div class="mt-4 grid grid-cols-4 gap-4 w-full text-center text-[10px] text-slate-500">
+                <div>ARROWS: D-PAD</div>
+                <div>X: A / Z: B</div>
+                <div>ENTER: START</div>
+                <div>TAB: SELECT</div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 flex flex-col gap-4">
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                <h3 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-tighter">RAM Sync Status</h3>
+                <div class="flex justify-between items-center bg-slate-900 p-2 rounded mb-1">
+                    <span class="text-[10px]">P1_READY ($C2FF)</span>
+                    <span id="p1-flag" class="w-3 h-3 rounded-full bg-slate-700"></span>
+                </div>
+                <div class="flex justify-between items-center bg-slate-900 p-2 rounded">
+                    <span class="text-[10px]">P2_READY ($C3FF)</span>
+                    <span id="p2-flag" class="w-3 h-3 rounded-full bg-slate-700"></span>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex-1 flex flex-col overflow-hidden max-h-[400px]">
+                <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-tighter">Link Chat</h3>
+                <div id="chat-box" class="flex-1 overflow-y-auto text-[11px] mb-2 space-y-1 hide-scroll"></div>
+                <div class="flex gap-2">
+                    <input type="text" id="chat-input" placeholder="Say something..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs focus:outline-none">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="binjgb.js"></script>
+
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const log = (msg) => {
+            const div = document.createElement('div');
+            div.className = 'log-line';
+            div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            $('system-logs').appendChild(div);
+            $('system-logs').scrollTop = $('system-logs').scrollHeight;
+        };
+
+        let module = null;
+        let emulatorPtr = null;
+        let audio = null;
+        let joypadPtr = null;
+        let keyFuncs = {};
+        
+        class GameAudio {
+            constructor(m, e) {
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                this.module = m;
+                this.ptr = this.module._get_audio_buffer_ptr(e);
+                this.capacity = this.module._get_audio_buffer_capacity(e);
+                this.buffer = new Uint8Array(this.module.HEAP8.buffer, this.ptr, this.capacity);
+                this.startSec = 0;
+            }
+            push() {
+                if (this.ctx.state === 'suspended') return;
+                const nowSec = this.ctx.currentTime;
+                const latency = 0.1;
+                this.startSec = (this.startSec || nowSec + latency);
+                if (this.startSec < nowSec) this.startSec = nowSec + latency;
+                const frames = 4096;
+                const buffer = this.ctx.createBuffer(2, frames, this.ctx.sampleRate);
+                const c0 = buffer.getChannelData(0);
+                const c1 = buffer.getChannelData(1);
+                for (let i = 0; i < frames; i++) {
+                    c0[i] = this.buffer[2 * i] / 255 * 0.5;
+                    c1[i] = this.buffer[2 * i + 1] / 255 * 0.5;
+                }
+                const source = this.ctx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(this.ctx.destination);
+                source.start(this.startSec);
+                this.startSec += frames / this.ctx.sampleRate;
+            }
+        }
+
+        // Keyboard event handlers
+        window.addEventListener('keydown', (e) => {
+            if (e.code in keyFuncs && document.activeElement.tagName !== 'INPUT') {
+                keyFuncs[e.code](true);
+                e.preventDefault();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.code in keyFuncs && document.activeElement.tagName !== 'INPUT') {
+                keyFuncs[e.code](false);
+                e.preventDefault();
+            }
+        });
+
+        // --- NETWORKING ---
+        let peer = null;
+        let connection = null;
+
+        function initPeer() {
+            peer = new Peer();
+            peer.on('open', (id) => {
+                $('my-id').innerText = id;
+                log(`Signaling ready. ID: ${id}`);
+            });
+            peer.on('connection', handleConnection);
+        }
+
+        function handleConnection(conn) {
+            connection = conn;
+            $('conn-status').innerText = "LINKED";
+            $('conn-status').className = "text-green-500 font-bold uppercase";
+            log(`Partner linked: ${conn.peer}`);
+            conn.on('data', (data) => {
+                if (data.type === 'chat') addChatMessage('PARTNER', data.msg);
+                if (data.type === 'ram_sync') applyRemoteRam(data.address, data.payload);
+            });
+        }
+
+        $('btn-connect').onclick = () => {
+            const remoteId = $('remote-id').value;
+            if (remoteId) handleConnection(peer.connect(remoteId));
+        };
+
+        // --- RAM SYNC ---
+        function getWramArray() {
+            if (!module || !emulatorPtr) return null;
+            try {
+                const getWram = module._get_wram_ptr || (module.asm ? module.asm._get_wram_ptr : null);
+                const ptr = getWram ? getWram(emulatorPtr) : null;
+                if (ptr) return new Uint8Array(module.HEAP8.buffer, ptr, 0x2000);
+            } catch(e) {}
+            return null;
+        }
+
+        function checkRamFlags() {
+            const wram = getWramArray();
+            if (!wram) return;
+            
+            const p1Flag = wram[0x2FF];
+            const p2Flag = wram[0x3FF];
+
+            $('p1-flag').className = `w-3 h-3 rounded-full ${p1Flag > 0 ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-slate-700'}`;
+            $('p2-flag').className = `w-3 h-3 rounded-full ${p2Flag > 0 ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-slate-700'}`;
+
+            if (p1Flag > 0 && connection && connection.open) {
+                const p1Data = Array.from(wram.slice(0x200, 0x300)); 
+                connection.send({ type: 'ram_sync', address: 0xC200, payload: p1Data });
+            }
+        }
+
+        function applyRemoteRam(address, payload) {
+            const wram = getWramArray();
+            if (!wram) return;
+            const offset = address - 0xC000;
+            wram.set(payload, offset);
+        }
+
+        // --- CHAT ---
+        function addChatMessage(sender, msg) {
+            const div = document.createElement('div');
+            div.innerHTML = `<span class="${sender === 'YOU' ? 'text-blue-400' : 'text-pink-400'} font-bold">${sender}:</span> ${msg}`;
+            $('chat-box').appendChild(div);
+            $('chat-box').scrollTop = $('chat-box').scrollHeight;
+        }
+
+        $('chat-input').onkeydown = (e) => {
+            if (e.key === 'Enter' && e.target.value) {
+                if (connection && connection.open) {
+                    connection.send({ type: 'chat', msg: e.target.value });
+                    addChatMessage('YOU', e.target.value);
+                    e.target.value = '';
+                }
+            }
+        };
+
+        // --- START ---
+        async function startEngine(romBuffer) {
+            try {
+                log("Initializing WASM...");
+                const wasmResponse = await fetch('binjgb.wasm');
+                const wasmBinary = await wasmResponse.arrayBuffer();
+                
+                // Ensure module initialization doesn't pollute the global scope in a way that breaks exports
+                module = await Binjgb({ wasmBinary });
+
+                const size = (romBuffer.byteLength + 0x7fff) & ~0x7fff;
+                const romDataPtr = module._malloc(size);
+                new Uint8Array(module.HEAP8.buffer, romDataPtr, size).set(new Uint8Array(romBuffer));
+
+                emulatorPtr = module._emulator_new_simple(romDataPtr, size, 44100, 4096, 2);
+                audio = new GameAudio(module, emulatorPtr);
+
+                // Set up joypad callback for input
+                joypadPtr = module._joypad_new();
+                module._emulator_set_default_joypad_callback(emulatorPtr, joypadPtr);
+
+                // Bind key functions
+                const keyBindings = {
+                    'ArrowDown': '_set_joyp_down',
+                    'ArrowLeft': '_set_joyp_left',
+                    'ArrowRight': '_set_joyp_right',
+                    'ArrowUp': '_set_joyp_up',
+                    'KeyZ': '_set_joyp_B',
+                    'KeyX': '_set_joyp_A',
+                    'Enter': '_set_joyp_start',
+                    'Tab': '_set_joyp_select'
+                };
+
+                Object.keys(keyBindings).forEach(code => {
+                    const fnName = keyBindings[code];
+                    if (module[fnName]) {
+                        keyFuncs[code] = module[fnName].bind(null, emulatorPtr);
+                    } else {
+                        log(`Warning: Input function ${fnName} not available.`, "yellow-400");
+                    }
+                });
+
+                log("Engine started. Map: Arrows=Dpad, X=A, Z=B.");
+                $('rom-info').innerText = "ROM ACTIVE";
+                requestAnimationFrame(tick);
+            } catch (err) {
+                log(`Error: ${err.message}`);
+                console.error(err);
+            }
+        }
+
+        function tick() {
+            if (!module || !emulatorPtr) return;
+            let ticksPerFrame = 70224;
+            let targetTicks = module._emulator_get_ticks_f64(emulatorPtr) + ticksPerFrame;
+            
+            while (module._emulator_get_ticks_f64(emulatorPtr) < targetTicks) {
+                const event = module._emulator_run_until_f64(emulatorPtr, targetTicks);
+                if (event & 2) audio.push(); // AUDIO_BUFFER_FULL
+                if (event & 4) break; // EVENT_UNTIL_TICKS
+            }
+
+            const canvas = $('gb-canvas');
+            const ctx = canvas.getContext('2d');
+            const fbPtr = module._get_frame_buffer_ptr(emulatorPtr);
+            const frameData = new Uint8ClampedArray(module.HEAPU8.buffer, fbPtr, 160 * 144 * 4);
+            ctx.putImageData(new ImageData(frameData, 160, 144), 0, 0);
+
+            checkRamFlags();
+            requestAnimationFrame(tick);
+        }
+
+        $('rom-upload').onchange = (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (ev) => startEngine(ev.target.result);
+            reader.readAsArrayBuffer(file);
+        };
+
+        $('gb-canvas').onclick = () => {
+             $('gb-canvas').focus();
+        };
+
+        $('focus-overlay').onclick = () => {
+            if (audio && audio.ctx) audio.ctx.resume();
+            $('gb-canvas').focus();
+            $('focus-overlay').classList.add('hidden');
+        };
+
+        initPeer();
+    </script>
+</body>
+</html>

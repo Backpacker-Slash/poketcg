@@ -16,7 +16,7 @@ INCLUDE "engine/menus/deck_selection.asm"
 INCLUDE "engine/menus/deck_check.asm"
 INCLUDE "engine/menus/deck_configuration.asm"
 INCLUDE "engine/menus/card_album.asm"
-INCLUDE "engine/menus/printer.asm"
+; INCLUDE "engine/menus/printer.asm"
 INCLUDE "engine/menus/deck_machine.asm"
 
 SECTION "Overworld Scripting", ROMX
@@ -26,35 +26,36 @@ INCLUDE "engine/overworld/scripting.asm"
 SECTION "Menus 2", ROMX
 INCLUDE "engine/menus/init_menu.asm"
 INCLUDE "engine/menus/status.asm"
-INCLUDE "engine/menus/diary.asm"
+; INCLUDE "engine/menus/diary.asm"
 INCLUDE "engine/menus/print_stats.asm"
-INCLUDE "engine/menus/medal.asm"
-INCLUDE "engine/menus/give_booster_pack.asm"
+; INCLUDE "engine/menus/medal.asm"
+; INCLUDE "engine/menus/give_booster_pack.asm"
 INCLUDE "engine/menus/duel_init.asm"
 INCLUDE "engine/menus/pc_glossary.asm"
 INCLUDE "engine/menus/config.asm"
-INCLUDE "engine/menus/mail.asm"
+; INCLUDE "engine/menus/mail.asm"
 
 SECTION "Color", ROMX
 INCLUDE "engine/gfx/color.asm"
 
-SECTION "Gift Center Menu", ROMX
+; SECTION "Gift Center Menu", ROMX
 INCLUDE "engine/menus/gift_center.asm"
 
-SECTION "Overworld Map", ROMX
-INCLUDE "engine/overworld_map.asm"
-INCLUDE "engine/menus/labels.asm"
+; SECTION "Overworld Map", ROMX
+; INCLUDE "engine/overworld_map.asm"
+; INCLUDE "engine/menus/labels.asm"
 
 SECTION "Save", ROMX
 INCLUDE "engine/save.asm"
-
-SECTION "Map Scripts", ROMX
-INCLUDE "data/map_scripts.asm"
-INCLUDE "engine/overworld/npc_data.asm"
 INCLUDE "data/duel/duel_configurations.asm"
-INCLUDE "data/script_table.asm"
-INCLUDE "data/multichoice.asm"
-INCLUDE "data/overworld_map/player_movement_paths.asm"
+
+; SECTION "Map Scripts", ROMX
+; INCLUDE "data/map_scripts.asm"
+INCLUDE "engine/overworld/npc_data.asm"
+; INCLUDE "data/duel/duel_configurations.asm"
+; INCLUDE "data/script_table.asm"
+; INCLUDE "data/multichoice.asm"
+; INCLUDE "data/overworld_map/player_movement_paths.asm"
 
 SECTION "Menus 3", ROMX
 INCLUDE "engine/menus/debug_main.asm"
@@ -73,9 +74,9 @@ INCLUDE "engine/scenes.asm"
 SECTION "Challenge Machine", ROMX
 INCLUDE "engine/challenge_machine.asm"
 
-SECTION "Map Objects", ROMX
-INCLUDE "data/npc_map_data.asm"
-INCLUDE "data/map_objects.asm"
+; SECTION "Map Objects", ROMX
+; INCLUDE "data/npc_map_data.asm"
+; INCLUDE "data/map_objects.asm"
 
 SECTION "AI Logic 1", ROMX
 INCLUDE "data/deck_ai_pointers.asm"
@@ -105,17 +106,17 @@ INCLUDE "engine/starter_deck.asm"
 SECTION "Link Functions", ROMX
 INCLUDE "engine/link/ir_functions.asm"
 INCLUDE "engine/link/card_pop.asm"
-INCLUDE "engine/link/printer.asm"
+; INCLUDE "engine/link/printer.asm"
 INCLUDE "engine/link/link_duel.asm"
 
-SECTION "Promotional Card", ROMX
-INCLUDE "engine/promotional_card.asm"
+; SECTION "Promotional Card", ROMX
+; INCLUDE "engine/promotional_card.asm"
 
-SECTION "Booster Pack Menu", ROMX
-INCLUDE "engine/menus/booster_pack.asm"
+; SECTION "Booster Pack Menu", ROMX
+; INCLUDE "engine/menus/booster_pack.asm"
 
-SECTION "Unused Save Validation", ROMX
-INCLUDE "engine/unused_save_validation.asm"
+; SECTION "Unused Save Validation", ROMX
+; INCLUDE "engine/unused_save_validation.asm"
 
 SECTION "Input Name", ROMX
 INCLUDE "engine/input_name.asm"
@@ -123,13 +124,13 @@ INCLUDE "engine/input_name.asm"
 SECTION "Auto Deck Machines", ROMX
 INCLUDE "engine/auto_deck_machines.asm"
 
-SECTION "Bank 7", ROMX
-INCLUDE "engine/overworld/debug_player_coordinates.asm"
-INCLUDE "engine/overworld/warp.asm"
-INCLUDE "engine/overworld/load_map_header.asm"
-INCLUDE "engine/overworld/npc_core.asm"
-INCLUDE "engine/masters_beaten_list.asm"
-INCLUDE "engine/debug_sprites.asm"
+; SECTION "Bank 7", ROMX
+; INCLUDE "engine/overworld/debug_player_coordinates.asm"
+; INCLUDE "engine/overworld/warp.asm"
+; INCLUDE "engine/overworld/load_map_header.asm"
+; INCLUDE "engine/overworld/npc_core.asm"
+; INCLUDE "engine/masters_beaten_list.asm"
+; INCLUDE "engine/debug_sprites.asm"
 
 SECTION "Duel Animations", ROMX
 INCLUDE "engine/duel/animations/core.asm"
@@ -143,13 +144,13 @@ SECTION "Intro Sequence", ROMX
 INCLUDE "engine/intro.asm"
 INCLUDE "engine/sequences/intro_sequence_commands.asm"
 
-SECTION "Unused Copyright", ROMX
-INCLUDE "engine/unused_copyright.asm"
+; SECTION "Unused Copyright", ROMX
+; INCLUDE "engine/unused_copyright.asm"
 
-SECTION "Credits Sequence", ROMX
-INCLUDE "engine/credits.asm"
-INCLUDE "engine/sequences/credits_sequence_commands.asm"
-INCLUDE "data/sequences/credits.asm"
+; SECTION "Credits Sequence", ROMX
+; INCLUDE "engine/credits.asm"
+; INCLUDE "engine/sequences/credits_sequence_commands.asm"
+; INCLUDE "data/sequences/credits.asm"
 
 SECTION "Booster Packs", ROMX
 INCLUDE "engine/booster_packs.asm"
@@ -165,19 +166,17 @@ INCLUDE "engine/duel/effect_functions.asm"
 SECTION "Decks", ROMX
 INCLUDE "data/decks.asm"
 
+SECTION "Card List", ROMX
+INCLUDE "data/cardlist.asm"
+
 SECTION "Cards", ROMX
 INCLUDE "data/cards.asm"
 
 SECTION "SGB", ROMX
 INCLUDE "engine/sgb.asm"
 
-SECTION "Load Gfx", ROMX
-INCLUDE "engine/overworld/load_overworld.asm"
-INCLUDE "engine/gfx/load_gfx.asm"
-INCLUDE "engine/overworld/animation.asm"
-INCLUDE "engine/overworld/map_events.asm"
-INCLUDE "engine/gfx/debug.asm"
-INCLUDE "engine/gfx/sprite_null_animation.asm"
+SECTION "Bank 20", ROMX
+INCLUDE "engine/bank20.asm"
 
 SECTION "Gfx", ROMX
 INCLUDE "engine/gfx/gfx_table_pointers.asm"

@@ -25,7 +25,7 @@ OpenInPlayAreaScreen::
 	ld a, [wInPlayAreaCurPosition]
 	call .print_associated_text
 .on_frame
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	call DoFrame
 
@@ -437,11 +437,11 @@ OpenInPlayAreaScreen_HandleInput:
 	cp INPLAYAREA_PLAYER_ACTIVE
 	jr c, .player_area
 	cp INPLAYAREA_OPP_BENCH_1
-	jr c, .dpad_processed
+	jr c, .next
 	cp INPLAYAREA_PLAYER_PLAY_AREA
 	jr c, .opponent_area
 
-	jr .dpad_processed
+	jr .next
 
 .player_area
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
@@ -453,13 +453,13 @@ OpenInPlayAreaScreen_HandleInput:
 	; then move to player's play area.
 	ld a, INPLAYAREA_PLAYER_PLAY_AREA
 	ld [wInPlayAreaCurPosition], a
-	jr .dpad_processed
+	jr .next
 
 .bench_pokemon_exists
 	ld b, a
 	ld a, [wInPlayAreaCurPosition]
 	cp b
-	jr c, .dpad_processed
+	jr c, .next
 
 	; handle index overflow
 	ldh a, [hDPadHeld]
@@ -468,13 +468,13 @@ OpenInPlayAreaScreen_HandleInput:
 
 	xor a
 	ld [wInPlayAreaCurPosition], a
-	jr .dpad_processed
+	jr .next
 
 .on_left
 	ld a, b
 	dec a
 	ld [wInPlayAreaCurPosition], a
-	jr .dpad_processed
+	jr .next
 
 .opponent_area
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
@@ -484,14 +484,14 @@ OpenInPlayAreaScreen_HandleInput:
 
 	ld a, INPLAYAREA_OPP_PLAY_AREA
 	ld [wInPlayAreaCurPosition], a
-	jr .dpad_processed
+	jr .next
 
 .bench_pokemon_exists_2
 	ld b, a
 	ld a, [wInPlayAreaCurPosition]
 	sub INPLAYAREA_OPP_BENCH_1
 	cp b
-	jr c, .dpad_processed
+	jr c, .next
 
 	ldh a, [hDPadHeld]
 	bit B_PAD_LEFT, a
@@ -499,44 +499,40 @@ OpenInPlayAreaScreen_HandleInput:
 
 	ld a, INPLAYAREA_OPP_BENCH_1
 	ld [wInPlayAreaCurPosition], a
-	jr .dpad_processed
+	jr .next
 
 .on_right
 	ld a, b
 	add INPLAYAREA_OPP_DISCARD_PILE
 	ld [wInPlayAreaCurPosition], a
-.dpad_processed
+.next
 	ld a, SFX_CURSOR
 	ld [wMenuInputSFX], a
 	xor a
 	ld [wCheckMenuCursorBlinkCounter], a
 .check_button
-	; bug, it's not guaranteed that [wInPlayAreaCurPosition]
-	; is in a valid Play Area item here
-	; in fact, pressing Down+A under some circumstances
-	; allows the "Duel Escape" glitch to occur
 	ldh a, [hKeysPressed]
 	and PAD_A | PAD_B
-	jr z, .no_a_or_b_btn
+	jr z, .return
 
 	and PAD_A
 	jr nz, .a_button
 
 	; pressed b button
-	ld a, MENU_CANCEL
+	ld a, -1
 	farcall PlaySFXConfirmOrCancel
 	scf
 	ret
 
 .a_button
 	call .draw_cursor
-	ld a, MENU_CONFIRM
+	ld a, $01
 	farcall PlaySFXConfirmOrCancel
 	ld a, [wInPlayAreaCurPosition]
 	scf
 	ret
 
-.no_a_or_b_btn
+.return
 	ld a, [wMenuInputSFX]
 	or a
 	jr z, .skip_sfx
@@ -545,10 +541,10 @@ OpenInPlayAreaScreen_HandleInput:
 	ld hl, wCheckMenuCursorBlinkCounter
 	ld a, [hl]
 	inc [hl]
-	and CURSOR_BLINK_PERIOD_MASK
+	and $10 - 1
 	ret nz
 
-	bit B_CURSOR_BLINK_PERIOD, [hl]
+	bit 4, [hl] ; = and $10
 	jr nz, ZeroObjectPositionsAndToggleOAMCopy_Bank6
 
 .draw_cursor
@@ -575,6 +571,6 @@ OpenInPlayAreaScreen_HandleInput:
 
 ZeroObjectPositionsAndToggleOAMCopy_Bank6:
 	call ZeroObjectPositions
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	ret

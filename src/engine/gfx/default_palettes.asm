@@ -1,6 +1,6 @@
 Func_12871:
 	call ZeroObjectPositions
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	call Set_OBJ_8x8
 	call SetDefaultPalettes

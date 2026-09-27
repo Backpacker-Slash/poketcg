@@ -1,9 +1,9 @@
 .PHONY: all clean
 
 CC := gcc
-CFLAGS := -O3 -std=c17 -Wall -Wextra -pedantic
+CFLAGS := -O3 -std=c99 -Wall -Wextra -pedantic
 
-tools := bgmap compressor gfx make_patch scan_includes
+tools := scan_includes gfx compressor bgmap
 
 all: $(tools)
 	@:
@@ -11,5 +11,6 @@ all: $(tools)
 clean:
 	rm -f $(tools)
 
-%: %.c common.h
+gfx: common.h
+%: %.c
 	$(CC) $(CFLAGS) -o $@ $<

@@ -784,6 +784,11 @@ BeginAPrizeDuelWithText:
 	line "with <RAMNAME>."
 	done
 
+BeginAPrizeLinkDuelWithText:
+	text "Begin a <RAMNUM>-Prize Duel"
+	line "with"
+	done
+
 AreYouBothReadyToCardPopText:
 	text "Are you both ready"
 	line "to Card Pop! ?"
@@ -1877,4 +1882,4 @@ ThisDeckCanOnlyBeBuiltIfYouDismantleText:
 	line "you dismantle another Deck."
 	done
 
-	ds $26
+	ds $b;$26 $1b 38-27= 11

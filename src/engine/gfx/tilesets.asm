@@ -7,35 +7,35 @@ ENDM
 
 Tilesets:
 	table_width 4
-	tileset OverworldMapTiles,             193 ; TILESET_OVERWORLD_MAP
-	tileset MasonLaboratoryTilesetGfx,     151 ; TILESET_MASON_LABORATORY
-	tileset IshiharaTilesetGfx,             77 ; TILESET_ISHIHARA
-	tileset ClubEntranceTilesetGfx,        129 ; TILESET_CLUB_ENTRANCE
-	tileset ClubLobbyTilesetGfx,           120 ; TILESET_CLUB_LOBBY
-	tileset FightingClubTilesetGfx,         99 ; TILESET_FIGHTING_CLUB
-	tileset RockClubTilesetGfx,             60 ; TILESET_ROCK_CLUB
-	tileset WaterClubTilesetGfx,           161 ; TILESET_WATER_CLUB
-	tileset LightningClubTilesetGfx,       131 ; TILESET_LIGHTNING_CLUB
-	tileset GrassClubTilesetGfx,            87 ; TILESET_GRASS_CLUB
-	tileset PsychicClubTilesetGfx,          58 ; TILESET_PSYCHIC_CLUB
-	tileset ScienceClubTilesetGfx,          82 ; TILESET_SCIENCE_CLUB
-	tileset FireClubTilesetGfx,             87 ; TILESET_FIRE_CLUB
-	tileset ChallengeHallTilesetGfx,       157 ; TILESET_CHALLENGE_HALL
-	tileset PokemonDomeEntranceTilesetGfx,  78 ; TILESET_POKEMON_DOME_ENTRANCE
-	tileset PokemonDomeTilesetGfx,         207 ; TILESET_POKEMON_DOME
-	tileset HallOfHonorTilesetGfx,         121 ; TILESET_HALL_OF_HONOR
+	; tileset OverworldMapTiles,             193 ; TILESET_OVERWORLD_MAP
+	; tileset MasonLaboratoryTilesetGfx,     151 ; TILESET_MASON_LABORATORY
+	; tileset IshiharaTilesetGfx,             77 ; TILESET_ISHIHARA
+	; tileset ClubEntranceTilesetGfx,        129 ; TILESET_CLUB_ENTRANCE
+	; tileset ClubLobbyTilesetGfx,           120 ; TILESET_CLUB_LOBBY
+	; tileset FightingClubTilesetGfx,         99 ; TILESET_FIGHTING_CLUB
+	; tileset RockClubTilesetGfx,             60 ; TILESET_ROCK_CLUB
+	; tileset WaterClubTilesetGfx,           161 ; TILESET_WATER_CLUB
+	; tileset LightningClubTilesetGfx,       131 ; TILESET_LIGHTNING_CLUB
+	; tileset GrassClubTilesetGfx,            87 ; TILESET_GRASS_CLUB
+	; tileset PsychicClubTilesetGfx,          58 ; TILESET_PSYCHIC_CLUB
+	; tileset ScienceClubTilesetGfx,          82 ; TILESET_SCIENCE_CLUB
+	; tileset FireClubTilesetGfx,             87 ; TILESET_FIRE_CLUB
+	; tileset ChallengeHallTilesetGfx,       157 ; TILESET_CHALLENGE_HALL
+	; tileset PokemonDomeEntranceTilesetGfx,  78 ; TILESET_POKEMON_DOME_ENTRANCE
+	; tileset PokemonDomeTilesetGfx,         207 ; TILESET_POKEMON_DOME
+	; tileset HallOfHonorTilesetGfx,         121 ; TILESET_HALL_OF_HONOR
 	tileset CardPopGfx,                    189 ; TILESET_CARD_POP
-	tileset MedalGfx,                       72 ; TILESET_MEDAL
+	; tileset MedalGfx,                       72 ; TILESET_MEDAL
 	tileset GameBoyLinkGfx,                109 ; TILESET_GAMEBOY_LINK
-	tileset GameBoyPrinterGfx,              93 ; TILESET_GAMEBOY_PRINTER
-	tileset Colosseum1Gfx,                  96 ; TILESET_COLOSSEUM_1
-	tileset Colosseum2Gfx,                  86 ; TILESET_COLOSSEUM_2
-	tileset Evolution1Gfx,                  96 ; TILESET_EVOLUTION_1
-	tileset Evolution2Gfx,                  86 ; TILESET_EVOLUTION_2
-	tileset Mystery1Gfx,                    96 ; TILESET_MYSTERY_1
-	tileset Mystery2Gfx,                    86 ; TILESET_MYSTERY_2
-	tileset Laboratory1Gfx,                 96 ; TILESET_LABORATORY_1
-	tileset Laboratory2Gfx,                 86 ; TILESET_LABORATORY_2
+	; tileset GameBoyPrinterGfx,              93 ; TILESET_GAMEBOY_PRINTER
+	; tileset Colosseum1Gfx,                  96 ; TILESET_COLOSSEUM_1
+	; tileset Colosseum2Gfx,                  86 ; TILESET_COLOSSEUM_2
+	; tileset Evolution1Gfx,                  96 ; TILESET_EVOLUTION_1
+	; tileset Evolution2Gfx,                  86 ; TILESET_EVOLUTION_2
+	; tileset Mystery1Gfx,                    96 ; TILESET_MYSTERY_1
+	; tileset Mystery2Gfx,                    86 ; TILESET_MYSTERY_2
+	; tileset Laboratory1Gfx,                 96 ; TILESET_LABORATORY_1
+	; tileset Laboratory2Gfx,                 86 ; TILESET_LABORATORY_2
 	tileset CharizardIntro1Gfx,             96 ; TILESET_CHARIZARD_INTRO_1
 	tileset CharizardIntro2Gfx,             96 ; TILESET_CHARIZARD_INTRO_2
 	tileset ScytherIntro1Gfx,               96 ; TILESET_SCYTHER_INTRO_1

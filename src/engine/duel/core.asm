@@ -42,6 +42,11 @@ StartDuel_VSAIOpp::
 	jr StartDuel
 
 StartDuel_VSLinkOpp:
+; 	ld a, 2
+; 	ld [wSerialOp], a
+; .debug
+; 	jr .debug
+
 	ld a, MUSIC_DUEL_THEME_1
 	ld [wDuelTheme], a
 	ld hl, wOpponentName
@@ -50,6 +55,50 @@ StartDuel_VSLinkOpp:
 	ld [hl], a
 	ld [wIsPracticeDuel], a
 ;	fallthrough
+
+
+; copy the TX_END-terminated player's name from sPlayerName to de
+; CopyPlayerName::
+	; call EnableSRAM
+	; ld hl, sPlayerName
+
+;     ld hl, wOpponentName_
+;     ld de, wOpponentName
+
+; .loop
+; 	ld a, [hli]
+; 	ld [de], a
+; 	inc de
+; 	or a ; TX_END
+; 	jr nz, .loop
+; 	; dec de
+; 	; ret
+
+    ; ; Copy opponent name received from JS
+    ; ld hl, wOpponentName_
+    ; ld de, wOpponentName
+    ; ld bc, NAME_LENGTH
+    ; call CopyBytes
+
+; ; CopyOpponentName::
+; 	ld hl, wOpponentName
+; 	ld a, [hli]
+; 	or [hl]
+; 	jr z, .special_name
+; 	ld a, [hld]
+; 	ld l, [hl]
+; 	ld h, a
+; 	jp CopyText
+; .special_name
+; 	ld hl, wNameBuffer
+; 	ld a, [hl]
+; 	or a
+; 	jr z, .print_player2
+; 	jr CopyPlayerName.loop
+; .print_player2
+; 	ldtx hl, Player2Text
+; 	jp CopyText
+
 
 StartDuel:
 	ld hl, sp+$0
@@ -66,7 +115,7 @@ StartDuel:
 	ld a, [wDuelTheme]
 	call PlaySong
 	call HandleDuelSetup
-	ret c
+	; ret c
 ;	fallthrough
 
 ; the loop returns here after every turn switch
@@ -91,24 +140,24 @@ MainDuelLoop:
 	jr nz, .duel_finished
 	ld hl, wDuelTurns
 	inc [hl]
-	ld a, [wDuelType]
-	cp DUELTYPE_PRACTICE
-	jr z, .practice_duel
+	; ld a, [wDuelType]
+	; cp DUELTYPE_PRACTICE
+	; jr z, .practice_duel
 
 .next_turn
 	call SwapTurn
 	jr MainDuelLoop
 
-.practice_duel
-	ld a, [wIsPracticeDuel]
-	or a
-	jr z, .next_turn
-	ld a, [hl]
-	cp 15 ; the practice duel lasts 15 turns (8 player turns and 7 opponent turns)
-	jr c, .next_turn
-	xor a ; DUEL_WIN
-	ld [wDuelResult], a
-	ret
+; .practice_duel
+; 	ld a, [wIsPracticeDuel]
+; 	or a
+; 	jr z, .next_turn
+; 	ld a, [hl]
+; 	cp 15 ; the practice duel lasts 15 turns (8 player turns and 7 opponent turns)
+; 	jr c, .next_turn
+; 	xor a ; DUEL_WIN
+; 	ld [wDuelResult], a
+; 	ret
 
 .duel_finished
 	call ZeroObjectPositionsAndToggleOAMCopy
@@ -303,10 +352,7 @@ PrintDuelMenuAndHandleInput:
 	ld hl, DuelMenuData
 	call PlaceTextItems
 .menu_items_printed
-	; bug, saving here can be problematic since in specific circumstances the duel may be over,
-	; and reloading it from here will lead to an invalid duel state
 	call SaveDuelData
-
 	ld a, [wDuelFinished]
 	or a
 	ret nz
@@ -954,12 +1000,12 @@ HandleEnergyDiscardMenuInput:
 .print_single_number
 	ld a, [wEnergyDiscardMenuNumerator]
 	inc b
-	call WriteTwoDigitNumberInTxSymbol_PadSpace
+	call WriteTwoDigitNumberInTxSymbolFormat
 .wait_input
 	call DoFrame
 	call HandleCardListInput
 	jr nc, .wait_input
-	cp MENU_CANCEL ; B pressed?
+	cp $ff ; B pressed?
 	jr z, .return_carry
 	call GetCardInDuelTempList_OnlyDeckIndex
 	or a
@@ -1018,7 +1064,7 @@ DuelMenu_Attack:
 	jr nz, .display_selected_attack_info
 	call HandleMenuInput
 	jr nc, .wait_for_input
-	cp MENU_CANCEL ; was B pressed?
+	cp -1 ; was B pressed?
 	jp z, PrintDuelMenuAndHandleInput
 	ld [wSelectedDuelSubMenuItem], a
 	call CheckIfEnoughEnergiesToAttack
@@ -1526,10 +1572,10 @@ PrintPlayerNumberOfHandAndDeckCards:
 	ld e, a
 	ld a, d
 	lb bc, 16, 10
-	call WriteTwoDigitNumberInTxSymbol_PadSpace
+	call WriteTwoDigitNumberInTxSymbolFormat
 	ld a, e
 	lb bc, 10, 10
-	jp WriteTwoDigitNumberInTxSymbol_PadSpace
+	jp WriteTwoDigitNumberInTxSymbolFormat
 
 PrintOpponentNumberOfHandAndDeckCards:
 	ld a, [wOpponentNumberOfCardsInHand]
@@ -1544,10 +1590,10 @@ PrintOpponentNumberOfHandAndDeckCards:
 	ld e, a
 	ld a, d
 	lb bc, 5, 3
-	call WriteTwoDigitNumberInTxSymbol_PadSpace
+	call WriteTwoDigitNumberInTxSymbolFormat
 	ld a, e
 	lb bc, 11, 3
-	jp WriteTwoDigitNumberInTxSymbol_PadSpace
+	jp WriteTwoDigitNumberInTxSymbolFormat
 
 DeckAndHandIconsTileData:
 ; x, y, tiles[], 0
@@ -1595,7 +1641,16 @@ DrawDuelistPortraitsAndNames:
 	; opponent's name (aligned to the right)
 	ld de, wDefaultText
 	push de
+
+	ld a, [wDuelistType]
+	cp DUELIST_TYPE_LINK_OPP
+	jr z, .link
 	call CopyOpponentName
+	jr .next
+
+.link
+	call CopyLinkOpponentName
+.next	
 	pop hl
 	call GetTextLengthInTiles
 	push hl
@@ -1605,6 +1660,16 @@ DrawDuelistPortraitsAndNames:
 	call InitTextPrinting
 	pop hl
 	call ProcessText
+
+; ; ;print opp name after prizetext
+; 	ld de, wDefaultText
+; 	push de
+; 	call CopyLinkOpponentName
+; 	lb de, 9, 16
+; 	call InitTextPrinting
+; 	pop hl
+; 	call ProcessText	
+
 	; opponent's portrait
 	ld a, [wOpponentPortrait]
 	lb bc, 13, 1
@@ -1626,7 +1691,7 @@ PrintDuelResultStats:
 
 ; print, at d,e, the number of prizes left, of active Pokemon, and of cards left in
 ; the deck of the turn duelist. b,c are used throughout as input coords for
-; WriteTwoDigitNumberInTxSymbol_PadSpace, and d,e for InitTextPrinting_ProcessTextFromID.
+; WriteTwoDigitNumberInTxSymbolFormat, and d,e for InitTextPrinting_ProcessTextFromID.
 .PrintDuelistResultStats:
 	call SetNoLineSeparation
 	ldtx hl, PrizesLeftActivePokemonCardsInDeckText
@@ -1660,7 +1725,7 @@ PrintDuelResultStats:
 	ld a, DECK_SIZE
 	sub [hl]
 .print_x_cards
-	call WriteTwoDigitNumberInTxSymbol_PadSpace
+	call WriteTwoDigitNumberInTxSymbolFormat
 	ldtx hl, CardsText
 	call InitTextPrinting_ProcessTextFromID
 	ret
@@ -1767,13 +1832,15 @@ HandleDuelSetup:
 	call SwapTurn
 	call ChooseInitialArenaAndBenchPokemon
 	call SwapTurn
-	jp c, .error
+	; jp c, .error
 	call DrawPlayAreaToPlacePrizeCards
 	ldtx hl, PlacingThePrizesText
 	call DrawWideTextBox_WaitForInput
 	call ExchangeRNG
 
-	ld a, [wDuelInitialPrizes]
+	; ld a, [wDuelInitialPrizes]
+	ld a, PRIZES_6
+	ld [wDuelInitialPrizes], a
 	ld l, a
 	ld h, 0
 	call LoadTxRam3
@@ -1866,10 +1933,10 @@ HandleDuelSetup:
 	; print new deck card number
 	lb bc, 3, 5
 	ld a, e
-	call WriteTwoDigitNumberInTxSymbol_PadSpace
+	call WriteTwoDigitNumberInTxSymbolFormat
 	lb bc, 18, 7
 	ld a, e
-	call WriteTwoDigitNumberInTxSymbol_PadSpace
+	call WriteTwoDigitNumberInTxSymbolFormat
 	pop hl
 	pop de
 	dec e ; decrease number of cards in deck
@@ -1921,21 +1988,32 @@ ChooseInitialArenaAndBenchPokemon:
 	ldtx hl, TransmittingDataText
 	call DrawWideTextBox_PrintText
 	call ExchangeRNG
+
+	; call wait_byte_exchange
+
 	ld hl, wPlayerDuelVariables
 	ld de, wOpponentDuelVariables
 	ld c, (wOpponentDuelVariables - wPlayerDuelVariables) / 2
 	call SerialExchangeBytes
-	jr c, .error
+
+	call wait_byte_exchange
+
+	; jr c, .error
+	ld hl, wPlayerDuelVariables
+	ld de, wOpponentDuelVariables
 	ld c, (wOpponentDuelVariables - wPlayerDuelVariables) / 2
 	call SerialExchangeBytes
-	jr c, .error
+
+	call wait_byte_exchange
+
+	; jr c, .error
 	ld a, DUELVARS_DUELIST_TYPE
 	call GetTurnDuelistVariable
 	ld [hl], DUELIST_TYPE_LINK_OPP
 	or a
 	ret
-.error
-	jp DuelTransmissionError
+; .error
+; 	jp DuelTransmissionError
 
 ; player's turn (either AI or link duel)
 ; prompt (force) the player to choose a basic Pokemon card to place in the arena
@@ -2008,9 +2086,9 @@ ChooseInitialArenaAndBenchPokemon:
 ; returns $00 in a and carry if no basic Pokemon cards are drawn, and $01 in a otherwise
 ShuffleDeckAndDrawSevenCards:
 	call InitializeDuelVariables
-	ld a, [wDuelType]
-	cp DUELTYPE_PRACTICE
-	jr z, .deck_ready
+	; ld a, [wDuelType]
+	; cp DUELTYPE_PRACTICE
+	; jr z, .deck_ready
 	call ShuffleDeck
 	call ShuffleDeck
 .deck_ready
@@ -2158,10 +2236,10 @@ PlayShuffleAndDrawCardsAnimation_BothDuelists:
 	ld c, DUEL_ANIM_BOTH_DRAW
 	ldtx hl, EachPlayerShuffleOpponentsDeckText
 	ldtx de, EachPlayerDraw7CardsText
-	ld a, [wDuelType]
-	cp DUELTYPE_PRACTICE
-	jr nz, PlayShuffleAndDrawCardsAnimation
-	ldtx hl, ThisIsJustPracticeDoNotShuffleText
+	; ld a, [wDuelType]
+	; cp DUELTYPE_PRACTICE
+	; jr nz, PlayShuffleAndDrawCardsAnimation
+	; ldtx hl, ThisIsJustPracticeDoNotShuffleText
 ;	fallthrough
 
 ; animate the shuffle and drawing screen
@@ -2711,11 +2789,11 @@ PracticeDuel_RepeatInstructions:
 	ldtx hl, FollowMyGuidancePracticeDuelText
 	call PrintPracticeDuelDrMasonInstructions
 	; restart the turn from the saved data of the previous turn
-	ld a, BANK(sBackupCurrentDuel)
+	ld a, $02
 	call BankswitchSRAM
-	ld de, sBackupCurrentDuel
-	call LoadSavedDuelDataFromDE
-	xor a ; BANK("SRAM0")
+	ld de, sCurrentDuel
+	call LoadSavedDuelData
+	xor a
 	call BankswitchSRAM
 	; return carry in order to repeat instructions
 	scf
@@ -3363,7 +3441,7 @@ CardListItemSelectionMenu:
 	call DoFrame
 	call HandleMenuInput
 	jr nc, .wait_a_or_b
-	cp MENU_CANCEL
+	cp -1
 	jr z, .b_pressed
 	; A pressed
 	or a
@@ -3408,7 +3486,7 @@ CardListFunction:
 	jr nz, .reload_card_image ; jump if the PAD_CTRL_PAD key was released this frame
 	ret
 .exit
-	ld a, MENU_CANCEL
+	ld a, $ff
 	ldh [hCurMenuItem], a
 .action_button
 	scf
@@ -3510,6 +3588,8 @@ OpenCardPage:
 	jr c, .done ; done if trying to advance past the last page with PAD_START or PAD_A
 	call EnableLCD
 .input_loop
+	ld a, TRUE
+	ld [wSkipAnimations], a
 	call DoFrame
 	ldh a, [hDPadHeld]
 	ld b, a
@@ -3873,7 +3953,7 @@ CardPageSwitch_TrainerEnd:
 
 ZeroObjectPositionsAndToggleOAMCopy:
 	call ZeroObjectPositions
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	ret
 
@@ -3907,7 +3987,7 @@ PlaceCardImageOAM:
 	ld d, a
 	dec c
 	jr nz, .next_column
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	ret
 
@@ -4245,10 +4325,10 @@ DisplayCardPage_PokemonOverview:
 	; print card level and maximum HP
 	lb bc, 12, 2
 	ld a, [wLoadedCard1Level]
-	call WriteTwoDigitNumberInTxSymbol_PadSpace
+	call WriteTwoDigitNumberInTxSymbolFormat
 	lb bc, 16, 2
 	ld a, [wLoadedCard1HP]
-	call WriteOneByteNumberInTxSymbol_PadSpace
+	call WriteTwoByteNumberInTxSymbolFormat
 	jr .print_numbers_and_energies
 
 ; CARDPAGETYPE_PLAY_AREA
@@ -4272,7 +4352,7 @@ DisplayCardPage_PokemonOverview:
 	; print Pokedex number in the bottom right corner (16,16)
 	lb bc, 16, 16
 	ld a, [wLoadedCard1PokedexNumber]
-	call WriteOneByteNumberInTxSymbol_PadSpace
+	call WriteTwoByteNumberInTxSymbolFormat
 	; print the name, damage, and energy cost of each attack and/or Pokemon power that exists
 	; first attack at 5,10 and second at 5,12
 	lb bc, 5, 10
@@ -4370,7 +4450,7 @@ PrintAttackOrPkmnPowerInformation:
 	ld b, 15 ; unless damage has three digits, this is effectively 16
 	ld c, e
 	inc c
-	call WriteOneByteNumberInTxSymbol_PadSpace
+	call WriteTwoByteNumberInTxSymbolFormat
 .print_category
 	pop hl
 	inc hl
@@ -4566,10 +4646,10 @@ DisplayCardPage_PokemonDescription:
 	; print the Level and HP numbers at 12,2 and 16,2 respectively
 	lb bc, 12, 2
 	ld a, [wLoadedCard1Level]
-	call WriteTwoDigitNumberInTxSymbol_PadSpace
+	call WriteTwoDigitNumberInTxSymbolFormat
 	lb bc, 16, 2
 	ld a, [wLoadedCard1HP]
-	call WriteOneByteNumberInTxSymbol_PadSpace
+	call WriteTwoByteNumberInTxSymbolFormat
 	; print the Pokemon's category at 1,10 (just above the length and weight texts)
 	lb de, 1, 10
 	ld hl, wLoadedCard1Category
@@ -4795,7 +4875,7 @@ PrintPokemonCardWeight:
 	push bc
 	ld l, e
 	ld h, d
-	call TwoByteNumberToTxSymbol_PadSpace_Bank1
+	call TwoByteNumberToTxSymbol_TrimLeadingZeros_Bank1
 	pop bc
 	pop hl
 	ld a, l
@@ -4853,7 +4933,7 @@ PrintPokemonCardLength:
 ; is printed after the number.
 	push de
 	push bc
-	call TwoByteNumberToTxSymbol_PadSpace_Bank1
+	call TwoByteNumberToTxSymbol_TrimLeadingZeros_Bank1
 	ld a, b
 	inc a
 	ld [wPokemonLengthPrintOffset], a
@@ -4998,7 +5078,7 @@ DisplayPlayAreaScreen:
 	add c
 	ldh [hTempPlayAreaLocation_ff9d], a
 	ldh a, [hCurMenuItem]
-	cp MENU_CANCEL
+	cp $ff
 	jr z, .asm_60b5
 	ldh a, [hTempPlayAreaLocation_ff9d]
 	add DUELVARS_ARENA_CARD_HP
@@ -5043,7 +5123,7 @@ PlayAreaScreenMenuFunction:
 	ret z
 	bit B_PAD_B, a
 	jr z, .start_or_a
-	ld a, MENU_CANCEL
+	ld a, $ff
 	ldh [hCurMenuItem], a
 .start_or_a
 	scf
@@ -5423,7 +5503,7 @@ PrintPlayAreaCardHeader:
 	ld c, a
 	ld b, 15
 	ld a, [wLoadedCard1Level]
-	call WriteTwoDigitNumberInTxSymbol_PadSpace
+	call WriteTwoDigitNumberInTxSymbolFormat
 
 	; print the 2x2 face down card image depending on the Pokemon's evolution stage
 	ld a, [wCurPlayAreaSlot]
@@ -5632,7 +5712,7 @@ DisplayPlayAreaScreenToUsePkmnPower:
 	ldh [hTempPlayAreaLocation_ff9d], a
 	ld [wHUDEnergyAndHPBarsX], a
 	jr nc, .asm_6447
-	cp MENU_CANCEL
+	cp $ff
 	jr z, .asm_649b
 	ld [wSelectedDuelSubMenuItem], a
 	ldh a, [hKeysPressed]
@@ -5823,15 +5903,15 @@ AttemptRetreat:
 	ld [wConfusionRetreatCheckWasUnsuccessful], a
 	ret
 
-; convert one-byte number in a to TX_SYMBOL format,
-; and write it to wStringBuffer + 2 and BGMap0 address at bc
-; replace leading zeros with SYM_SPACE
-WriteOneByteNumberInTxSymbol_PadSpace:
+; given a number between 0-255 in a, converts it to TX_SYMBOL format,
+; and writes it to wStringBuffer + 2 and to the BGMap0 address at bc.
+; leading zeros replaced with SYM_SPACE.
+WriteTwoByteNumberInTxSymbolFormat:
 	push de
 	push bc
 	ld l, a
 	ld h, $00
-	call TwoByteNumberToTxSymbol_PadSpace_Bank1
+	call TwoByteNumberToTxSymbol_TrimLeadingZeros_Bank1
 	pop bc
 	push bc
 	call BCCoordToBGMap0Address
@@ -5842,16 +5922,16 @@ WriteOneByteNumberInTxSymbol_PadSpace:
 	pop de
 	ret
 
-; convert one-byte two-digit number in a (0-99) to TX_SYMBOL format,
-; and write it to wStringBuffer + 3 and BGMap0 address at bc
-; replace leading zero with SYM_SPACE if 0-9
-WriteTwoDigitNumberInTxSymbol_PadSpace:
+; given a number between 0-99 in a, converts it to TX_SYMBOL format,
+; and writes it to wStringBuffer + 3 and to the BGMap0 address at bc.
+; if the number is between 0-9, the first digit is replaced with SYM_SPACE.
+WriteTwoDigitNumberInTxSymbolFormat:
 	push hl
 	push de
 	push bc
 	ld l, a
 	ld h, $00
-	call TwoByteNumberToTxSymbol_PadSpace_Bank1
+	call TwoByteNumberToTxSymbol_TrimLeadingZeros_Bank1
 	pop bc
 	push bc
 	call BCCoordToBGMap0Address
@@ -5863,9 +5943,9 @@ WriteTwoDigitNumberInTxSymbol_PadSpace:
 	pop hl
 	ret
 
-; convert two-byte number in hl to TX_SYMBOL format and write it to wStringBuffer
+; convert the number at hl to TX_SYMBOL text format and write it to wStringBuffer
 ; replace leading zeros with SYM_SPACE
-TwoByteNumberToTxSymbol_PadSpace_Bank1:
+TwoByteNumberToTxSymbol_TrimLeadingZeros_Bank1:
 	ld de, wStringBuffer
 	ld bc, -10000
 	call .get_digit
@@ -5934,7 +6014,8 @@ DrawHPBar:
 	jr nz, .tile_loop
 	ret
 
-; display attack detail when the opponent's Pokemon uses an attack
+; when an opponent's Pokemon card attacks, this displays a screen
+; containing the description and information of the used attack
 DisplayOpponentUsedAttackScreen:
 	call ZeroObjectPositionsAndToggleOAMCopy
 	call EmptyScreen
@@ -5988,54 +6069,51 @@ PrintUsedTrainerCardDescription:
 	ret
 
 ; save data of the current duel to sCurrentDuel
-; header (4 bytes): valid flag (TRUE), 2-byte checksum, [wDuelType]
-; main (826 bytes): defined in DuelDataToSave
+; byte 0 is $01, bytes 1 and 2 are the checksum, byte 3 is [wDuelType]
+; next $33a bytes come from DuelDataToSave
 SaveDuelData::
-	farcall StubbedUnusedSaveDataValidation
 	ld de, sCurrentDuel
 ;	fallthrough
 
 ; save data of the current duel to de (in SRAM)
-; header (4 bytes): valid flag (TRUE), 2-byte checksum, [wDuelType]
-; main (826 bytes): defined in DuelDataToSave
+; byte 0 is $01, bytes 1 and 2 are the checksum, byte 3 is [wDuelType]
+; next $33a bytes come from DuelDataToSave
 SaveDuelDataToDE::
 	call EnableSRAM
 	push de
-REPT SAVE_DUEL_HEADER_SIZE
 	inc de
-ENDR
+	inc de
+	inc de
+	inc de
 	ld hl, DuelDataToSave
 	push de
-; start copying data to de = sCurrentDuelData
-.loop_duel_data
-	ld c, [hl] ; LOW(ptr)
+.save_duel_data_loop
+	; start copying data to de = sCurrentDuelData + $1
+	ld c, [hl]
 	inc hl
-	ld b, [hl] ; HIGH(ptr)
+	ld b, [hl]
 	inc hl
 	ld a, c
 	or b
 	jr z, .data_done
 	push hl
 	push bc
-	ld c, [hl] ; LOW(size)
+	ld c, [hl]
 	inc hl
-	ld b, [hl] ; HIGH(size)
-	inc hl ; redundant
-	pop hl ; ptr
+	ld b, [hl]
+	inc hl
+	pop hl
 	call CopyDataHLtoDE
-; next
 	pop hl
 	inc hl
 	inc hl
-	jr .loop_duel_data
-
+	jr .save_duel_data_loop
 .data_done
 	pop hl
-; calculate checksum with hl = sCurrentDuelData (omitting last 6 bytes)
-; and set header
-	ld de, SAVE_DUEL_CHECKSUM_SEED
-	ld bc, SAVE_DUEL_DATA_SIZE - 6
-.loop_checksum
+	; save a checksum to hl = sCurrentDuelData + $1
+	lb de, $23, $45
+	ld bc, $334 ; misses last 6 bytes to calculate checksum
+.checksum_loop
 	ld a, e
 	sub [hl]
 	ld e, a
@@ -6045,16 +6123,16 @@ ENDR
 	dec bc
 	ld a, c
 	or b
-	jr nz, .loop_checksum
+	jr nz, .checksum_loop
 	pop hl
-	ld a, TRUE
-	ld [hli], a ; sCurrentDuelValid
+	ld a, $01
+	ld [hli], a ; sCurrentDuel
 	ld [hl], e ; sCurrentDuelChecksum
 	inc hl
 	ld [hl], d ; sCurrentDuelChecksum
 	inc hl
 	ld a, [wDuelType]
-	ld [hl], a ; sCurrentDuelType
+	ld [hl], a ; sCurrentDuelData
 	call DisableSRAM
 	ret
 
@@ -6062,10 +6140,10 @@ ENDR
 ; if the data is not valid, returns carry
 LoadAndValidateDuelSaveData:
 	ld hl, sCurrentDuel
-	call ValidateSavedDuelDataFromHL
+	call ValidateSavedDuelData
 	ret c
 	ld de, sCurrentDuel
-	call LoadSavedDuelDataFromDE
+	call LoadSavedDuelData
 
 	call ValidateGeneralSaveData
 	ret nc
@@ -6073,92 +6151,90 @@ LoadAndValidateDuelSaveData:
 	or a
 	ret
 
-; load data saved at de (in SRAM) to WRAM, using DuelDataToSave table
-; assumes saved data exists with valid checksum
-LoadSavedDuelDataFromDE:
+; load the data saved in sCurrentDuelData to WRAM according to the distribution
+; of DuelDataToSave. assumes saved data exists and that the checksum is valid.
+LoadSavedDuelData:
 	call EnableSRAM
-REPT SAVE_DUEL_HEADER_SIZE
 	inc de
-ENDR
+	inc de
+	inc de
+	inc de
 	ld hl, DuelDataToSave
-.loop_duel_data
-	ld c, [hl] ; LOW(ptr)
+.next_block
+	ld c, [hl]
 	inc hl
-	ld b, [hl] ; HIGH(ptr)
+	ld b, [hl]
 	inc hl
 	ld a, c
 	or b
 	jr z, .done
 	push hl
 	push bc
-	ld c, [hl] ; LOW(size)
+	ld c, [hl]
 	inc hl
-	ld b, [hl] ; HIGH(size)
-	inc hl ; redundant
-	pop hl ; ptr
-.loop_copy
+	ld b, [hl]
+	inc hl
+	pop hl
+.copy_loop
 	ld a, [de]
 	inc de
 	ld [hli], a
 	dec bc
 	ld a, c
 	or b
-	jr nz, .loop_copy
-; next
+	jr nz, .copy_loop
 	pop hl
 	inc hl
 	inc hl
-	jr .loop_duel_data
+	jr .next_block
 .done
 	call DisableSRAM
 	ret
 
-; 826 bytes
 DuelDataToSave:
 ;	dw address, number of bytes to copy
 	dw wPlayerDuelVariables,   wOpponentDuelVariables - wPlayerDuelVariables
 	dw wOpponentDuelVariables, wPlayerDeck - wOpponentDuelVariables
 	dw wPlayerDeck,            wDuelTempList - wPlayerDeck
-	dw wDuelStates,            wDuelStatesEnd - wDuelStates
+	dw wWhoseTurn,             wDuelTheme + $1 - wWhoseTurn
 	dw hWhoseTurn,             $1
-	dw wRNGVars,               RNGVARS_SIZE
+	dw wRNG1,                  wRNGCounter + $1 - wRNG1
 	dw wAIDuelVars,            wAIDuelVarsEnd - wAIDuelVars
 	dw NULL
 
-; return carry if sCurrentDuel is from link duel
-; or invalid (no valid flag or checksum mismatch)
+; return carry if there is no data saved at sCurrentDuel or if the checksum isn't correct,
+; or if the value saved from wDuelType is DUELTYPE_LINK
 ValidateSavedNonLinkDuelData:
 	call EnableSRAM
 	ld hl, sCurrentDuel
-	ld a, [sCurrentDuelType]
+	ld a, [sCurrentDuelData]
 	call DisableSRAM
 	cp DUELTYPE_LINK
-	jr nz, ValidateSavedDuelDataFromHL
-; ignore any saved data of link duel
+	jr nz, ValidateSavedDuelData
+	; ignore any saved data of a link duel
 	scf
 	ret
 
-; return carry if duel save at hl (in SRAM) is invalid
-; (no valid flag or checksum mismatch)
-ValidateSavedDuelDataFromHL:
+; return carry if there is no data saved at sCurrentDuel or if the checksum isn't correct
+; input: hl = sCurrentDuel
+ValidateSavedDuelData:
 	call EnableSRAM
 	push de
-	ld a, [hli] ; sCurrentDuelValid
-	or a ; cp FALSE
-	jr z, .set_carry
-	ld de, SAVE_DUEL_CHECKSUM_SEED
-	ld bc, SAVE_DUEL_DATA_SIZE - 6
-	ld a, [hl] ; sCurrentDuelChecksum
+	ld a, [hli]
+	or a
+	jr z, .no_saved_data
+	lb de, $23, $45
+	ld bc, $334
+	ld a, [hl]
 	sub e
 	ld e, a
 	inc hl
-	ld a, [hl] ; sCurrentDuelChecksum
+	ld a, [hl]
 	xor d
 	ld d, a
 	inc hl
 	inc hl
-; hl = sCurrentDuelData
-.loop_checksum
+.loop
 	ld a, [hl]
 	add e
 	ld e, a
@@ -6168,25 +6244,26 @@ ValidateSavedDuelDataFromHL:
 	dec bc
 	ld a, c
 	or b
-	jr nz, .loop_checksum
+	jr nz, .loop
 	ld a, e
 	or d
-	jr z, .no_carry
-.set_carry
+	jr z, .ok
+.no_saved_data
 	scf
-.no_carry
+.ok
 	call DisableSRAM
 	pop de
 	ret
 
-; reset sCurrentDuelValid and sCurrentDuelChecksum
-ClearSavedDuel:
+; discard data of a duel that was saved by SaveDuelData, by setting the first byte
+; of sCurrentDuel to $00, and zeroing the checksum (next two bytes)
+DiscardSavedDuelData:
 	call EnableSRAM
 	ld hl, sCurrentDuel
 	xor a
-	ld [hli], a ; sCurrentDuelValid
-	ld [hli], a ; sCurrentDuelChecksum
-	ld [hl], a  ; sCurrentDuelChecksum
+	ld [hli], a
+	ld [hli], a
+	ld [hl], a
 	call DisableSRAM
 	ret
 
@@ -6465,14 +6542,14 @@ DoLinkOpponentTurn:
 	call SerialRecvDuelData
 	ld a, OPPONENT_TURN
 	ldh [hWhoseTurn], a
-	ld a, [wSerialFlags]
-	or a
-	jp nz, DuelTransmissionError
+	; ld a, [wSerialFlags]
+	; or a
+	; jp nz, DuelTransmissionError
 	xor a
 	ld [wSkipDuelistIsThinkingDelay], a
 	ldh a, [hOppActionTableIndex]
 	cp NUM_OPP_ACTIONS
-	jp nc, DuelTransmissionError
+	; jp nc, DuelTransmissionError
 	ld hl, OppActionTable
 	call JumpToFunctionInTable
 	ld hl, wOpponentTurnEnded
@@ -6564,7 +6641,7 @@ OppAction_PlayBasicPokemonCard:
 	ldh [hTempPlayAreaLocation_ff9d], a
 	add DUELVARS_ARENA_CARD_STAGE
 	call GetTurnDuelistVariable
-	ld [hl], BASIC
+	ld [hl], 0
 	ldh a, [hTemp_ffa0]
 	ldtx hl, PlacedOnTheBenchText
 	call DisplayCardDetailScreen
@@ -6697,6 +6774,7 @@ OppAction_ForceSwitchActive:
 	call SwapTurn
 	ldh a, [hTempPlayAreaLocation_ff9d]
 	call SerialSendByte
+	; call wait_byte_exchange
 	ret
 
 OppAction_UsePokemonPower:
@@ -7652,9 +7730,9 @@ InitVariablesToBeginDuel:
 	xor a
 	ld [wDuelFinished], a
 	ld [wDuelTurns], a
-	ld [wUnused_cce7], a
+	ld [wcce7], a
 	ld a, $ff
-	ld [wUnused_cc0f], a
+	ld [wcc0f], a
 	ld [wPlayerAttackingCardIndex], a
 	ld [wPlayerAttackingAttackIndex], a
 	call EnableSRAM
@@ -7816,11 +7894,11 @@ ClearNonTurnTemporaryDuelvars::
 	ret
 
 ; same as ClearNonTurnTemporaryDuelvars, except the non-turn holder's arena
-; Pokemon status condition is copied to wUnused_DefendingPkmnStatus
+; Pokemon status condition is copied to wccc5
 ClearNonTurnTemporaryDuelvars_CopyStatus::
 	ld a, DUELVARS_ARENA_CARD_STATUS
 	call GetNonTurnDuelistVariable
-	ld [wUnused_DefendingPkmnStatus], a
+	ld [wccc5], a
 	call ClearNonTurnTemporaryDuelvars
 	ret
 
@@ -7843,6 +7921,11 @@ UpdateArenaCardLastTurnDamage::
 	ld [hli], a
 	ld [hl], a
 	ret
+
+; _TossCoin_Heads::
+; 	call ResetAnimationQueue
+; 	ld d, DUEL_ANIM_COIN_TOSS_GOING_TAILS
+; 	ld e, TAILS
 
 _TossCoin::
 	ld [wCoinTossTotalNum], a
@@ -7901,13 +7984,13 @@ _TossCoin::
 	lb bc, 15, 11
 	ld a, [wCoinTossNumTossed]
 	inc a ; current coin number is wCoinTossNumTossed + 1
-	call WriteTwoDigitNumberInTxSymbol_PadSpace
+	call WriteTwoDigitNumberInTxSymbolFormat
 	ld b, 17
 	ld a, SYM_SLASH
 	call WriteByteToBGMap0
 	inc b
 	ld a, [wCoinTossTotalNum]
-	call WriteTwoDigitNumberInTxSymbol_PadSpace
+	call WriteTwoDigitNumberInTxSymbolFormat
 
 .skip_print_coin_tally
 	call ResetAnimationQueue
@@ -8083,7 +8166,7 @@ _TossCoin::
 	ret nz ; not link duel
 	ldh a, [hff96]
 	call SerialSendByte
-	call .CheckTransmissionError
+	; call .CheckTransmissionError
 	ret
 
 ; if opponent is AI, then wait for animation and
@@ -8128,20 +8211,19 @@ _TossCoin::
 	call DoFrame
 	call SerialRecvByte
 	jr c, .wait_serial_byte_recv
-	call .CheckTransmissionError
 	ret
 
 .CheckTransmissionError:
 	push af
-	ld a, [wSerialFlags]
-	or a
-	jr nz, .transmission_error
+	; ld a, [wSerialFlags]
+	; or a
+	; jr nz, .transmission_error
 	pop af
 	ret
-.transmission_error
-	call FinishQueuedAnimations
-	call DuelTransmissionError
-	ret
+; .transmission_error
+; 	call FinishQueuedAnimations
+; 	call DuelTransmissionError
+; 	ret
 
 BuildVersion:
 	db "VER 12/20 09:36", TX_END
@@ -8249,10 +8331,10 @@ DrawOpponentSelectionScreen:
 	call DrawDuelistPortraitsAndNames
 	ld a, [wOpponentDeckID]
 	lb bc, 5, 16
-	call WriteOneByteNumberInTxSymbol_PadSpace
+	call WriteTwoByteNumberInTxSymbolFormat
 	ld a, [wNPCDuelPrizes]
 	lb bc, 15, 10
-	call WriteOneByteNumberInTxSymbol_PadSpace
+	call WriteTwoByteNumberInTxSymbolFormat
 	ret
 
 SelectComputerOpponentData:
@@ -8405,86 +8487,119 @@ PlayAttackAnimation::
 	ldh [hWhoseTurn], a
 	ret
 
-; debug? unreferenced
-RequestToPrintCards_SelectStartCard:
-	call EmptyScreen
-	call EnableLCD
-	ld a, GRASS_ENERGY
-	ld [wPrinterStartCardID], a
-.wait_input
-	call DoFrame
-	ldh a, [hDPadHeld]
-	ld b, a
-	ld a, [wPrinterStartCardID]
-; left
-	bit B_PAD_LEFT, b
-	jr z, .right
-	dec a ; previous card
-.right
-	bit B_PAD_RIGHT, b
-	jr z, .up
-	inc a ; next card
-.up
-	bit B_PAD_UP, b
-	jr z, .down
-	add 10
-.down
-	bit B_PAD_DOWN, b
-	jr z, .got_card_id
-	sub 10
+; Func_74dc:
+; 	call EmptyScreen
+; 	call EnableLCD
+; 	ld a, GRASS_ENERGY
+; 	ld [wPrizeCardSelectionFrameCounter], a
+; .wait_input
+; 	call DoFrame
+; 	ldh a, [hDPadHeld]
+; 	ld b, a
+; 	ld a, [wPrizeCardSelectionFrameCounter]
+; ; left
+; 	bit B_PAD_LEFT, b
+; 	jr z, .right
+; 	dec a ; previous card
+; .right
+; 	bit B_PAD_RIGHT, b
+; 	jr z, .up
+; 	inc a ; next card
+; .up
+; 	bit B_PAD_UP, b
+; 	jr z, .down
+; 	add 10
+; .down
+; 	bit B_PAD_DOWN, b
+; 	jr z, .got_card_id
+; 	sub 10
 
-.got_card_id
-	ld [wPrinterStartCardID], a
-	lb bc, 5, 5
-	bank1call WriteOneByteNumberInTxSymbol_PadSpace
-	ldh a, [hKeysPressed]
-	and PAD_START
-	jr z, .wait_input
-
-; request to print until end of card index
-	ld a, [wPrinterStartCardID]
-	ld e, a
-	ld d, 0
-.loop_cards
-	call LoadCardDataToBuffer1_FromCardID
-	ret c ; reached out of bounds
-	push de
-	ld a, e
-	call RequestToPrintCard
-	pop de
-	inc de
-	jr .loop_cards
+; .got_card_id
+; 	ld [wPrizeCardSelectionFrameCounter], a
+; 	lb bc, 5, 5
+; 	bank1call WriteTwoByteNumberInTxSymbolFormat
+; 	ldh a, [hKeysPressed]
+; 	and PAD_START
+; 	jr z, .wait_input
+; 	ld a, [wPrizeCardSelectionFrameCounter]
+; 	ld e, a
+; 	ld d, $0
+; .card_loop
+; 	call LoadCardDataToBuffer1_FromCardID
+; 	ret c ; card not found
+; 	push de
+; 	ld a, e
+; 	call RequestToPrintCard
+; 	pop de
+; 	inc de
+; 	jr .card_loop
 
 ; seems to communicate with other device
 ; for starting a duel
 ; outputs in hl either wPlayerDuelVariables
 ; or wOpponentDuelVariables depending on wSerialOp
 DecideLinkDuelVariables:
-	call Func_0e8e
+
+	ld a, TRUE
+	ld [wP1_Ready], a
+
+	; call Func_0e8e
+ 	call ClearSerialData
+	bank1call LoadPlayerDeck
 	ldtx hl, PressStartWhenReadyText
 	call DrawWideTextBox_PrintText
 	call EnableLCD
 .input_loop
 	call DoFrame
+
 	ldh a, [hKeysPressed]
 	bit B_PAD_B, a
 	jr nz, .link_cancel
-	and PAD_START
-	call Func_0cc5
-	jr nc, .input_loop
+
+	ld a, [wP2_Ready]
+	or a 
+	jr z, .input_loop	;not ready
+
+; make both players exchange decks
+; .exchange_loop
+; 	ld a, [wP2_Ready]
+
+	; ld hl, wPlayerDeck
+	; ld de, wOpponentDeck
+
+
 	ld hl, wPlayerDuelVariables
 	ld a, [wSerialOp]
 	cp $29
 	jr z, .link_continue
 	ld hl, wOpponentDuelVariables
-	cp $12
-	jr z, .link_continue
-.link_cancel
-	call ResetSerial
-	scf
-	ret
+	; cp $12
+	; jr z, .link_continue
+
 .link_continue
 	or a
 	ret
 
-	ret ; stray ret
+	;players ready
+	; ldh a, [hKeysPressed]
+	; bit B_PAD_B, a
+	; jr nz, .link_cancel
+	; and PAD_START
+	; call Func_0cc5
+	; jr nc, .input_loop
+	; ld hl, wPlayerDuelVariables
+	; ld a, [wSerialOp]
+	; cp $29
+	; jr z, .link_continue
+	; ld hl, wOpponentDuelVariables
+	; cp $12
+	; jr z, .link_continue
+.link_cancel
+	call ResetSerial
+	scf
+	ret
+; .link_continue
+; 	or a
+; 	ret
+
+	; ret ; stray ret

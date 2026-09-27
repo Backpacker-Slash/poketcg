@@ -183,3 +183,25 @@ RecycleDescription:
 	line "in your discard pile on top of your"
 	line "deck."
 	done
+
+SelectDuelMode:
+	text "Please select the Duel Mode:"
+	line "      Online  Challenge run"
+	done
+
+ChangeAvatarText:
+	text "left / right to change Avatar"
+	line "a to confirm / b to cancel"
+	done
+
+ChangeProfileText:
+	text "Change Profile"
+	line "             NAME    AVATAR"
+	done	
+
+ChooseAvatarText:
+	text "choose your Avatar."
+	line "you can change it"
+	line "later under the"
+	line "Profile menu option."
+	done

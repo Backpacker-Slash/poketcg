@@ -138,8 +138,8 @@ FillTileMap::
 
 ; zero work RAM, stack area, and high RAM ($C000-$DFFF, $FF80-$FFEF)
 ZeroRAM::
-	ld hl, STARTOF(WRAM0)
-	ld bc, SIZEOF(WRAM0)
+	ld hl, $c000
+	ld bc, $e000 - $c000
 .zero_wram_loop
 	xor a
 	ld [hli], a
@@ -147,9 +147,8 @@ ZeroRAM::
 	ld a, c
 	or b
 	jr nz, .zero_wram_loop
-
-	ld c, LOW(STARTOF("HRAM"))
-	ld b, SIZEOF("HRAM")
+	ld c, LOW($ff80)
+	ld b, $fff0 - $ff80
 	xor a
 .zero_hram_loop
 	ld [$ff00+c], a

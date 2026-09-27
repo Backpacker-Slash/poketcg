@@ -101,7 +101,7 @@ TextOffsets::
 	textpointer PlacedOnTheBenchText                               ; 0x0061
 	textpointer PlacedInTheArenaText                               ; 0x0062
 	textpointer ShufflesTheDeckText                                ; 0x0063
-	textpointer ThisIsJustPracticeDoNotShuffleText                 ; 0x0064
+	; textpointer ThisIsJustPracticeDoNotShuffleText                 ; 0x0064
 	textpointer EachPlayerShuffleOpponentsDeckText                 ; 0x0065
 	textpointer EachPlayerDraw7CardsText                           ; 0x0066
 	textpointer Drew7CardsText                                     ; 0x0067
@@ -395,6 +395,7 @@ TextOffsets::
 	textpointer ChooseTheNumberOfPrizesText                        ; 0x0187
 	textpointer PleaseWaitDecidingNumberOfPrizesText               ; 0x0188
 	textpointer BeginAPrizeDuelWithText                            ; 0x0189
+	textpointer BeginAPrizeLinkDuelWithText
 	textpointer AreYouBothReadyToCardPopText                       ; 0x018a
 	textpointer ThePopWasntSuccessfulText                          ; 0x018b
 	textpointer CannotCardPopWithFriendPreviouslyPoppedWithText    ; 0x018c
@@ -833,10 +834,10 @@ TextOffsets::
 	textpointer PauseMenuOptionsText                               ; 0x033d
 	textpointer DebugPauseMenuOptionsText                          ; 0x033e
 	textpointer PlayerStatusNameText                               ; 0x033f
-	textpointer PlayerStatusAlbumText                              ; 0x0340
+	textpointer PlayerOnlineLossesText                              ; 0x0340
 	textpointer PlayerStatusPlayTimeText                           ; 0x0341
 	textpointer PlayerDiaryTitleText                               ; 0x0342
-	textpointer PlayerDiaryMedalsWonText                           ; 0x0343
+	textpointer PlayerOnlineWinsText                           ; 0x0343
 	textpointer PlayerDiarySaveQuestionText                        ; 0x0344
 	textpointer PlayerDiarySaveConfirmText                         ; 0x0345
 	textpointer PlayerDiarySaveCancelText                          ; 0x0346
@@ -879,11 +880,15 @@ TextOffsets::
 	textpointer Mail15Text                                         ; 0x036b
 	textpointer NewGameText                                        ; 0x036c
 	textpointer CardPopContinueDiaryNewGameText                    ; 0x036d
-	textpointer CardPopContinueDiaryNewGameContinueDuelText        ; 0x036e
-	textpointer WhenYouCardPopWithFriendText                       ; 0x036f
-	textpointer ContinueFromDiarySummaryText                       ; 0x0370
-	textpointer StartANewGameText                                  ; 0x0371
-	textpointer TheGameWillContinueFromThePointInTheDuelText       ; 0x0372
+	textpointer StartMenuTextItems
+	; textpointer CardPopContinueDiaryNewGameContinueDuelText        ; 0x036e
+	textpointer ProfileText;WhenYouCardPopWithFriendText                       ; 0x036f
+	textpointer DuelText
+	textpointer DeckBuilderText
+	textpointer DeckVaultText
+	; textpointer ContinueFromDiarySummaryText                       ; 0x0370
+	; textpointer StartANewGameText                                  ; 0x0371
+	; textpointer TheGameWillContinueFromThePointInTheDuelText       ; 0x0372
 	textpointer SavedDataAlreadyExistsText                         ; 0x0373
 	textpointer OKToDeleteTheDataText                              ; 0x0374
 	textpointer AllDataWasDeletedText                              ; 0x0375
@@ -2991,3 +2996,7 @@ TextOffsets::
 	textpointer GamblerDescription                                 ; 0x0bab
 	textpointer RecycleName                                        ; 0x0bac
 	textpointer RecycleDescription                                 ; 0x0bad
+	textpointer SelectDuelMode
+	textpointer ChangeAvatarText
+	textpointer ChangeProfileText
+	textpointer ChooseAvatarText

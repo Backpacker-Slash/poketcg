@@ -7,46 +7,46 @@ ENDM
 
 Sprites:
 	table_width 4
-	gfx_pointer OWPlayerGfx,         $14 ; SPRITE_OW_PLAYER
-	gfx_pointer OWRonaldGfx,         $14 ; SPRITE_OW_RONALD
-	gfx_pointer OWDrMasonGfx,        $14 ; SPRITE_OW_DRMASON
-	gfx_pointer OWIshiharaGfx,       $14 ; SPRITE_OW_ISHIHARA
-	gfx_pointer OWImakuniGfx,        $14 ; SPRITE_OW_IMAKUNI
-	gfx_pointer OWNikkiGfx,          $14 ; SPRITE_OW_NIKKI
-	gfx_pointer OWRickGfx,           $14 ; SPRITE_OW_RICK
-	gfx_pointer OWKenGfx,            $14 ; SPRITE_OW_KEN
-	gfx_pointer OWAmyGfx,            $1b ; SPRITE_OW_AMY
-	gfx_pointer OWIsaacGfx,          $14 ; SPRITE_OW_ISAAC
-	gfx_pointer OWMitchGfx,          $14 ; SPRITE_OW_MITCH
-	gfx_pointer OWGeneGfx,           $14 ; SPRITE_OW_GENE
-	gfx_pointer OWMurrayGfx,         $14 ; SPRITE_OW_MURRAY
-	gfx_pointer OWCourtneyGfx,       $14 ; SPRITE_OW_COURTNEY
-	gfx_pointer OWSteveGfx,          $14 ; SPRITE_OW_STEVE
-	gfx_pointer OWJackGfx,           $14 ; SPRITE_OW_JACK
-	gfx_pointer OWRodGfx,            $14 ; SPRITE_OW_ROD
-	gfx_pointer OWBoyGfx,            $14 ; SPRITE_OW_BOY
-	gfx_pointer OWLadGfx,            $14 ; SPRITE_OW_LAD
-	gfx_pointer OWSpecsGfx,          $14 ; SPRITE_OW_SPECS
-	gfx_pointer OWButchGfx,          $14 ; SPRITE_OW_BUTCH
-	gfx_pointer OWManiaGfx,          $14 ; SPRITE_OW_MANIA
-	gfx_pointer OWJoshuaGfx,         $14 ; SPRITE_OW_JOSHUA
-	gfx_pointer OWHoodGfx,           $14 ; SPRITE_OW_HOOD
-	gfx_pointer OWTechGfx,           $14 ; SPRITE_OW_TECH
-	gfx_pointer OWChapGfx,           $14 ; SPRITE_OW_CHAP
-	gfx_pointer OWManGfx,            $14 ; SPRITE_OW_MAN
-	gfx_pointer OWPappyGfx,          $14 ; SPRITE_OW_PAPPY
-	gfx_pointer OWGirlGfx,           $14 ; SPRITE_OW_GIRL
-	gfx_pointer OWLass1Gfx,          $14 ; SPRITE_OW_LASS1
-	gfx_pointer OWLass2Gfx,          $14 ; SPRITE_OW_LASS2
-	gfx_pointer OWLass3Gfx,          $14 ; SPRITE_OW_LASS3
-	gfx_pointer OWSwimmerGfx,        $14 ; SPRITE_OW_SWIMMER
-	gfx_pointer OWClerkGfx,          $08 ; SPRITE_OW_CLERK
-	gfx_pointer OWGalGfx,            $14 ; SPRITE_OW_GAL
-	gfx_pointer OWWomanGfx,          $14 ; SPRITE_OW_WOMAN
-	gfx_pointer OWGrannyGfx,         $14 ; SPRITE_OW_GRANNY
-	gfx_pointer OverworldMapOAMGfx,  $08 ; SPRITE_OW_MAP_OAM
-	gfx_pointer OWTorchGfx,          $16 ; SPRITE_OW_TORCH
-	gfx_pointer OWLegendaryCardGfx,  $0a ; SPRITE_OW_LEGENDARY_CARD
+	; gfx_pointer OWPlayerGfx,         $14 ; SPRITE_OW_PLAYER
+	; gfx_pointer OWRonaldGfx,         $14 ; SPRITE_OW_RONALD
+	; gfx_pointer OWDrMasonGfx,        $14 ; SPRITE_OW_DRMASON
+	; gfx_pointer OWIshiharaGfx,       $14 ; SPRITE_OW_ISHIHARA
+	; gfx_pointer OWImakuniGfx,        $14 ; SPRITE_OW_IMAKUNI
+	; gfx_pointer OWNikkiGfx,          $14 ; SPRITE_OW_NIKKI
+	; gfx_pointer OWRickGfx,           $14 ; SPRITE_OW_RICK
+	; gfx_pointer OWKenGfx,            $14 ; SPRITE_OW_KEN
+	; gfx_pointer OWAmyGfx,            $1b ; SPRITE_OW_AMY
+	; gfx_pointer OWIsaacGfx,          $14 ; SPRITE_OW_ISAAC
+	; gfx_pointer OWMitchGfx,          $14 ; SPRITE_OW_MITCH
+	; gfx_pointer OWGeneGfx,           $14 ; SPRITE_OW_GENE
+	; gfx_pointer OWMurrayGfx,         $14 ; SPRITE_OW_MURRAY
+	; gfx_pointer OWCourtneyGfx,       $14 ; SPRITE_OW_COURTNEY
+	; gfx_pointer OWSteveGfx,          $14 ; SPRITE_OW_STEVE
+	; gfx_pointer OWJackGfx,           $14 ; SPRITE_OW_JACK
+	; gfx_pointer OWRodGfx,            $14 ; SPRITE_OW_ROD
+	; gfx_pointer OWBoyGfx,            $14 ; SPRITE_OW_BOY
+	; gfx_pointer OWLadGfx,            $14 ; SPRITE_OW_LAD
+	; gfx_pointer OWSpecsGfx,          $14 ; SPRITE_OW_SPECS
+	; gfx_pointer OWButchGfx,          $14 ; SPRITE_OW_BUTCH
+	; gfx_pointer OWManiaGfx,          $14 ; SPRITE_OW_MANIA
+	; gfx_pointer OWJoshuaGfx,         $14 ; SPRITE_OW_JOSHUA
+	; gfx_pointer OWHoodGfx,           $14 ; SPRITE_OW_HOOD
+	; gfx_pointer OWTechGfx,           $14 ; SPRITE_OW_TECH
+	; gfx_pointer OWChapGfx,           $14 ; SPRITE_OW_CHAP
+	; gfx_pointer OWManGfx,            $14 ; SPRITE_OW_MAN
+	; gfx_pointer OWPappyGfx,          $14 ; SPRITE_OW_PAPPY
+	; gfx_pointer OWGirlGfx,           $14 ; SPRITE_OW_GIRL
+	; gfx_pointer OWLass1Gfx,          $14 ; SPRITE_OW_LASS1
+	; gfx_pointer OWLass2Gfx,          $14 ; SPRITE_OW_LASS2
+	; gfx_pointer OWLass3Gfx,          $14 ; SPRITE_OW_LASS3
+	; gfx_pointer OWSwimmerGfx,        $14 ; SPRITE_OW_SWIMMER
+	; gfx_pointer OWClerkGfx,          $08 ; SPRITE_OW_CLERK
+	; gfx_pointer OWGalGfx,            $14 ; SPRITE_OW_GAL
+	; gfx_pointer OWWomanGfx,          $14 ; SPRITE_OW_WOMAN
+	; gfx_pointer OWGrannyGfx,         $14 ; SPRITE_OW_GRANNY
+	; gfx_pointer OverworldMapOAMGfx,  $08 ; SPRITE_OW_MAP_OAM
+	; gfx_pointer OWTorchGfx,          $16 ; SPRITE_OW_TORCH
+	; gfx_pointer OWLegendaryCardGfx,  $0a ; SPRITE_OW_LEGENDARY_CARD
 	gfx_pointer DuelGlowGfx,         $0b ; SPRITE_DUEL_GLOW
 	gfx_pointer DuelParalysisGfx,    $06 ; SPRITE_DUEL_PARALYSIS
 	gfx_pointer DuelSleepGfx,        $08 ; SPRITE_DUEL_SLEEP
@@ -104,15 +104,15 @@ Sprites:
 	gfx_pointer DuelDrainGfx,        $02 ; SPRITE_DUEL_DRAIN
 	gfx_pointer DuelSmallGlowGfx,    $03 ; SPRITE_DUEL_SMALL_GLOW
 	gfx_pointer DuelBallGfx,         $08 ; SPRITE_DUEL_BALL
-	gfx_pointer DuelCatPawGfx,       $0f ; SPRITE_DUEL_CAT_PAW
+	gfx_pointer DuelCatPawGfx,       $0f ; SPRITE_DUEL_CAT_POW
 	gfx_pointer DuelWaveGfx,         $03 ; SPRITE_DUEL_WAVE
 	gfx_pointer DuelCardGfx,         $05 ; SPRITE_DUEL_CARD
 	gfx_pointer DuelCoinGfx,         $17 ; SPRITE_DUEL_COIN
 	gfx_pointer DuelResultGfx,       $36 ; SPRITE_DUEL_RESULT
 	gfx_pointer LinkOAMGfx,          $0b ; SPRITE_LINK
-	gfx_pointer PrinterOAMGfx,       $06 ; SPRITE_PRINTER
-	gfx_pointer CardPopOAMGfx,       $16 ; SPRITE_CARD_POP
-	gfx_pointer BoosterPackOAMGfx,   $20 ; SPRITE_BOOSTER_PACK_OAM
+	; gfx_pointer PrinterOAMGfx,       $06 ; SPRITE_PRINTER
+	; gfx_pointer CardPopOAMGfx,       $16 ; SPRITE_CARD_POP
+	; gfx_pointer BoosterPackOAMGfx,   $20 ; SPRITE_BOOSTER_PACK_OAM
 	gfx_pointer PressStartGfx,       $14 ; SPRITE_PRESS_START
 	gfx_pointer GrassGfx,            $04 ; SPRITE_GRASS
 	gfx_pointer FireGfx,             $04 ; SPRITE_FIRE

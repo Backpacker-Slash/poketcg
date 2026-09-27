@@ -57,12 +57,12 @@ _LoadScene::
 	inc hl
 	push af ; palette
 	xor a
-	ld [wWhichOBP], a ; not used
+	ld [wd4ca], a
 	ld a, [hli]
-	ld [wWhichBGPalIndex], a ; palette offset
+	ld [wd4cb], a ; palette offset
 	ld [wd291], a ; palette offset
 	pop af ; palette
-	farcall LoadBGPalette ; load palette
+	farcall SetBGPAndLoadedPal ; load palette
 	ld a, [wConsole]
 	cp CONSOLE_CGB
 	ld a, [hli]
@@ -77,9 +77,9 @@ _LoadScene::
 	pop bc ; base x,y
 	call LoadScene_LoadSGBPacket
 	ld a, [hli]
-	ld [wVRAMTileOffset], a ; tile offset
+	ld [wd4ca], a ; tile offset
 	ld a, [hli]
-	ld [wWhichVRAMBank], a ; vram0 or vram1
+	ld [wd4cb], a ; vram0 or vram1
 	farcall LoadTilesetGfx
 .next_sprite
 	ld a, [hli]
@@ -91,17 +91,15 @@ _LoadScene::
 	ld a, [hli]
 	jr nz, .not_cgb_3
 	ld a, [hl]
-
 .not_cgb_3
 	inc hl
 	push af ; sprite palette
 	xor a
-	ld [wWhichOBP], a ; OBP0
+	ld [wd4ca], a
 	ld a, [hli]
-	ld [wWhichOBPalIndex], a ; palette index
+	ld [wd4cb], a ; palette offset
 	pop af ; sprite palette
-	farcall LoadOBPalette
-
+	farcall LoadPaletteData
 .next_animation
 	ld a, [hli]
 	or a
@@ -272,18 +270,18 @@ _DrawPortrait::
 	push hl
 	ld [wCurTileset], a
 	ld a, d
-	ld [wVRAMTileOffset], a
+	ld [wd4ca], a
 	xor a
-	ld [wWhichVRAMBank], a ; VRAM0
+	ld [wd4cb], a
 	farcall LoadTilesetGfx
 	pop hl
 	xor a
-	ld [wWhichOBP], a ; not used
+	ld [wd4ca], a
 	ld a, [wd291]
-	ld [wWhichBGPalIndex], a
+	ld [wd4cb], a
 	ld a, [hli]
 	push hl
-	farcall LoadBGPalette
+	farcall SetBGPAndLoadedPal
 	pop hl
 	ld a, [hli]
 	ld h, [hl]
@@ -297,108 +295,108 @@ _DrawPortrait::
 
 INCLUDE "data/duel/portraits.asm"
 
-LoadBoosterGfx:
-	push hl
-	push bc
-	push de
-	ld e, a
-	ld a, [wCurTilemap]
-	push af
-	push bc
-	ld a, e
-	call _LoadScene
-	call FlushAllPalettes
-	call SetBoosterLogoOAM
-	pop bc
-	pop af
-	ld [wCurTilemap], a
-	pop de
-	pop bc
-	pop hl
-	ret
+; LoadBoosterGfx:
+; 	push hl
+; 	push bc
+; 	push de
+; 	ld e, a
+; 	ld a, [wCurTilemap]
+; 	push af
+; 	push bc
+; 	ld a, e
+; 	call _LoadScene
+; 	call FlushAllPalettes
+; 	call SetBoosterLogoOAM
+; 	pop bc
+; 	pop af
+; 	ld [wCurTilemap], a
+; 	pop de
+; 	pop bc
+; 	pop hl
+; 	ret
 
-SetBoosterLogoOAM:
-	ld a, [wConsole]
-	cp CONSOLE_CGB
-	ret nz
-	push hl
-	push bc
-	push de
-	push bc
-	xor a
-	ld [wWhichVRAMBank], a ; VRAM0
-	ld [wVRAMTileOffset], a
-	ld a, SPRITE_BOOSTER_PACK_OAM
-	farcall LoadSpriteGfx
-	pop bc
-	call ZeroObjectPositions
-	ld hl, BoosterLogoOAM
-	ld c, [hl]
-	inc hl
-.oam_loop
-	push bc
-	ldh a, [hSCX]
-	ld d, a
-	ldh a, [hSCY]
-	ld e, a
-	ld a, [wSceneBaseY]
-	sub e
-	add [hl]
-	ld e, a
-	inc hl
-	ld a, [wSceneBaseX]
-	sub d
-	add [hl]
-	ld d, a
-	inc hl
-	ld a, [wd61f]
-	add [hl]
-	ld c, a
-	inc hl
-	ld b, [hl]
-	inc hl
-	call SetOneObjectAttributes
-	pop bc
-	dec c
-	jr nz, .oam_loop
-	ld hl, wVBlankOAMCopyToggle
-	inc [hl]
-	pop de
-	pop bc
-	pop hl
-	ret
+; SetBoosterLogoOAM:
+; 	ld a, [wConsole]
+; 	cp CONSOLE_CGB
+; 	ret nz
+; 	push hl
+; 	push bc
+; 	push de
+; 	push bc
+; 	xor a
+; 	ld [wd4cb], a
+; 	ld [wd4ca], a
+; 	ld a, SPRITE_BOOSTER_PACK_OAM
+; 	farcall Func_8025b
+; 	pop bc
+; 	call ZeroObjectPositions
+; 	ld hl, BoosterLogoOAM
+; 	ld c, [hl]
+; 	inc hl
+; .oam_loop
+; 	push bc
+; 	ldh a, [hSCX]
+; 	ld d, a
+; 	ldh a, [hSCY]
+; 	ld e, a
+; 	ld a, [wSceneBaseY]
+; 	sub e
+; 	add [hl]
+; 	ld e, a
+; 	inc hl
+; 	ld a, [wSceneBaseX]
+; 	sub d
+; 	add [hl]
+; 	ld d, a
+; 	inc hl
+; 	ld a, [wd61f]
+; 	add [hl]
+; 	ld c, a
+; 	inc hl
+; 	ld b, [hl]
+; 	inc hl
+; 	call SetOneObjectAttributes
+; 	pop bc
+; 	dec c
+; 	jr nz, .oam_loop
+; 	ld hl, wVBlankOAMCopyToggle
+; 	inc [hl]
+; 	pop de
+; 	pop bc
+; 	pop hl
+; 	ret
 
-BoosterLogoOAM:
-	db $20
-	db $00, $00, $00, $00
-	db $00, $08, $01, $00
-	db $00, $10, $02, $00
-	db $00, $18, $03, $00
-	db $00, $20, $04, $00
-	db $00, $28, $05, $00
-	db $00, $30, $06, $00
-	db $00, $38, $07, $00
-	db $08, $00, $10, $00
-	db $08, $08, $11, $00
-	db $08, $10, $12, $00
-	db $08, $18, $13, $00
-	db $08, $20, $14, $00
-	db $08, $28, $15, $00
-	db $08, $30, $16, $00
-	db $08, $38, $17, $00
-	db $10, $00, $08, $00
-	db $10, $08, $09, $00
-	db $10, $10, $0a, $00
-	db $10, $18, $0b, $00
-	db $10, $20, $0c, $00
-	db $10, $28, $0d, $00
-	db $10, $30, $0e, $00
-	db $10, $38, $0f, $00
-	db $18, $00, $18, $00
-	db $18, $08, $19, $00
-	db $18, $10, $1a, $00
-	db $18, $18, $1b, $00
-	db $18, $20, $1c, $00
-	db $18, $28, $1d, $00
-	db $18, $30, $1e, $00
-	db $18, $38, $1f, $00
+; BoosterLogoOAM:
+; 	db $20
+; 	db $00, $00, $00, $00
+; 	db $00, $08, $01, $00
+; 	db $00, $10, $02, $00
+; 	db $00, $18, $03, $00
+; 	db $00, $20, $04, $00
+; 	db $00, $28, $05, $00
+; 	db $00, $30, $06, $00
+; 	db $00, $38, $07, $00
+; 	db $08, $00, $10, $00
+; 	db $08, $08, $11, $00
+; 	db $08, $10, $12, $00
+; 	db $08, $18, $13, $00
+; 	db $08, $20, $14, $00
+; 	db $08, $28, $15, $00
+; 	db $08, $30, $16, $00
+; 	db $08, $38, $17, $00
+; 	db $10, $00, $08, $00
+; 	db $10, $08, $09, $00
+; 	db $10, $10, $0a, $00
+; 	db $10, $18, $0b, $00
+; 	db $10, $20, $0c, $00
+; 	db $10, $28, $0d, $00
+; 	db $10, $30, $0e, $00
+; 	db $10, $38, $0f, $00
+; 	db $18, $00, $18, $00
+; 	db $18, $08, $19, $00
+; 	db $18, $10, $1a, $00
+; 	db $18, $18, $1b, $00
+; 	db $18, $20, $1c, $00
+; 	db $18, $28, $1d, $00
+; 	db $18, $30, $1e, $00
+; 	db $18, $38, $1f, $00

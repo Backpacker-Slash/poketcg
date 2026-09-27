@@ -3,6 +3,15 @@
 ; then exchanges names and duels between the players
 ; and starts the main duel routine
 _SetUpAndStartLinkDuel:
+	; call ClearSerialData
+
+	ld a, $FF
+	ld [wSerialOp], a
+
+	; ld a, FALSE
+	; ld [wP1_Ready], a
+	; ld [wP2_Ready], a
+
 	ld hl, sp+$00
 	ld a, l
 	ld [wDuelReturnAddress + 0], a
@@ -14,13 +23,20 @@ _SetUpAndStartLinkDuel:
 	lb bc, 0, 0
 	call LoadScene
 
-	bank1call LoadPlayerDeck
-	call SwitchToCGBNormalSpeed
+	; bank1call LoadPlayerDeck
+
+	; call SwitchToCGBNormalSpeed
 	bank1call DecideLinkDuelVariables
+
 	push af
 	call RestoreVBlankFunction
 	pop af
-	jp c, .error
+	; ret c
+
+	; push af
+	; call RestoreVBlankFunction
+	; pop af
+	; jp c, .error
 
 	ld a, DUELIST_TYPE_PLAYER
 	ld [wPlayerDuelistType], a
@@ -29,15 +45,24 @@ _SetUpAndStartLinkDuel:
 	ld a, DUELTYPE_LINK
 	ld [wDuelType], a
 
+.check_serialOp
+	ld a, [wSerialOp]
+	cp $FF
+	jp z, .check_serialOp_DoFrame
+
 	call EmptyScreen
+
+	; ld a, $33
+    ; ld [wNPCDuelPrizes], a      ; BREADCRUMB 3: Entered routine
+
 	ld a, [wSerialOp]
 	cp $29
-	jr nz, .asm_1a540
+	jr nz, .go_second
 
 	ld a, PLAYER_TURN
 	ldh [hWhoseTurn], a
-	call .ExchangeNamesAndDecks
-	jr c, .error
+	; call .ExchangeNamesAndDecks
+	; jr c, .error
 	lb de, 6, 2
 	lb bc, 8, 6
 	call DrawRegularTextBox
@@ -50,60 +75,104 @@ _SetUpAndStartLinkDuel:
 	call EnableLCD
 	call .PickNumberOfPrizeCards
 	ld a, [wNPCDuelPrizes]
-	call SerialSend8Bytes
+	call SerialSendByte;SerialSend8Bytes
+	; ld a, PRIZES_6
+	; ld [wNPCDuelPrizes], a
 	jr .prizes_decided
 
-.asm_1a540
+.go_second
 	ld a, OPPONENT_TURN
 	ldh [hWhoseTurn], a
-	call .ExchangeNamesAndDecks
-	jr c, .error
+	; call .ExchangeNamesAndDecks
+	; jr c, .error
 	ldtx hl, PleaseWaitDecidingNumberOfPrizesText
 	call DrawWideTextBox_PrintText
 	call EnableLCD
-	call SerialRecv8Bytes
+.wait
+	call SerialRecvByte;SerialRecv8Bytes
+	jr c, .wait_DoFrame
 	ld [wNPCDuelPrizes], a
+	; ld a, PRIZES_6
+	; ld [wNPCDuelPrizes], a
 
 .prizes_decided
-	call ExchangeRNG
-	ld a, LINK_OPP_PIC
+	call ExchangeRNG	
+	; ld a, PRIZES_6
+	; ld [wNPCDuelPrizes], a
+	; call EmptyScreen ;; for test only
+
+	; ld a, $1
+	; ld [wSerialOp], a
+	; call ExchangeRNG
+	; ld a, $2
+	; ld [wSerialOp], a
+
+	; ld a, LINK_OPP_PIC
+	; ld [wOpponentPortrait], a
+
+	ld a, [wLinkOpponentAvatar]
 	ld [wOpponentPortrait], a
+
 	ldh a, [hWhoseTurn]
 	push af
+	; call EnableLCD
 	call EmptyScreen
 	bank1call SetDefaultConsolePalettes
 	ld a, SHUFFLE_DECK
 	ld [wDuelDisplayedScreen], a
+
 	bank1call DrawDuelistPortraitsAndNames
+	call EnableLCD	
 	ld a, OPPONENT_TURN
 	ldh [hWhoseTurn], a
+
+; ;print opp name after prizetext
+
+	; ld de, wDefaultText
+	; push de
+	; call CopyLinkOpponentName
+	; lb de, 4, 15
+	; call InitTextPrinting
+	; pop hl
+	; call ProcessText	
+	
 	ld a, [wNPCDuelPrizes]
 	ld l, a
 	ld h, $00
-	call LoadTxRam3
+	call LoadTxRam3 ; prizes
 	ldtx hl, BeginAPrizeDuelWithText
 	call DrawWideTextBox_WaitForInput
+
 	pop af
 	ldh [hWhoseTurn], a
 	call ExchangeRNG
+	; call wait_byte_exchange
 	bank1call StartDuel_VSLinkOpp
-	call SwitchToCGBDoubleSpeed
+	; call SwitchToCGBDoubleSpeed
 	ret
 
-.error
-	ld a, -1
-	ld [wDuelResult], a
-	call SetSpriteAnimationsAsVBlankFunction
+.wait_DoFrame
+	call DoFrame
+	jr .wait	
 
-	ld a, SCENE_GAMEBOY_LINK_NOT_CONNECTED
-	lb bc, 0, 0
-	call LoadScene
+; .error
+; 	ld a, -1
+; 	ld [wDuelResult], a
+; 	call SetSpriteAnimationsAsVBlankFunction
 
-	ldtx hl, TransmissionErrorText
-	call DrawWideTextBox_WaitForInput
-	call RestoreVBlankFunction
-	call ResetSerial
-	ret
+; 	ld a, SCENE_GAMEBOY_LINK_NOT_CONNECTED
+; 	lb bc, 0, 0
+; 	call LoadScene
+
+; 	ldtx hl, TransmissionErrorText
+; 	call DrawWideTextBox_WaitForInput
+; 	call RestoreVBlankFunction
+; 	call ResetSerial
+; 	ret
+
+.check_serialOp_DoFrame
+	call DoFrame
+	jp .check_serialOp
 
 .ExchangeNamesAndDecks
 	ld de, wDefaultText
@@ -113,7 +182,8 @@ _SetUpAndStartLinkDuel:
 	ld de, wNameBuffer
 	ld c, NAME_BUFFER_LENGTH
 	call SerialExchangeBytes
-	ret c
+	call wait_byte_exchange	
+	; ret c
 	xor a
 	ld hl, wOpponentName
 	ld [hli], a
@@ -122,6 +192,7 @@ _SetUpAndStartLinkDuel:
 	ld de, wOpponentDeck
 	ld c, DECK_SIZE
 	call SerialExchangeBytes
+	call wait_byte_exchange
 	ret
 
 ; handles player choice of number of prize cards

@@ -19,7 +19,7 @@ InvalidateSaveData:
 	call BankswitchSRAM
 	call DisableSRAM
 	call EnableSRAM
-	bank1call ClearSavedDuel
+	bank1call DiscardSavedDuelData
 	call DisableSRAM
 	pop hl
 	ret
@@ -31,8 +31,8 @@ SaveAndBackupData:
 	push de
 	ld de, sGeneralSaveData
 	call SaveGeneralSaveDataFromDE
-	ld de, sAlbumProgress
-	call UpdateAlbumProgress
+	; ld de, sAlbumProgress
+	;call UpdateAlbumProgress
 	call WriteBackupGeneralSaveData
 	call WriteBackupCardAndDeckSaveData
 	pop de
@@ -40,11 +40,11 @@ SaveAndBackupData:
 
 _SaveGeneralSaveData::
 	push de
-	call GetReceivedLegendaryCards
+	;call GetReceivedLegendaryCards
 	ld de, sGeneralSaveData
 	call SaveGeneralSaveDataFromDE
-	ld de, sAlbumProgress
-	call UpdateAlbumProgress
+	; ld de, sAlbumProgress
+	;call UpdateAlbumProgress
 	pop de
 	ret
 
@@ -54,10 +54,10 @@ SaveGeneralSaveDataFromDE:
 	push bc
 	call EnableSRAM
 	push de
-	farcall TryGiveMedalPCPacks
-	ld [wMedalCount], a
-	farcall OverworldMap_GetOWMapID
-	ld [wCurOverworldMap], a
+	;farcall TryGiveMedalPCPacks
+	;ld [wMedalCount], a
+	;farcall OverworldMap_GetOWMapID
+	;ld [wCurOverworldMap], a
 	pop de
 	push de
 	call CopyGeneralSaveDataToSRAM
@@ -70,23 +70,23 @@ SaveGeneralSaveDataFromDE:
 ; writes in de total num of cards collected
 ; and in (de + 1) total num of cards to collect
 ; also updates wTotalNumCardsCollected and wTotalNumCardsToCollect
-UpdateAlbumProgress:
-	push hl
-	push de
-	push de
-	call GetCardAlbumProgress
-	call EnableSRAM
-	pop hl
-	ld a, d
-	ld [wTotalNumCardsCollected], a
-	ld [hli], a
-	ld a, e
-	ld [wTotalNumCardsToCollect], a
-	ld [hl], a
-	call DisableSRAM
-	pop de
-	pop hl
-	ret
+; UpdateAlbumProgress:
+; 	push hl
+; 	push de
+; 	push de
+; 	call GetCardAlbumProgress
+; 	call EnableSRAM
+; 	pop hl
+; 	ld a, d
+; 	ld [wTotalNumCardsCollected], a
+; 	ld [hli], a
+; 	ld a, e
+; 	ld [wTotalNumCardsToCollect], a
+; 	ld [hl], a
+; 	call DisableSRAM
+; 	pop de
+; 	pop hl
+; 	ret
 
 ; save values that are listed in WRAMToSRAMMapper
 ; from WRAM to SRAM, and calculate its checksum
@@ -188,8 +188,8 @@ ValidateBackupGeneralSaveData:
 	call BankswitchSRAM
 	ld de, sBackupGeneralSaveData
 	call ValidateGeneralSaveDataFromDE
-	ld de, sAlbumProgress
-	call LoadAlbumProgressFromSRAM
+	; ld de, sAlbumProgress
+	; call LoadAlbumProgressFromSRAM
 	pop af
 	call BankswitchSRAM
 	call DisableSRAM
@@ -205,8 +205,8 @@ _ValidateGeneralSaveData::
 	call EnableSRAM
 	ld de, sGeneralSaveData
 	call ValidateGeneralSaveDataFromDE
-	ld de, sAlbumProgress
-	call LoadAlbumProgressFromSRAM
+	; ld de, sAlbumProgress
+	; call LoadAlbumProgressFromSRAM
 	call DisableSRAM
 	pop de
 	ld a, [wNumSRAMValidationErrors]
@@ -333,25 +333,25 @@ ValidateGeneralSaveDataFromDE:
 	ld [wPlayTimeHourMinutes + 2], a
 
 	; copy medal count and current overworld map
-	ld hl, sGeneralSaveDataHeaderEnd - sGeneralSaveData
-	add hl, de
-	ld a, [hli]
-	ld [wMedalCount], a
-	ld a, [hl]
-	ld [wCurOverworldMap], a
+	; ld hl, sGeneralSaveDataHeaderEnd - sGeneralSaveData
+	; add hl, de
+	; ld a, [hli]
+	; ld [wMedalCount], a
+	; ld a, [hl]
+	; ld [wCurOverworldMap], a
 	pop bc
 	pop hl
 	ret
 
-LoadAlbumProgressFromSRAM:
-	push de
-	ld a, [de]
-	ld [wTotalNumCardsCollected], a
-	inc de
-	ld a, [de]
-	ld [wTotalNumCardsToCollect], a
-	pop de
-	ret
+; LoadAlbumProgressFromSRAM:
+; 	push de
+; 	ld a, [de]
+; 	ld [wTotalNumCardsCollected], a
+; 	inc de
+; 	ld a, [de]
+; 	ld [wTotalNumCardsToCollect], a
+; 	pop de
+; 	ret
 
 ; first copies data from backup SRAM to main SRAM
 ; then loads it to WRAM from main SRAM
@@ -359,7 +359,7 @@ LoadBackupSaveData:
 	push hl
 	push de
 	call EnableSRAM
-	bank1call ClearSavedDuel
+	bank1call DiscardSavedDuelData
 	call DisableSRAM
 	call LoadBackupGeneralSaveData
 	call LoadBackupCardAndDeckSaveData
@@ -440,6 +440,7 @@ LoadGeneralSaveDataFromDE:
 	ld a, [sAnimationsDisabled]
 	ld [wAnimationsDisabled], a
 	ld a, [sTextSpeed]
+	; ld a, TEXT_SPEED_5
 	ld [wTextSpeed], a
 	call DisableSRAM
 	pop de
@@ -459,8 +460,8 @@ ENDM
 ; also works as a test in order check whether
 ; the saved values is SRAM are legal, within the given value range
 WRAMToSRAMMapper:
-	wram_sram_map wMedalCount,                        1, $00, $ff ; sMedalCount
-	wram_sram_map wCurOverworldMap,                   1, $00, $ff ; sCurOverworldMap
+	; wram_sram_map wMedalCount,                        1, $00, $ff ; sMedalCount
+	; wram_sram_map wCurOverworldMap,                   1, $00, $ff ; sCurOverworldMap
 	wram_sram_map wPlayTimeCounter + 0,               1, $00, $ff ; sPlayTimeCounter
 	wram_sram_map wPlayTimeCounter + 1,               1, $00, $ff
 	wram_sram_map wPlayTimeCounter + 2,               1, $00, $ff
@@ -475,14 +476,14 @@ WRAMToSRAMMapper:
 	wram_sram_map wNPCDuelist,                        1, $00, $ff ; sNPCDuelist
 	wram_sram_map wChallengeHallNPC,                  1, $00, $ff ; sChallengeHallNPC
 	wram_sram_map wd698,                              4, $00, $ff ; sb818
-	wram_sram_map wOWMapEvents,          NUM_MAP_EVENTS, $00, $ff ; sOWMapEvents
+	; wram_sram_map wOWMapEvents,          NUM_MAP_EVENTS, $00, $ff ; sOWMapEvents
 	wram_sram_map .EmptySRAMSlot,                     1, $00, $ff ; sb827
 	wram_sram_map wSelectedPauseMenuItem,             1, $00, $ff ; sSelectedPauseMenuItem
 	wram_sram_map wSelectedPCMenuItem,                1, $00, $ff ; sSelectedPCMenuItem
 	wram_sram_map wConfigCursorYPos,                  1, $00, $ff ; sConfigCursorYPos
 	wram_sram_map wSelectedGiftCenterMenuItem,        1, $00, $ff ; sSelectedGiftCenterMenuItem
-	wram_sram_map wPCPackSelection,                   1,   0,  14 ; sPCPackSelection
-	wram_sram_map wPCPacks,                NUM_PC_PACKS, $00, $ff ; sPCPacks
+	; wram_sram_map wPCPackSelection,                   1,   0,  14 ; sPCPackSelection
+	; wram_sram_map wPCPacks,                NUM_PC_PACKS, $00, $ff ; sPCPacks
 	wram_sram_map wDefaultSong,                       1, $00, $ff ; sDefaultSong
 	wram_sram_map wDebugPauseAllowed,                 1, $00, $ff ; sDebugPauseAllowed
 	wram_sram_map wRonaldIsInMap,                     1, $00, $ff ; sRonaldIsInMap
@@ -504,59 +505,59 @@ WRAMToSRAMMapper:
 ; if c is 0, save the player at their current position
 ; otherwise, save the player in Mason's lab
 _SaveGame::
-	ld a, c
-	or a
-	jr nz, .force_mason_lab
-	farcall BackupPlayerPosition
-	jr .save
+; 	ld a, c
+; 	or a
+; 	jr nz, .force_mason_lab
+; 	; farcall BackupPlayerPosition
+; 	jr .save
 
-.force_mason_lab
-	ld a, $2
-	ld [wTempPlayerXCoord], a
-	ld a, $4
-	ld [wTempPlayerYCoord], a
-	ld a, SOUTH
-	ld [wTempPlayerDirection], a
-	ld a, MASON_LABORATORY
-	ld [wTempMap], a
-	ld a, OWMAP_MASON_LABORATORY
-	ld [wOverworldMapSelection], a
+; .force_mason_lab
+; 	ld a, $2
+; 	ld [wTempPlayerXCoord], a
+; 	ld a, $4
+; 	ld [wTempPlayerYCoord], a
+; 	ld a, SOUTH
+; 	ld [wTempPlayerDirection], a
+; 	ld a, MASON_LABORATORY
+; 	ld [wTempMap], a
+; 	ld a, OWMAP_MASON_LABORATORY
+; 	ld [wOverworldMapSelection], a
 
-.save
+; .save
 	call SaveAndBackupData
 	ret
 
-_AddCardToCollectionAndUpdateAlbumProgress::
-	ld [wCardToAddToCollection], a
-	push hl
-	push bc
-	push de
-	ldh a, [hBankSRAM]
-	push af
-	ld a, BANK(sAlbumProgress)
-	call BankswitchSRAM
-	ld a, [wCardToAddToCollection]
-	call AddCardToCollection
-	ld de, sAlbumProgress
-	call UpdateAlbumProgress
-	pop af
-	call BankswitchSRAM
-	call DisableSRAM ; unnecessary
+; _AddCardToCollectionAndUpdateAlbumProgress::
+; 	ld [wCardToAddToCollection], a
+; 	push hl
+; 	push bc
+; 	push de
+; 	ldh a, [hBankSRAM]
+; 	push af
+; 	ld a, BANK(sAlbumProgress)
+; 	call BankswitchSRAM
+; 	ld a, [wCardToAddToCollection]
+; 	call AddCardToCollection
+; 	ld de, sAlbumProgress
+; 	call UpdateAlbumProgress
+; 	pop af
+; 	call BankswitchSRAM
+; 	call DisableSRAM ; unnecessary
 
-; unintentional? runs the same write operation
-; on the same address but on the current SRAM bank
-	ld a, [wCardToAddToCollection]
-	call AddCardToCollection
-	ld de, $b8fe
-	call UpdateAlbumProgress
-	pop de
-	pop bc
-	pop hl
-	ret
+; ; unintentional? runs the same write operation
+; ; on the same address but on the current SRAM bank
+; 	ld a, [wCardToAddToCollection]
+; 	call AddCardToCollection
+; 	ld de, $b8fe
+; 	call UpdateAlbumProgress
+; 	pop de
+; 	pop bc
+; 	pop hl
+; 	ret
 
 WriteBackupCardAndDeckSaveData:
 	ld bc, sCardAndDeckSaveDataEnd - sCardAndDeckSaveData
-	ld hl, sCardCollection
+	ld hl, sCardAndDeckSaveData
 	jr WriteDataToBackup
 
 WriteBackupGeneralSaveData:
@@ -589,7 +590,7 @@ WriteDataToBackup:
 
 LoadBackupCardAndDeckSaveData:
 	ld bc, sCardAndDeckSaveDataEnd - sCardAndDeckSaveData
-	ld hl, sCardCollection
+	ld hl, sCardAndDeckSaveData;sCardCollection
 	jr LoadDataFromBackup
 
 LoadBackupGeneralSaveData:

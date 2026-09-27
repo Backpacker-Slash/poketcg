@@ -5,7 +5,7 @@ TimerHandler::
 	push de
 	push bc
 	ei
-	call SerialTimerHandler
+	; call SerialTimerHandler
 	; only trigger every fourth interrupt ≈ 60.24 Hz
 	ld hl, wTimerCounter
 	ld a, [hl]

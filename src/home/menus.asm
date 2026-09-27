@@ -74,9 +74,7 @@ InitializeMenuParameters::
 ; returns a = 0 if A was pressed, a = -1 if B was pressed
 ; note: return values still subject to those of the function at [wMenuUpdateFunc] if any
 HandleMenuInput::
-	vc_hook Unknown_disable_menu_1
 	xor a
-	vc_hook Unknown_disable_menu_2
 	ld [wRefreshMenuCursorSFX], a
 	ldh a, [hDPadHeld]
 	or a
@@ -115,7 +113,6 @@ HandleMenuInput::
 	ld hl, wMenuUpdateFunc ; call the function if non-0 (periodically)
 	ld a, [hli]
 	or [hl]
-	vc_hook Disable_PC_Print_menu
 	jr z, .check_A_or_B
 	ld a, [hld]
 	ld l, [hl]
@@ -415,7 +412,7 @@ Func_2827::
 
 ; convert the number at a to TX_SYMBOL text format and write it to wDefaultText
 ; if the first digit is a 0, delete it and shift the number one tile to the left
-OneByteNumberToTxSymbol_TrimLeadingZeroAndAlign::
+OneByteNumberToTxSymbol_TrimLeadingZerosAndAlign::
 	call OneByteNumberToTxSymbol
 	ld a, [hli]
 	cp SYM_0
@@ -560,7 +557,7 @@ CardListMenuFunction::
 	ld c, a
 	ldh a, [hCurMenuItem]
 	inc a
-	call OneByteNumberToTxSymbol_PadSpace
+	call OneByteNumberToTxSymbol_TrimLeadingZeros
 	ld b, 13
 	ld a, 2
 	call CopyDataToBGMap0
@@ -568,7 +565,7 @@ CardListMenuFunction::
 	ld a, SYM_SLASH
 	call WriteByteToBGMap0
 	ld a, [wNumListItems]
-	call OneByteNumberToTxSymbol_PadSpace
+	call OneByteNumberToTxSymbol_TrimLeadingZeros
 	ld b, 16
 	ld a, 2
 	call CopyDataToBGMap0
@@ -598,7 +595,7 @@ CardListMenuFunction::
 
 ; convert the number at a to TX_SYMBOL text format and write it to wDefaultText
 ; replace leading zeros with SYM_SPACE
-OneByteNumberToTxSymbol_PadSpace::
+OneByteNumberToTxSymbol_TrimLeadingZeros::
 	call OneByteNumberToTxSymbol
 	ld a, [hl]
 	cp SYM_0
@@ -868,11 +865,39 @@ WideTextBoxMenuParameters::
 	db SYM_BOX_BOTTOM ; tile behind cursor
 	dw NULL ; function pointer if non-0
 
+HandleDuelMenuChoice::
+.start
+	ldtx hl, SelectDuelMode
+	call DrawWideTextBox_PrintTextNoDelay
+	lb de, 3, 16 ; x, y
+	ld a, d
+; returns carry if "no" selected
+	call TwoItemHorizontalMenu_cancel.custum
+	ret
+
+
+; display a two-item horizontal menu with custom text provided in hl and handle input
+; returns c when b pressed
+TwoItemHorizontalMenu_cancel::
+	call DrawWideTextBox_PrintTextNoDelay
+	lb de, 6, 16 ; x, y
+	ld a, d
+.custum	
+	ld [wLeftmostItemCursorX], a
+	lb bc, SYM_CURSOR_R, SYM_SPACE ; cursor tile, tile behind cursor
+	call SetCursorParametersForTextBox
+	ld a, 1
+	ld [wCurMenuItem], a
+	call EnableLCD
+	jp HandleYesOrNoMenu_cancel.refresh_menu
+
+
 ; display a two-item horizontal menu with custom text provided in hl and handle input
 TwoItemHorizontalMenu::
 	call DrawWideTextBox_PrintText
 	lb de, 6, 16 ; x, y
 	ld a, d
+.custum	
 	ld [wLeftmostItemCursorX], a
 	lb bc, SYM_CURSOR_R, SYM_SPACE ; cursor tile, tile behind cursor
 	call SetCursorParametersForTextBox
@@ -961,6 +986,69 @@ HandleYesOrNoMenu::
 	ld [wDefaultYesOrNo], a ; 0
 	ld a, 1
 	ldh [hCurMenuItem], a
+	scf
+	ret
+
+HandleYesOrNoMenu_cancel::
+	ld a, d
+	ld [wLeftmostItemCursorX], a
+	lb bc, SYM_CURSOR_R, SYM_SPACE ; cursor tile, tile behind cursor
+	call SetCursorParametersForTextBox
+	ld a, [wDefaultYesOrNo]
+	ld [wCurMenuItem], a
+	call EnableLCD
+	jr .refresh_menu
+.wait_button_loop
+	call DoFrame
+	call RefreshMenuCursor
+	ldh a, [hKeysPressed]
+	bit B_PAD_A, a
+	jr nz, .a_pressed
+
+	ldh a, [hKeysPressed]
+	bit B_PAD_B, a
+	jr nz, .b_pressed
+
+	ldh a, [hDPadHeld]
+	and PAD_RIGHT | PAD_LEFT
+	jr z, .wait_button_loop
+	; left or right pressed, so switch to the other menu item
+	ld a, SFX_CURSOR
+	call PlaySFX
+	call EraseCursor
+.refresh_menu
+	ld a, [wLeftmostItemCursorX]
+	ld c, a
+	; default to the second option (NO)
+	ld hl, wCurMenuItem
+	ld a, [hl]
+	xor $1
+	ld [hl], a
+	; x separation between left and right items is 4 tiles
+	add a
+	add a
+	add c
+	ld [wMenuCursorXOffset], a
+	xor a
+	ld [wCursorBlinkCounter], a
+	jr .wait_button_loop
+.a_pressed
+	ld a, [wCurMenuItem]
+	ldh [hCurMenuItem], a
+	or a
+	jr nz, .no
+;.yes
+	ld [wDefaultYesOrNo], a ; 0
+	ret
+.no
+	xor a
+	ld [wDefaultYesOrNo], a ; 0
+	ld a, 1
+	ldh [hCurMenuItem], a
+	or a
+	ret
+
+.b_pressed
 	scf
 	ret
 

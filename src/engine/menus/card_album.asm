@@ -29,10 +29,10 @@ CreateCardSetList:
 
 ; it's same set as input
 	ld a, e
-	cp VENUSAUR_LV64
-	jp z, .SetVenusaurLv64OwnedFlag
-	cp MEW_LV15
-	jp z, .SetMewLv15OwnedFlag
+	; cp VENUSAUR_LV64
+	; jp z, .SetVenusaurLv64OwnedFlag
+	; cp MEW_LV15
+	; jp z, .SetMewLv15OwnedFlag
 
 	push bc
 	push hl
@@ -210,12 +210,12 @@ CreateCardSetList:
 ; a = CARD_SET_* constant
 CreateCardSetListAndInitListCoords:
 	push af
-	ld hl, sCardCollection
+	ld hl, CardList;	ld hl, sCardCollection
 	ld de, wTempCardCollection
 	ld b, CARD_COLLECTION_SIZE - 1
-	call EnableSRAM
+	; call EnableSRAM
 	call CopyNBytesFromHLToDE
-	call DisableSRAM
+	; call DisableSRAM
 	pop af
 
 	push af
@@ -389,10 +389,10 @@ PrintCardSetListEntries:
 	ld a, [hl]
 	cp DOUBLE_COLORLESS_ENERGY + 1
 	jr c, .energy_card
-	cp VENUSAUR_LV64
-	jr z, .phantom_card
-	cp MEW_LV15
-	jr z, .phantom_card
+	; cp VENUSAUR_LV64
+	; jr z, .phantom_card
+	; cp MEW_LV15
+	; jr z, .phantom_card
 
 	ld a, [wNumVisibleCardListEntries]
 	sub b
@@ -603,7 +603,7 @@ HandleCardAlbumCardPage:
 	jp .handle_input
 
 .exit
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	ld a, [wCardListCursorPos]
 	ld [wTempCardListCursorPos], a
@@ -637,7 +637,7 @@ CardAlbum:
 	call HandleMenuInput
 	jp nc, .loop_input_1 ; can be jr
 	ldh a, [hCurMenuItem]
-	cp MENU_CANCEL
+	cp $ff
 	ret z
 
 	; ignore input if this Card Set is unavailable
@@ -666,7 +666,7 @@ CardAlbum:
 	ldh a, [hKeysPressed]
 	and PAD_B
 	jr z, .loop_input_2
-	ld a, MENU_CANCEL
+	ld a, $ff
 	call PlaySFXConfirmOrCancel
 	ldh a, [hCurMenuItem]
 	jp .booster_pack_menu
@@ -701,7 +701,7 @@ CardAlbum:
 	and PAD_START
 	jr z, .loop_input_3
 .open_card_page
-	ld a, MENU_CONFIRM
+	ld a, $01
 	call PlaySFXConfirmOrCancel
 	ld a, [wCardListNumCursorPositions]
 	ld [wTempCardListNumCursorPositions], a
@@ -743,7 +743,7 @@ CardAlbum:
 	ld a, [wCardListCursorPos]
 	ld [wTempCardListCursorPos], a
 	ld a, [hffb3]
-	cp MENU_CANCEL
+	cp $ff
 	jr nz, .open_card_page
 	ldh a, [hCurMenuItem]
 	jp .booster_pack_menu
@@ -788,7 +788,7 @@ CardAlbum:
 	ld [wTileMapFill], a
 	call ZeroObjectPositions
 	call EmptyScreen
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 	call LoadCursorTile
 	call LoadSymbolsFont
@@ -893,7 +893,7 @@ CardAlbum:
 	ld [hffb4], a
 	call Set_OBJ_8x8
 	call ZeroObjectPositions
-	ld a, TRUE
+	ld a, $01
 	ld [wVBlankOAMCopyToggle], a
 
 	call LoadCursorTile

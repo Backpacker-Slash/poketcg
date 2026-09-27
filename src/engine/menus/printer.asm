@@ -39,7 +39,7 @@ PrinterMenu_PokemonCards:
 	call HandleCardSelectionInput
 	jr nc, .loop_frame_1
 	ld a, [hffb3]
-	cp MENU_CANCEL
+	cp $ff
 	jr nz, .asm_abd7
 	ret
 
@@ -78,7 +78,7 @@ PrinterMenu_PokemonCards:
 	and PAD_START
 	jr z, .loop_frame_2
 ; start btn
-	ld a, MENU_CONFIRM
+	ld a, $01
 	call PlaySFXConfirmOrCancel
 	ld a, [wCardListNumCursorPositions]
 	ld [wTempCardListNumCursorPositions], a
@@ -118,7 +118,7 @@ PrinterMenu_PokemonCards:
 	ld a, [wCardListCursorPos]
 	ld [wTempCardListCursorPos], a
 	ld a, [hffb3]
-	cp MENU_CANCEL
+	cp $ff
 	jr nz, .asm_ac92
 
 	ld hl, FiltersCardSelectionParams
@@ -197,121 +197,121 @@ Data_ad05:
 	db SYM_SPACE ; invisible cursor tile
 	dw NULL ; wCardListHandlerFunction
 
-PrinterMenu_CardList:
-	call WriteCardListsTerminatorBytes
-	call Set_OBJ_8x8
-	call PrepareMenuGraphics
-	lb bc, 0, 4
-	ld a, SYM_BOX_TOP
-	call FillBGMapLineWithA
+; PrinterMenu_CardList:
+; 	call WriteCardListsTerminatorBytes
+; 	call Set_OBJ_8x8
+; 	call PrepareMenuGraphics
+; 	lb bc, 0, 4
+; 	ld a, SYM_BOX_TOP
+; 	call FillBGMapLineWithA
 
-	xor a
-	ld [wCardListVisibleOffset], a
-	ld [wCurCardTypeFilter], a
-	call PrintFilteredCardSelectionList
-	call EnableLCD
-	lb de, 1, 1
-	call InitTextPrinting
-	ldtx hl, PrintTheCardListText
-	call ProcessTextFromID
-	ld a, $01
-	ld hl, Data_ad05
-	call InitCardSelectionParams
-.loop_frame
-	call DoFrame
-	call HandleCardSelectionInput
-	jr nc, .loop_frame
-	ld a, [hffb3]
-	or a
-	ret nz
-	bank1call PrintCardList
-	ret
+; 	xor a
+; 	ld [wCardListVisibleOffset], a
+; 	ld [wCurCardTypeFilter], a
+; 	call PrintFilteredCardSelectionList
+; 	call EnableLCD
+; 	lb de, 1, 1
+; 	call InitTextPrinting
+; 	ldtx hl, PrintTheCardListText
+; 	call ProcessTextFromID
+; 	ld a, $01
+; 	ld hl, Data_ad05
+; 	call InitCardSelectionParams
+; .loop_frame
+; 	call DoFrame
+; 	call HandleCardSelectionInput
+; 	jr nc, .loop_frame
+; 	ld a, [hffb3]
+; 	or a
+; 	ret nz
+; 	bank1call PrintCardList
+; 	ret
 
-HandlePrinterMenu:
-	bank1call PreparePrinterConnection
-	ret c
-	xor a
-.loop
-	ld hl, PrinterMenuParameters
-	call InitializeMenuParameters
-	call EmptyScreenAndLoadFontDuelAndHandCardsIcons
-	lb de, 4, 0
-	lb bc, 12, 12
-	call DrawRegularTextBox
-	lb de, 6, 2
-	call InitTextPrinting
-	ldtx hl, PrintMenuItemsText
-	call ProcessTextFromID
-	ldtx hl, WhatWouldYouLikeToPrintText
-	call DrawWideTextBox_PrintText
-	call EnableLCD
-.loop_input
-	call DoFrame
-	call HandleMenuInput
-	jr nc, .loop_input
-	ldh a, [hCurMenuItem]
-	cp MENU_CANCEL
-	call z, PrinterMenu_QuitPrint
-	ld [wSelectedPrinterMenuItem], a
-	ld hl, PrinterMenuFunctionTable
-	call JumpToFunctionInTable
-	ld a, [wSelectedPrinterMenuItem]
-	jr .loop
+; HandlePrinterMenu:
+; 	bank1call PreparePrinterConnection
+; 	ret c
+; 	xor a
+; .loop
+; 	ld hl, PrinterMenuParameters
+; 	call InitializeMenuParameters
+; 	call EmptyScreenAndLoadFontDuelAndHandCardsIcons
+; 	lb de, 4, 0
+; 	lb bc, 12, 12
+; 	call DrawRegularTextBox
+; 	lb de, 6, 2
+; 	call InitTextPrinting
+; 	ldtx hl, PrintMenuItemsText
+; 	call ProcessTextFromID
+; 	ldtx hl, WhatWouldYouLikeToPrintText
+; 	call DrawWideTextBox_PrintText
+; 	call EnableLCD
+; .loop_input
+; 	call DoFrame
+; 	call HandleMenuInput
+; 	jr nc, .loop_input
+; 	ldh a, [hCurMenuItem]
+; 	cp $ff
+; 	call z, PrinterMenu_QuitPrint
+; 	ld [wSelectedPrinterMenuItem], a
+; 	ld hl, PrinterMenuFunctionTable
+; 	call JumpToFunctionInTable
+; 	ld a, [wSelectedPrinterMenuItem]
+; 	jr .loop
 
-PrinterMenu_QuitPrint:
-	add sp, $2 ; exit menu
-	ldtx hl, PleaseMakeSureToTurnGameBoyPrinterOffText
-	call DrawWideTextBox_WaitForInput
-	ret
+; PrinterMenu_QuitPrint:
+; 	add sp, $2 ; exit menu
+; 	ldtx hl, PleaseMakeSureToTurnGameBoyPrinterOffText
+; 	call DrawWideTextBox_WaitForInput
+; 	ret
 
-PrinterMenuFunctionTable:
-	dw PrinterMenu_PokemonCards
-	dw PrinterMenu_DeckConfiguration
-	dw PrinterMenu_CardList
-	dw PrinterMenu_PrintQuality
-	dw PrinterMenu_QuitPrint
+; PrinterMenuFunctionTable:
+; 	dw PrinterMenu_PokemonCards
+; 	dw PrinterMenu_DeckConfiguration
+; 	dw PrinterMenu_CardList
+; 	dw PrinterMenu_PrintQuality
+; 	dw PrinterMenu_QuitPrint
 
-PrinterMenuParameters:
-	db 5, 2 ; cursor x, cursor y
-	db 2 ; y displacement between items
-	db 5 ; number of items
-	db SYM_CURSOR_R ; cursor tile number
-	db SYM_SPACE ; tile behind cursor
-	dw NULL ; function pointer if non-0
+; PrinterMenuParameters:
+; 	db 5, 2 ; cursor x, cursor y
+; 	db 2 ; y displacement between items
+; 	db 5 ; number of items
+; 	db SYM_CURSOR_R ; cursor tile number
+; 	db SYM_SPACE ; tile behind cursor
+; 	dw NULL ; function pointer if non-0
 
-PrinterMenu_PrintQuality:
-	ldtx hl, PleaseSetTheContrastText
-	call DrawWideTextBox_PrintText
-	call EnableSRAM
-	ld a, [sPrinterContrastLevel]
-	call DisableSRAM
-	ld hl, Data_adf5
-	call InitCardSelectionParams
-.loop_frame
-	call DoFrame
-	call HandleCardSelectionInput
-	jr nc, .loop_frame
-	ld a, [hffb3]
-	cp MENU_CANCEL
-	jr z, .asm_ade2
-	call EnableSRAM
-	ld [sPrinterContrastLevel], a
-	call DisableSRAM
-.asm_ade2
-	add sp, $2 ; exit menu
-	ld a, [wSelectedPrinterMenuItem]
-	ld hl, PrinterMenuParameters
-	call InitializeMenuParameters
-	ldtx hl, WhatWouldYouLikeToPrintText
-	call DrawWideTextBox_PrintText
-	jr HandlePrinterMenu.loop_input
+; PrinterMenu_PrintQuality:
+; 	ldtx hl, PleaseSetTheContrastText
+; 	call DrawWideTextBox_PrintText
+; 	call EnableSRAM
+; 	ld a, [sPrinterContrastLevel]
+; 	call DisableSRAM
+; 	ld hl, Data_adf5
+; 	call InitCardSelectionParams
+; .loop_frame
+; 	call DoFrame
+; 	call HandleCardSelectionInput
+; 	jr nc, .loop_frame
+; 	ld a, [hffb3]
+; 	cp $ff
+; 	jr z, .asm_ade2
+; 	call EnableSRAM
+; 	ld [sPrinterContrastLevel], a
+; 	call DisableSRAM
+; .asm_ade2
+; 	add sp, $2 ; exit menu
+; 	ld a, [wSelectedPrinterMenuItem]
+; 	ld hl, PrinterMenuParameters
+; 	call InitializeMenuParameters
+; 	ldtx hl, WhatWouldYouLikeToPrintText
+; 	call DrawWideTextBox_PrintText
+; 	jr HandlePrinterMenu.loop_input
 
-Data_adf5:
-	db 5  ; x pos
-	db 16 ; y pos
-	db 0  ; y spacing
-	db 2  ; x spacing
-	db 5  ; num entries
-	db SYM_CURSOR_R ; visible cursor tile
-	db SYM_SPACE ; invisible cursor tile
-	dw NULL ; wCardListHandlerFunction
+; Data_adf5:
+; 	db 5  ; x pos
+; 	db 16 ; y pos
+; 	db 0  ; y spacing
+; 	db 2  ; x spacing
+; 	db 5  ; num entries
+; 	db SYM_CURSOR_R ; visible cursor tile
+; 	db SYM_SPACE ; invisible cursor tile
+; 	dw NULL ; wCardListHandlerFunction

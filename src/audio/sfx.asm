@@ -403,14 +403,14 @@ SFX_wave:
 	ld a, AUD3ENA_OFF
 	ldh [rAUD3ENA], a
 	ld b, d
-	ld de, _AUD3WAVERAM
+	ld de, $ff30
 .asm_fc215
 	ld a, [hli]
 	ld [de], a
 	inc de
 	inc b
 	ld a, b
-	cp AUD3WAVE_SIZE
+	cp $10
 	jr nz, .asm_fc215
 	ld a, $1
 	ld [wMusicWaveChange], a

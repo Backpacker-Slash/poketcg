@@ -1,33 +1,33 @@
 	const_def
-	const TILESET_OVERWORLD_MAP               ; $00
-	const TILESET_MASON_LABORATORY            ; $01
-	const TILESET_ISHIHARA                    ; $02
-	const TILESET_CLUB_ENTRANCE               ; $03
-	const TILESET_CLUB_LOBBY                  ; $04
-	const TILESET_FIGHTING_CLUB               ; $05
-	const TILESET_ROCK_CLUB                   ; $06
-	const TILESET_WATER_CLUB                  ; $07
-	const TILESET_LIGHTNING_CLUB              ; $08
-	const TILESET_GRASS_CLUB                  ; $09
-	const TILESET_PSYCHIC_CLUB                ; $0a
-	const TILESET_SCIENCE_CLUB                ; $0b
-	const TILESET_FIRE_CLUB                   ; $0c
-	const TILESET_CHALLENGE_HALL              ; $0d
-	const TILESET_POKEMON_DOME_ENTRANCE       ; $0e
-	const TILESET_POKEMON_DOME                ; $0f
-	const TILESET_HALL_OF_HONOR               ; $10
+	; const TILESET_OVERWORLD_MAP               ; $00
+	; const TILESET_MASON_LABORATORY            ; $01
+	; const TILESET_ISHIHARA                    ; $02
+	; const TILESET_CLUB_ENTRANCE               ; $03
+	; const TILESET_CLUB_LOBBY                  ; $04
+	; const TILESET_FIGHTING_CLUB               ; $05
+	; const TILESET_ROCK_CLUB                   ; $06
+	; const TILESET_WATER_CLUB                  ; $07
+	; const TILESET_LIGHTNING_CLUB              ; $08
+	; const TILESET_GRASS_CLUB                  ; $09
+	; const TILESET_PSYCHIC_CLUB                ; $0a
+	; const TILESET_SCIENCE_CLUB                ; $0b
+	; const TILESET_FIRE_CLUB                   ; $0c
+	; const TILESET_CHALLENGE_HALL              ; $0d
+	; const TILESET_POKEMON_DOME_ENTRANCE       ; $0e
+	; const TILESET_POKEMON_DOME                ; $0f
+	; const TILESET_HALL_OF_HONOR               ; $10
 	const TILESET_CARD_POP                    ; $11
-	const TILESET_MEDAL                       ; $12
+	; const TILESET_MEDAL                       ; $12
 	const TILESET_GAMEBOY_LINK                ; $13
-	const TILESET_GAMEBOY_PRINTER             ; $14
-	const TILESET_COLOSSEUM_1                 ; $15
-	const TILESET_COLOSSEUM_2                 ; $16
-	const TILESET_EVOLUTION_1                 ; $17
-	const TILESET_EVOLUTION_2                 ; $18
-	const TILESET_MYSTERY_1                   ; $19
-	const TILESET_MYSTERY_2                   ; $1a
-	const TILESET_LABORATORY_1                ; $1b
-	const TILESET_LABORATORY_2                ; $1c
+	; const TILESET_GAMEBOY_PRINTER             ; $14
+	; const TILESET_COLOSSEUM_1                 ; $15
+	; const TILESET_COLOSSEUM_2                 ; $16
+	; const TILESET_EVOLUTION_1                 ; $17
+	; const TILESET_EVOLUTION_2                 ; $18
+	; const TILESET_MYSTERY_1                   ; $19
+	; const TILESET_MYSTERY_2                   ; $1a
+	; const TILESET_LABORATORY_1                ; $1b
+	; const TILESET_LABORATORY_2                ; $1c
 	const TILESET_CHARIZARD_INTRO_1           ; $1d
 	const TILESET_CHARIZARD_INTRO_2           ; $1e
 	const TILESET_SCYTHER_INTRO_1             ; $1f

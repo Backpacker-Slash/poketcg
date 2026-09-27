@@ -111,22 +111,22 @@ SetNPCMatchStartTheme:
 	ld a, [hli]
 	ld [wMatchStartTheme], a
 	pop af
-	cp NPC_RONALD1
-	jr nz, .not_ronald_final_duel
-	ld a, [wCurMap]
-	cp POKEMON_DOME
-	jr nz, .not_ronald_final_duel
-	ld a, MUSIC_MATCH_START_3
-	ld [wMatchStartTheme], a
+; 	cp NPC_RONALD1
+; 	jr nz, .not_ronald_final_duel
+; 	ld a, [wCurMap]
+; 	cp POKEMON_DOME
+; 	jr nz, .not_ronald_final_duel
+; 	ld a, MUSIC_MATCH_START_3
+; 	ld [wMatchStartTheme], a
 
-.not_ronald_final_duel
+; .not_ronald_final_duel
 	pop bc
 	pop hl
 	ret
 
 INCLUDE "data/npcs.asm"
 
-_GetNPCDuelConfigurations::
+GetNPCDuelConfigurations::
 	push hl
 	push bc
 	push de

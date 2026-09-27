@@ -427,22 +427,22 @@ MACRO print_text_for_challenge_cup
 ENDM
 
 ; Moves the Challenge Hall opponent NPC using an NPCMovement
-MACRO move_challenge_hall_npc
-	run_command ScriptCommand_MoveChallengeHallNPC
-	dw \1 ; NPCMovement (ex NPCMovement_d880)
-ENDM
+; MACRO move_challenge_hall_npc
+; 	run_command ScriptCommand_MoveChallengeHallNPC
+; 	dw \1 ; NPCMovement (ex NPCMovement_d880)
+; ENDM
 
 ; Unloads the Challenge Hall opponent NPC
-MACRO unload_challenge_hall_npc
-	run_command ScriptCommand_UnloadChallengeHallNPC
-ENDM
+; MACRO unload_challenge_hall_npc
+; 	run_command ScriptCommand_UnloadChallengeHallNPC
+; ENDM
 
 ; Sets the Challenge Hall opponent NPC's coords
-MACRO set_challenge_hall_npc_coords
-	run_command ScriptCommand_SetChallengeHallNPCCoords
-	db \1 ; X Coord
-	db \2 ; Y Coord
-ENDM
+; MACRO set_challenge_hall_npc_coords
+; 	run_command ScriptCommand_SetChallengeHallNPCCoords
+; 	db \1 ; X Coord
+; 	db \2 ; Y Coord
+; ENDM
 
 ; Picks the next Challenge Hall opponent NPC
 MACRO pick_challenge_hall_opponent
@@ -455,9 +455,9 @@ MACRO open_menu
 ENDM
 
 ; Picks the Challenge Cup prize card
-MACRO pick_challenge_cup_prize_card
-	run_command ScriptCommand_PickChallengeCupPrizeCard
-ENDM
+; MACRO pick_challenge_cup_prize_card
+; 	run_command ScriptCommand_PickChallengeCupPrizeCard
+; ENDM
 
 ; Closes Advanced TextBoxes then Ends Script Loop
 MACRO quit_script_fully
@@ -467,10 +467,10 @@ ENDM
 ; Replaces map blocks
 ; used for deck machines, challenge machine, Pokemon Dome doors, Hall of Honor doors etc
 ; accepts as argument any of MAP_EVENT_* constants
-MACRO replace_map_blocks
-	run_command ScriptCommand_ReplaceMapBlocks
-	db \1 ; id
-ENDM
+; MACRO replace_map_blocks
+; 	run_command ScriptCommand_ReplaceMapBlocks
+; 	db \1 ; id
+; ENDM
 
 MACRO choose_deck_to_duel_against
 	run_command ScriptCommand_ChooseDeckToDuelAgainstMultichoice
@@ -482,31 +482,31 @@ MACRO open_deck_machine
 	db \1 ; DECK_MACHINE_* constant
 ENDM
 
-MACRO choose_starter_deck
-	run_command ScriptCommand_ChooseStarterDeckMultichoice
-ENDM
+; MACRO choose_starter_deck
+; 	run_command ScriptCommand_ChooseStarterDeckMultichoice
+; ENDM
 
 ; Enters a given map screen
-MACRO enter_map
-	run_command ScriptCommand_EnterMap
-	db \1 ; Unused
-	db \2 ; Room (ex MASON_LABORATORY)
-	db \3 ; Player X
-	db \4 ; Player Y
-	db \5 ; Player Direction
-ENDM
+; MACRO enter_map
+; 	run_command ScriptCommand_EnterMap
+; 	db \1 ; Unused
+; 	db \2 ; Room (ex MASON_LABORATORY)
+; 	db \3 ; Player X
+; 	db \4 ; Player Y
+; 	db \5 ; Player Direction
+; ENDM
 
 ; Moves any NPC using an NPCMovement
-MACRO move_npc
-	run_command ScriptCommand_MoveArbitraryNPC
-	db \1 ; NPC (ex NPC_JOSHUA)
-	dw \2 ; NPCMovement (NPCMovement_e2ab)
-ENDM
+; MACRO move_npc
+; 	run_command ScriptCommand_MoveArbitraryNPC
+; 	db \1 ; NPC (ex NPC_JOSHUA)
+; 	dw \2 ; NPCMovement (NPCMovement_e2ab)
+; ENDM
 
-; Picks the next legendary card
-MACRO pick_legendary_card
-	run_command ScriptCommand_PickLegendaryCard
-ENDM
+; ; Picks the next legendary card
+; MACRO pick_legendary_card
+; 	run_command ScriptCommand_PickLegendaryCard
+; ENDM
 
 ; Flashes the screen to white
 ; if arg is non-zero, keep the screen white
@@ -532,36 +532,36 @@ ENDM
 ; Loads the Gift Center
 ; if arg is zero, display the options selection menu
 ; otherwise, execute the player's previously chosen selection
-MACRO gift_center
-	run_command ScriptCommand_GiftCenter
-	db \1 ; execute selection?
-ENDM
+; MACRO gift_center
+; 	run_command ScriptCommand_GiftCenter
+; 	db \1 ; execute selection?
+; ENDM
 
-; Plays the credits
-MACRO play_credits
-	run_command ScriptCommand_PlayCredits
-ENDM
+; ; Plays the credits
+; MACRO play_credits
+; 	run_command ScriptCommand_PlayCredits
+; ENDM
 
-; Tries to give the player a specific PC Pack from Dr. Mason
-MACRO try_give_pc_pack
-	run_command ScriptCommand_TryGivePCPack
-	db \1 ; PC Pack Index
-ENDM
+; ; Tries to give the player a specific PC Pack from Dr. Mason
+; MACRO try_give_pc_pack
+; 	run_command ScriptCommand_TryGivePCPack
+; 	db \1 ; PC Pack Index
+; ENDM
 
 ; Nothing.
 MACRO script_nop
 	run_command ScriptCommand_nop
 ENDM
 
-; Gives the player their previously chosen starter deck
-MACRO give_stater_deck
-	run_command ScriptCommand_GiveStarterDeck
-ENDM
+; ; Gives the player their previously chosen starter deck
+; MACRO give_stater_deck
+; 	run_command ScriptCommand_GiveStarterDeck
+; ENDM
 
-; Walks the player across the overworld map to MASON_LABORATORY
-MACRO walk_player_to_mason_lab
-	run_command ScriptCommand_WalkPlayerToMasonLaboratory
-ENDM
+; ; Walks the player across the overworld map to MASON_LABORATORY
+; MACRO walk_player_to_mason_lab
+; 	run_command ScriptCommand_WalkPlayerToMasonLaboratory
+; ENDM
 
 ; Plays a song and saves it to wSongOverride
 MACRO override_song
@@ -610,154 +610,154 @@ ENDM
 ; Records when the player defeats a master (the 8 Club Masters or the Ronald Grand Master duel)
 ; the order of wins is stored in wMastersBeatenList
 ; the purpose of this is still unknown
-MACRO record_master_win
-	run_command ScriptCommand_RecordMasterWin
-	db \1 ; which master duel
-ENDM
+; MACRO record_master_win
+; 	run_command ScriptCommand_RecordMasterWin
+; 	db \1 ; which master duel
+; ENDM
 
 ; Asks the player a question then jumps
-MACRO ask_question_jump_default_yes
-	run_command ScriptCommand_AskQuestionJumpDefaultYes
-	IF ISCONST(\1)
-		dw \1 ; NULL
-	ELSE
-		tx \1 ; Text Pointer
-	ENDC
-	dw \2 ; Script Label
-ENDM
+; MACRO ask_question_jump_default_yes
+; 	run_command ScriptCommand_AskQuestionJumpDefaultYes
+; 	IF ISCONST(\1)
+; 		dw \1 ; NULL
+; 	ELSE
+; 		tx \1 ; Text Pointer
+; 	ENDC
+; 	dw \2 ; Script Label
+; ENDM
 
-MACRO show_sam_normal_multichoice
-	run_command ScriptCommand_ShowSamNormalMultichoice
-ENDM
+; MACRO show_sam_normal_multichoice
+; 	run_command ScriptCommand_ShowSamNormalMultichoice
+; ENDM
 
-MACRO show_sam_rules_multichoice
-	run_command ScriptCommand_ShowSamRulesMultichoice
-ENDM
+; MACRO show_sam_rules_multichoice
+; 	run_command ScriptCommand_ShowSamRulesMultichoice
+; ENDM
 
-; Runs the Challenge Machine
-MACRO challenge_machine
-	run_command ScriptCommand_ChallengeMachine
-ENDM
+; ; Runs the Challenge Machine
+; MACRO challenge_machine
+; 	run_command ScriptCommand_ChallengeMachine
+; ENDM
 
-; Sets an event's value
-MACRO set_event
-	run_command ScriptCommand_SetEventValue
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-	db \2 ; new value
-ENDM
+; ; Sets an event's value
+; MACRO set_event
+; 	run_command ScriptCommand_SetEventValue
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; 	db \2 ; new value
+; ENDM
 
-; Jumps to a script position if a given event is zero
-MACRO jump_if_event_zero
-	run_command ScriptCommand_JumpIfEventZero
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-	dw \2 ; Script Label
-ENDM
+; ; Jumps to a script position if a given event is zero
+; MACRO jump_if_event_zero
+; 	run_command ScriptCommand_JumpIfEventZero
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; 	dw \2 ; Script Label
+; ENDM
 
-; Tests if a given event is zero
-MACRO test_if_event_zero
-	run_command ScriptCommand_JumpIfEventZero
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-	dw NULL
-ENDM
+; ; Tests if a given event is zero
+; MACRO test_if_event_zero
+; 	run_command ScriptCommand_JumpIfEventZero
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; 	dw NULL
+; ENDM
 
-; Jumps to a script position if a given event is nonzero
-MACRO jump_if_event_nonzero
-	run_command ScriptCommand_JumpIfEventNonzero
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-	dw \2 ; Script Label
-ENDM
+; ; Jumps to a script position if a given event is nonzero
+; MACRO jump_if_event_nonzero
+; 	run_command ScriptCommand_JumpIfEventNonzero
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; 	dw \2 ; Script Label
+; ENDM
 
-; Jumps to a script position if an event matches given value
-MACRO jump_if_event_equal
-	run_command ScriptCommand_JumpIfEventEqual
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-	db \2 ; value
-	dw \3 ; Script Label
-ENDM
+; ; Jumps to a script position if an event matches given value
+; MACRO jump_if_event_equal
+; 	run_command ScriptCommand_JumpIfEventEqual
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; 	db \2 ; value
+; 	dw \3 ; Script Label
+; ENDM
 
-; Tests if an event matches given value
-MACRO test_if_event_equal
-	run_command ScriptCommand_JumpIfEventEqual
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-	db \2 ; value
-	dw NULL
-ENDM
+; ; Tests if an event matches given value
+; MACRO test_if_event_equal
+; 	run_command ScriptCommand_JumpIfEventEqual
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; 	db \2 ; value
+; 	dw NULL
+; ENDM
 
-; Jumps to a script position if an event does not match a given value
-MACRO jump_if_event_not_equal
-	run_command ScriptCommand_JumpIfEventNotEqual
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-	db \2 ; value
-	dw \3 ; Script Label
-ENDM
+; ; Jumps to a script position if an event does not match a given value
+; MACRO jump_if_event_not_equal
+; 	run_command ScriptCommand_JumpIfEventNotEqual
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; 	db \2 ; value
+; 	dw \3 ; Script Label
+; ENDM
 
-; Tests if an event does not match a given value
-MACRO test_if_event_not_equal
-	run_command ScriptCommand_JumpIfEventNotEqual
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-	db \2 ; value
-	dw NULL
-ENDM
+; ; Tests if an event does not match a given value
+; MACRO test_if_event_not_equal
+; 	run_command ScriptCommand_JumpIfEventNotEqual
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; 	db \2 ; value
+; 	dw NULL
+; ENDM
 
-; Jumps to a script position if an event is greater than or equal to a given value
-MACRO jump_if_event_greater_or_equal
-	run_command ScriptCommand_JumpIfEventGreaterOrEqual
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-	db \2 ; value
-	dw \3 ; Script Label
-ENDM
+; ; Jumps to a script position if an event is greater than or equal to a given value
+; MACRO jump_if_event_greater_or_equal
+; 	run_command ScriptCommand_JumpIfEventGreaterOrEqual
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; 	db \2 ; value
+; 	dw \3 ; Script Label
+; ENDM
 
-; Jumps to a script position if an event is less than a given value
-MACRO jump_if_event_less_than
-	run_command ScriptCommand_JumpIfEventLessThan
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-	db \2 ; value
-	dw \3 ; Script Label
-ENDM
+; ; Jumps to a script position if an event is less than a given value
+; MACRO jump_if_event_less_than
+; 	run_command ScriptCommand_JumpIfEventLessThan
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; 	db \2 ; value
+; 	dw \3 ; Script Label
+; ENDM
 
-; Tests if an event is less than a given value
-MACRO test_if_event_less_than
-	run_command ScriptCommand_JumpIfEventLessThan
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-	db \2 ; value
-	dw NULL
-ENDM
+; ; Tests if an event is less than a given value
+; MACRO test_if_event_less_than
+; 	run_command ScriptCommand_JumpIfEventLessThan
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; 	db \2 ; value
+; 	dw NULL
+; ENDM
 
-; Sets an event to its maximum possible value
-MACRO max_out_event_value
-	run_command ScriptCommand_MaxOutEventValue
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-ENDM
+; ; Sets an event to its maximum possible value
+; MACRO max_out_event_value
+; 	run_command ScriptCommand_MaxOutEventValue
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; ENDM
 
-; Sets an event's value to zero
-MACRO zero_out_event_value
-	run_command ScriptCommand_ZeroOutEventValue
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-ENDM
+; ; Sets an event's value to zero
+; MACRO zero_out_event_value
+; 	run_command ScriptCommand_ZeroOutEventValue
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; ENDM
 
 ; Jumps to a script position if an event is true
-MACRO jump_if_event_true
-	run_command ScriptCommand_JumpIfEventTrue
-	db \1 ; event (ex EVENT_RECEIVED_LEGENDARY_CARDS)
-	dw \2 ; Script Label
-ENDM
+; MACRO jump_if_event_true
+; 	run_command ScriptCommand_JumpIfEventTrue
+; 	db \1 ; event (ex EVENT_RECEIVED_LEGENDARY_CARDS)
+; 	dw \2 ; Script Label
+; ENDM
 
-; Jumps to a script position if an event is false
-MACRO jump_if_event_false
-	run_command ScriptCommand_JumpIfEventFalse
-	db \1 ; event (ex EVENT_RECEIVED_LEGENDARY_CARDS)
-	dw \2 ; Script Label
-ENDM
+; ; Jumps to a script position if an event is false
+; MACRO jump_if_event_false
+; 	run_command ScriptCommand_JumpIfEventFalse
+; 	db \1 ; event (ex EVENT_RECEIVED_LEGENDARY_CARDS)
+; 	dw \2 ; Script Label
+; ENDM
 
-; Tests if an event is false
-MACRO test_if_event_false
-	run_command ScriptCommand_JumpIfEventFalse
-	db \1 ; event (ex EVENT_RECEIVED_LEGENDARY_CARDS)
-	dw NULL
-ENDM
+; ; Tests if an event is false
+; MACRO test_if_event_false
+; 	run_command ScriptCommand_JumpIfEventFalse
+; 	db \1 ; event (ex EVENT_RECEIVED_LEGENDARY_CARDS)
+; 	dw NULL
+; ENDM
 
-; Increments given event's value (truncates the new value)
-MACRO increment_event_value
-	run_command ScriptCommand_IncrementEventValue
-	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
-ENDM
+; ; Increments given event's value (truncates the new value)
+; MACRO increment_event_value
+; 	run_command ScriptCommand_IncrementEventValue
+; 	db \1 ; event (ex EVENT_IMAKUNI_WIN_COUNT)
+; ENDM

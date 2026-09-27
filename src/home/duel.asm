@@ -1,27 +1,27 @@
 ; save duel state to SRAM
 ; called between each two-player turn, just after player draws card (ROM bank 1 loaded)
 SaveDuelStateToSRAM::
-	ld a, BANK(sBackupCurrentDuel)
+	ld a, $2
 	call BankswitchSRAM
-; save duel data to sBackupCurrentDuel
+	; save duel data to sCurrentDuel
 	call SaveDuelData
-	xor a ; BANK("SRAM0")
+	xor a
 	call BankswitchSRAM
-; get hl = sDuelBufferN for N = [s0a008] & $3
 	call EnableSRAM
 	ld hl, s0a008
 	ld a, [hl]
 	inc [hl]
 	call DisableSRAM
+	; select hl = SRAM3:(a000 + $400 * [s0a008] & $3)
+	; save wDuelTurns, non-turn holder's arena card ID, turn holder's arena card ID
 	and $3
-	add HIGH(sDuelBuffer0) / 4
-	ld l, 0
+	add HIGH($a000) / 4
+	ld l, $0
 	ld h, a
 	add hl, hl
 	add hl, hl
-	ld a, BANK(sDuelBuffer0)
+	ld a, $3
 	call BankswitchSRAM
-; save wDuelTurns, non-turn holder's arena card ID, turn holder's arena card ID
 	push hl
 	ld a, DUELVARS_ARENA_CARD
 	call GetTurnDuelistVariable
@@ -44,9 +44,9 @@ SaveDuelStateToSRAM::
 	ld [hli], a
 	ld a, [wTempTurnDuelistCardID]
 	ld [hli], a
+	; save duel data to SRAM3:(a000 + $400 * [s0a008] & $3) + $0010
 	pop hl
-; save duel data to sDuelBufferN + $10
-	ld de, $10
+	ld de, $0010
 	add hl, de
 	ld e, l
 	ld d, h
@@ -428,9 +428,10 @@ CreateDeckCardList::
 	scf
 	ret
 
-; fill wDuelTempList with the turn holder's energy cards (their 0-59 deck indexes)
-; at PLAY_AREA_* location in a (then converted to CARD_LOCATION_*)
-; and return count in a and b
+; fill wDuelTempList with the turn holder's energy cards
+; in the arena or in a bench slot (their 0-59 deck indexes).
+; if a == 0: search in CARD_LOCATION_ARENA
+; if a != 0: search in CARD_LOCATION_BENCH_[A]
 ; return carry if no energy cards were found
 CreateArenaOrBenchEnergyCardList::
 	or CARD_LOCATION_PLAY_AREA
@@ -1485,7 +1486,7 @@ UpdateArenaCardIDsAndClearTwoTurnDuelVars::
 	ld [wTempNonTurnDuelistCardID], a
 	call SwapTurn
 	xor a
-	ld [wSentAttackDataToLinkOpponent], a
+	ld [wccec], a
 	ld [wStatusConditionQueueIndex], a
 	ld [wEffectFailed], a
 	ld [wIsDamageToSelf], a
@@ -1669,15 +1670,15 @@ UsePokemonPower::
 ; in a link duel, it's used to send the other game data about the
 ; attack being in use, triggering a call to OppAction_BeginUseAttack in the receiver
 SendAttackDataToLinkOpponent::
-	ld a, [wSentAttackDataToLinkOpponent]
+	ld a, [wccec]
 	or a
 	ret nz
 	ldh a, [hTemp_ffa0]
 	push af
 	ldh a, [hTempCardIndex_ff9f]
 	push af
-	ld a, TRUE
-	ld [wSentAttackDataToLinkOpponent], a
+	ld a, $1
+	ld [wccec], a
 	ld a, [wPlayerAttackingCardIndex]
 	ldh [hTempCardIndex_ff9f], a
 	ld a, [wPlayerAttackingAttackIndex]
@@ -2407,3 +2408,27 @@ CopyOpponentName::
 .print_player2
 	ldtx hl, Player2Text
 	jp CopyText
+
+CopyLinkOpponentName::	
+	ld hl, wOpponentName_
+.loop
+	ld a, [hli]
+	ld [de], a
+	inc de
+	or a ; TX_END
+	jr nz, .loop
+	dec de
+	ret
+
+; CopyDeckName:
+; 	ld de, wDefaultText
+; 	call CopyListFromHLToDE
+; 	ld hl, wDefaultText
+; 	call GetTextLengthInTiles
+; 	ld b, $0
+; 	ld hl, wDefaultText
+; 	add hl, bc
+; 	ld d, h
+; 	ld e, l
+; 	ld hl, DeckNameSuffix
+; 	call CopyListFromHLToDE

@@ -43,165 +43,165 @@ INCBIN "gfx/duel/box_messages.2bpp"
 
 SECTION "Gfx 3", ROMX
 
-WaterClubTilemap::
-	INCBIN "data/maps/tiles/dimensions/water_club.dimensions"
-	dw WaterClubPermissions
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/water_club.bin.lz"
-WaterClubPermissions:
-	INCBIN "data/maps/permissions/water_club.bin.lz"
+; WaterClubTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/water_club.dimensions"
+; 	dw WaterClubPermissions
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/water_club.bin.lz"
+; WaterClubPermissions:
+; 	INCBIN "data/maps/permissions/water_club.bin.lz"
 
-WaterClubCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/water_club.dimensions"
-	dw WaterClubCGBPermissions
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/water_club.bgmap.lz"
-WaterClubCGBPermissions:
-	INCBIN "data/maps/permissions/water_club.bin.lz"
+; WaterClubCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/water_club.dimensions"
+; 	dw WaterClubCGBPermissions
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/water_club.bgmap.lz"
+; WaterClubCGBPermissions:
+; 	INCBIN "data/maps/permissions/water_club.bin.lz"
 
-LightningClubTilemap::
-	INCBIN "data/maps/tiles/dimensions/lightning_club.dimensions"
-	dw LightningClubPermissions
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/lightning_club.bin.lz"
-LightningClubPermissions:
-	INCBIN "data/maps/permissions/lightning_club.bin.lz"
+; LightningClubTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/lightning_club.dimensions"
+; 	dw LightningClubPermissions
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/lightning_club.bin.lz"
+; LightningClubPermissions:
+; 	INCBIN "data/maps/permissions/lightning_club.bin.lz"
 
-LightningClubCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/lightning_club.dimensions"
-	dw LightningClubCGBPermissions
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/lightning_club.bgmap.lz"
-LightningClubCGBPermissions:
-	INCBIN "data/maps/permissions/lightning_club.bin.lz"
+; LightningClubCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/lightning_club.dimensions"
+; 	dw LightningClubCGBPermissions
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/lightning_club.bgmap.lz"
+; LightningClubCGBPermissions:
+; 	INCBIN "data/maps/permissions/lightning_club.bin.lz"
 
-GrassClubTilemap::
-	INCBIN "data/maps/tiles/dimensions/grass_club.dimensions"
-	dw GrassClubPermissions
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/grass_club.bin.lz"
-GrassClubPermissions:
-	INCBIN "data/maps/permissions/grass_club.bin.lz"
+; GrassClubTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/grass_club.dimensions"
+; 	dw GrassClubPermissions
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/grass_club.bin.lz"
+; GrassClubPermissions:
+; 	INCBIN "data/maps/permissions/grass_club.bin.lz"
 
-GrassClubCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/grass_club.dimensions"
-	dw GrassClubCGBPermissions
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/grass_club.bgmap.lz"
-GrassClubCGBPermissions:
-	INCBIN "data/maps/permissions/grass_club.bin.lz"
+; GrassClubCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/grass_club.dimensions"
+; 	dw GrassClubCGBPermissions
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/grass_club.bgmap.lz"
+; GrassClubCGBPermissions:
+; 	INCBIN "data/maps/permissions/grass_club.bin.lz"
 
-PsychicClubTilemap::
-	INCBIN "data/maps/tiles/dimensions/psychic_club.dimensions"
-	dw PsychicClubPermissions
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/psychic_club.bin.lz"
-PsychicClubPermissions:
-	INCBIN "data/maps/permissions/psychic_club.bin.lz"
+; PsychicClubTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/psychic_club.dimensions"
+; 	dw PsychicClubPermissions
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/psychic_club.bin.lz"
+; PsychicClubPermissions:
+; 	INCBIN "data/maps/permissions/psychic_club.bin.lz"
 
-PsychicClubCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/psychic_club.dimensions"
-	dw PsychicClubCGBPermissions
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/psychic_club.bgmap.lz"
-PsychicClubCGBPermissions:
-	INCBIN "data/maps/permissions/psychic_club.bin.lz"
+; PsychicClubCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/psychic_club.dimensions"
+; 	dw PsychicClubCGBPermissions
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/psychic_club.bgmap.lz"
+; PsychicClubCGBPermissions:
+; 	INCBIN "data/maps/permissions/psychic_club.bin.lz"
 
-ScienceClubTilemap::
-	INCBIN "data/maps/tiles/dimensions/science_club.dimensions"
-	dw ScienceClubPermissions
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/science_club.bin.lz"
-ScienceClubPermissions:
-	INCBIN "data/maps/permissions/science_club.bin.lz"
+; ScienceClubTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/science_club.dimensions"
+; 	dw ScienceClubPermissions
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/science_club.bin.lz"
+; ScienceClubPermissions:
+; 	INCBIN "data/maps/permissions/science_club.bin.lz"
 
-ScienceClubCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/science_club.dimensions"
-	dw ScienceClubCGBPermissions
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/science_club.bgmap.lz"
-ScienceClubCGBPermissions:
-	INCBIN "data/maps/permissions/science_club.bin.lz"
+; ScienceClubCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/science_club.dimensions"
+; 	dw ScienceClubCGBPermissions
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/science_club.bgmap.lz"
+; ScienceClubCGBPermissions:
+; 	INCBIN "data/maps/permissions/science_club.bin.lz"
 
-FireClubTilemap::
-	INCBIN "data/maps/tiles/dimensions/fire_club.dimensions"
-	dw FireClubPermissions
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/fire_club.bin.lz"
-FireClubPermissions:
-	INCBIN "data/maps/permissions/fire_club.bin.lz"
+; FireClubTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/fire_club.dimensions"
+; 	dw FireClubPermissions
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/fire_club.bin.lz"
+; FireClubPermissions:
+; 	INCBIN "data/maps/permissions/fire_club.bin.lz"
 
-FireClubCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/fire_club.dimensions"
-	dw FireClubCGBPermissions
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/fire_club.bgmap.lz"
-FireClubCGBPermissions:
-	INCBIN "data/maps/permissions/fire_club.bin.lz"
+; FireClubCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/fire_club.dimensions"
+; 	dw FireClubCGBPermissions
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/fire_club.bgmap.lz"
+; FireClubCGBPermissions:
+; 	INCBIN "data/maps/permissions/fire_club.bin.lz"
 
-ChallengeHallTilemap::
-	INCBIN "data/maps/tiles/dimensions/challenge_hall.dimensions"
-	dw ChallengeHallPermissions
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/challenge_hall.bin.lz"
-ChallengeHallPermissions:
-	INCBIN "data/maps/permissions/challenge_hall.bin.lz"
+; ChallengeHallTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/challenge_hall.dimensions"
+; 	dw ChallengeHallPermissions
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/challenge_hall.bin.lz"
+; ChallengeHallPermissions:
+; 	INCBIN "data/maps/permissions/challenge_hall.bin.lz"
 
-ChallengeHallCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/challenge_hall.dimensions"
-	dw ChallengeHallCGBPermissions
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/challenge_hall.bgmap.lz"
-ChallengeHallCGBPermissions:
-	INCBIN "data/maps/permissions/challenge_hall.bin.lz"
+; ChallengeHallCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/challenge_hall.dimensions"
+; 	dw ChallengeHallCGBPermissions
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/challenge_hall.bgmap.lz"
+; ChallengeHallCGBPermissions:
+; 	INCBIN "data/maps/permissions/challenge_hall.bin.lz"
 
-PokemonDomeEntranceTilemap::
-	INCBIN "data/maps/tiles/dimensions/pokemon_dome_entrance.dimensions"
-	dw PokemonDomeEntrancePermissions
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/pokemon_dome_entrance.bin.lz"
-PokemonDomeEntrancePermissions:
-	INCBIN "data/maps/permissions/pokemon_dome_entrance.bin.lz"
+; PokemonDomeEntranceTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/pokemon_dome_entrance.dimensions"
+; 	dw PokemonDomeEntrancePermissions
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/pokemon_dome_entrance.bin.lz"
+; PokemonDomeEntrancePermissions:
+; 	INCBIN "data/maps/permissions/pokemon_dome_entrance.bin.lz"
 
-PokemonDomeEntranceCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/pokemon_dome_entrance.dimensions"
-	dw PokemonDomeEntranceCGBPermissions
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/pokemon_dome_entrance.bgmap.lz"
-PokemonDomeEntranceCGBPermissions:
-	INCBIN "data/maps/permissions/pokemon_dome_entrance.bin.lz"
+; PokemonDomeEntranceCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/pokemon_dome_entrance.dimensions"
+; 	dw PokemonDomeEntranceCGBPermissions
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/pokemon_dome_entrance.bgmap.lz"
+; PokemonDomeEntranceCGBPermissions:
+; 	INCBIN "data/maps/permissions/pokemon_dome_entrance.bin.lz"
 
-PokemonDomeTilemap::
-	INCBIN "data/maps/tiles/dimensions/pokemon_dome.dimensions"
-	dw PokemonDomePermissions
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/pokemon_dome.bin.lz"
-PokemonDomePermissions:
-	INCBIN "data/maps/permissions/pokemon_dome.bin.lz"
+; PokemonDomeTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/pokemon_dome.dimensions"
+; 	dw PokemonDomePermissions
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/pokemon_dome.bin.lz"
+; PokemonDomePermissions:
+; 	INCBIN "data/maps/permissions/pokemon_dome.bin.lz"
 
-PokemonDomeCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/pokemon_dome.dimensions"
-	dw PokemonDomeCGBPermissions
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/pokemon_dome.bgmap.lz"
-PokemonDomeCGBPermissions:
-	INCBIN "data/maps/permissions/pokemon_dome.bin.lz"
+; PokemonDomeCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/pokemon_dome.dimensions"
+; 	dw PokemonDomeCGBPermissions
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/pokemon_dome.bgmap.lz"
+; PokemonDomeCGBPermissions:
+; 	INCBIN "data/maps/permissions/pokemon_dome.bin.lz"
 
-HallOfHonorTilemap::
-	INCBIN "data/maps/tiles/dimensions/hall_of_honor.dimensions"
-	dw HallOfHonorPermissions
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/hall_of_honor.bin.lz"
-HallOfHonorPermissions:
-	INCBIN "data/maps/permissions/hall_of_honor.bin.lz"
+; HallOfHonorTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/hall_of_honor.dimensions"
+; 	dw HallOfHonorPermissions
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/hall_of_honor.bin.lz"
+; HallOfHonorPermissions:
+; 	INCBIN "data/maps/permissions/hall_of_honor.bin.lz"
 
-HallOfHonorCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/hall_of_honor.dimensions"
-	dw HallOfHonorCGBPermissions
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/hall_of_honor.bgmap.lz"
-HallOfHonorCGBPermissions:
-	INCBIN "data/maps/permissions/hall_of_honor.bin.lz"
+; HallOfHonorCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/hall_of_honor.dimensions"
+; 	dw HallOfHonorCGBPermissions
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/hall_of_honor.bgmap.lz"
+; HallOfHonorCGBPermissions:
+; 	INCBIN "data/maps/permissions/hall_of_honor.bin.lz"
 
 CardPopCGBTilemap::
 	INCBIN "data/maps/tiles/dimensions/card_pop.dimensions"
@@ -215,47 +215,47 @@ CardPopTilemap::
 	db TRUE ; cgb mode
 	INCBIN "data/maps/tiles/gb/card_pop.bgmap.lz"
 
-ScienceMedalTilemap::
-	INCBIN "data/maps/tiles/dimensions/science_medal.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/science_medal.bgmap.lz"
+; ScienceMedalTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/science_medal.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/science_medal.bgmap.lz"
 
-FireMedalTilemap::
-	INCBIN "data/maps/tiles/dimensions/fire_medal.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/fire_medal.bgmap.lz"
+; FireMedalTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/fire_medal.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/fire_medal.bgmap.lz"
 
-WaterMedalTilemap::
-	INCBIN "data/maps/tiles/dimensions/water_medal.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/water_medal.bgmap.lz"
+; WaterMedalTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/water_medal.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/water_medal.bgmap.lz"
 
-LightningMedalTilemap::
-	INCBIN "data/maps/tiles/dimensions/lightning_medal.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/lightning_medal.bgmap.lz"
+; LightningMedalTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/lightning_medal.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/lightning_medal.bgmap.lz"
 
-FightingMedalTilemap::
-	INCBIN "data/maps/tiles/dimensions/fighting_medal.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/fighting_medal.bgmap.lz"
+; FightingMedalTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/fighting_medal.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/fighting_medal.bgmap.lz"
 
-RockMedalTilemap::
-	INCBIN "data/maps/tiles/dimensions/rock_medal.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/rock_medal.bgmap.lz"
+; RockMedalTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/rock_medal.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/rock_medal.bgmap.lz"
 
-PsychicMedalTilemap::
-	INCBIN "data/maps/tiles/dimensions/psychic_medal.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/psychic_medal.bgmap.lz"
+; PsychicMedalTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/psychic_medal.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/psychic_medal.bgmap.lz"
 
 GameBoyLinkCGBTilemap::
 	INCBIN "data/maps/tiles/dimensions/gameboy_link.dimensions"
@@ -281,65 +281,65 @@ GameBoyLinkConnectingTilemap::
 	db FALSE ; cgb mode
 	INCBIN "data/maps/tiles/gb/gameboy_link_connecting.bin.lz"
 
-GameBoyPrinterCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/gameboy_printer.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/gameboy_printer.bgmap.lz"
+; GameBoyPrinterCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/gameboy_printer.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/gameboy_printer.bgmap.lz"
 
-GameBoyPrinterTilemap::
-	INCBIN "data/maps/tiles/dimensions/gameboy_printer.dimensions"
-	dw NULL
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/gameboy_printer.bin.lz"
+; GameBoyPrinterTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/gameboy_printer.dimensions"
+; 	dw NULL
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/gameboy_printer.bin.lz"
 
-ColosseumTilemap::
-	INCBIN "data/maps/tiles/dimensions/colosseum.dimensions"
-	dw NULL
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/colosseum.bin.lz"
+; ColosseumTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/colosseum.dimensions"
+; 	dw NULL
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/colosseum.bin.lz"
 
-ColosseumCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/colosseum.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/colosseum.bgmap.lz"
+; ColosseumCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/colosseum.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/colosseum.bgmap.lz"
 
-EvolutionTilemap::
-	INCBIN "data/maps/tiles/dimensions/evolution.dimensions"
-	dw NULL
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/evolution.bin.lz"
+; EvolutionTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/evolution.dimensions"
+; 	dw NULL
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/evolution.bin.lz"
 
-EvolutionCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/evolution.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/evolution.bgmap.lz"
+; EvolutionCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/evolution.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/evolution.bgmap.lz"
 
-MysteryTilemap::
-	INCBIN "data/maps/tiles/dimensions/mystery.dimensions"
-	dw NULL
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/mystery.bin.lz"
+; MysteryTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/mystery.dimensions"
+; 	dw NULL
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/mystery.bin.lz"
 
-MysteryCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/mystery.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/mystery.bgmap.lz"
+; MysteryCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/mystery.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/mystery.bgmap.lz"
 
-LaboratoryTilemap::
-	INCBIN "data/maps/tiles/dimensions/laboratory.dimensions"
-	dw NULL
-	db FALSE ; cgb mode
-	INCBIN "data/maps/tiles/gb/laboratory.bin.lz"
+; LaboratoryTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/laboratory.dimensions"
+; 	dw NULL
+; 	db FALSE ; cgb mode
+; 	INCBIN "data/maps/tiles/gb/laboratory.bin.lz"
 
-LaboratoryCGBTilemap::
-	INCBIN "data/maps/tiles/dimensions/laboratory.dimensions"
-	dw NULL
-	db TRUE ; cgb mode
-	INCBIN "data/maps/tiles/cgb/laboratory.bgmap.lz"
+; LaboratoryCGBTilemap::
+; 	INCBIN "data/maps/tiles/dimensions/laboratory.dimensions"
+; 	dw NULL
+; 	db TRUE ; cgb mode
+; 	INCBIN "data/maps/tiles/cgb/laboratory.bgmap.lz"
 
 CharizardIntroTilemap::
 	INCBIN "data/maps/tiles/dimensions/charizard_intro.dimensions"
@@ -473,9 +473,9 @@ CompaniesTilemap::
 	db FALSE ; cgb mode
 	INCBIN "data/maps/tiles/gb/companies.bin.lz"
 
-IshiharaTilesetGfx::
-	dw 77
-	INCBIN "gfx/tilesets/ishihara.2bpp"
+; IshiharaTilesetGfx::
+; 	dw 77
+; 	INCBIN "gfx/tilesets/ishihara.2bpp"
 
 SolidTiles1::
 	dw 4
@@ -504,41 +504,41 @@ AnimData12::
 
 SECTION "Gfx 4", ROMX
 
-OverworldMapTiles::
-	dw 193
-	INCBIN "gfx/overworld_map.2bpp"
+; OverworldMapTiles::
+; 	dw 193
+; 	INCBIN "gfx/overworld_map.2bpp"
 
-MasonLaboratoryTilesetGfx::
-	dw 151
-	INCBIN "gfx/tilesets/masonlaboratory.2bpp"
+; MasonLaboratoryTilesetGfx::
+; 	dw 151
+; 	INCBIN "gfx/tilesets/masonlaboratory.2bpp"
 
-ClubEntranceTilesetGfx::
-	dw 129
-	INCBIN "gfx/tilesets/clubentrance.2bpp"
+; ClubEntranceTilesetGfx::
+; 	dw 129
+; 	INCBIN "gfx/tilesets/clubentrance.2bpp"
 
-ClubLobbyTilesetGfx::
-	dw 120
-	INCBIN "gfx/tilesets/clublobby.2bpp"
+; ClubLobbyTilesetGfx::
+; 	dw 120
+; 	INCBIN "gfx/tilesets/clublobby.2bpp"
 
-FightingClubTilesetGfx::
-	dw 99
-	INCBIN "gfx/tilesets/fightingclub.2bpp"
+; FightingClubTilesetGfx::
+; 	dw 99
+; 	INCBIN "gfx/tilesets/fightingclub.2bpp"
 
-RockClubTilesetGfx::
-	dw 60
-	INCBIN "gfx/tilesets/rockclub.2bpp"
+; RockClubTilesetGfx::
+; 	dw 60
+; 	INCBIN "gfx/tilesets/rockclub.2bpp"
 
-WaterClubTilesetGfx::
-	dw 161
-	INCBIN "gfx/tilesets/waterclub.2bpp"
+; WaterClubTilesetGfx::
+; 	dw 161
+; 	INCBIN "gfx/tilesets/waterclub.2bpp"
 
-GrassClubTilesetGfx::
-	dw 87
-	INCBIN "gfx/tilesets/grassclub.2bpp"
+; GrassClubTilesetGfx::
+; 	dw 87
+; 	INCBIN "gfx/tilesets/grassclub.2bpp"
 
-OWPlayerGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/player.2bpp"
+; OWPlayerGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/player.2bpp"
 
 DuelPetalGfx::
 	dw $1
@@ -552,64 +552,64 @@ AnimData2::
 	frame_data 6, 16, 0, 0
 	frame_data 0, 0, 0, 0
 
-JapaneseTitleScreenDmgPal::
+Palette109::
 	db 1, %11100100
 	db 0
 
 SECTION "Gfx 5", ROMX
 
-LightningClubTilesetGfx::
-	dw 131
-	INCBIN "gfx/tilesets/lightningclub.2bpp"
+; LightningClubTilesetGfx::
+; 	dw 131
+; 	INCBIN "gfx/tilesets/lightningclub.2bpp"
 
-PsychicClubTilesetGfx::
-	dw 58
-	INCBIN "gfx/tilesets/psychicclub.2bpp"
+; PsychicClubTilesetGfx::
+; 	dw 58
+; 	INCBIN "gfx/tilesets/psychicclub.2bpp"
 
-ScienceClubTilesetGfx::
-	dw 82
-	INCBIN "gfx/tilesets/scienceclub.2bpp"
+; ScienceClubTilesetGfx::
+; 	dw 82
+; 	INCBIN "gfx/tilesets/scienceclub.2bpp"
 
-FireClubTilesetGfx::
-	dw 87
-	INCBIN "gfx/tilesets/fireclub.2bpp"
+; FireClubTilesetGfx::
+; 	dw 87
+; 	INCBIN "gfx/tilesets/fireclub.2bpp"
 
-ChallengeHallTilesetGfx::
-	dw 157
-	INCBIN "gfx/tilesets/challengehall.2bpp"
+; ChallengeHallTilesetGfx::
+; 	dw 157
+; 	INCBIN "gfx/tilesets/challengehall.2bpp"
 
-PokemonDomeEntranceTilesetGfx::
-	dw 78
-	INCBIN "gfx/tilesets/pokemondomeentrance.2bpp"
+; PokemonDomeEntranceTilesetGfx::
+; 	dw 78
+; 	INCBIN "gfx/tilesets/pokemondomeentrance.2bpp"
 
-PokemonDomeTilesetGfx::
-	dw 207
-	INCBIN "gfx/tilesets/pokemondome.2bpp"
+; PokemonDomeTilesetGfx::
+; 	dw 207
+; 	INCBIN "gfx/tilesets/pokemondome.2bpp"
 
-HallOfHonorTilesetGfx::
-	dw 121
-	INCBIN "gfx/tilesets/hallofhonor.2bpp"
+; HallOfHonorTilesetGfx::
+; 	dw 121
+; 	INCBIN "gfx/tilesets/hallofhonor.2bpp"
 
-MedalGfx::
-	dw 72
-	INCBIN "gfx/medals.2bpp",   $0, $c0
-	INCBIN "gfx/medals.2bpp", $240, $30
-	INCBIN "gfx/medals.2bpp", $340, $10
-	INCBIN "gfx/medals.2bpp",  $c0, $c0
-	INCBIN "gfx/medals.2bpp", $300, $30
-	INCBIN "gfx/medals.2bpp", $350, $10
-	INCBIN "gfx/medals.2bpp", $180, $c0
-	INCBIN "gfx/medals.2bpp", $3c0, $30
-	INCBIN "gfx/medals.2bpp", $410, $10
-	INCBIN "gfx/medals.2bpp", $2d0, $30
-	INCBIN "gfx/medals.2bpp", $2a0, $30
-	INCBIN "gfx/medals.2bpp", $270, $30
-	INCBIN "gfx/medals.2bpp", $390, $30
-	INCBIN "gfx/medals.2bpp", $360, $30
-	INCBIN "gfx/medals.2bpp", $330, $10
-	INCBIN "gfx/medals.2bpp", $450, $30
-	INCBIN "gfx/medals.2bpp", $420, $30
-	INCBIN "gfx/medals.2bpp", $3f0, $20
+; MedalGfx::
+; 	dw 72
+; 	INCBIN "gfx/medals.2bpp",   $0, $c0
+; 	INCBIN "gfx/medals.2bpp", $240, $30
+; 	INCBIN "gfx/medals.2bpp", $340, $10
+; 	INCBIN "gfx/medals.2bpp",  $c0, $c0
+; 	INCBIN "gfx/medals.2bpp", $300, $30
+; 	INCBIN "gfx/medals.2bpp", $350, $10
+; 	INCBIN "gfx/medals.2bpp", $180, $c0
+; 	INCBIN "gfx/medals.2bpp", $3c0, $30
+; 	INCBIN "gfx/medals.2bpp", $410, $10
+; 	INCBIN "gfx/medals.2bpp", $2d0, $30
+; 	INCBIN "gfx/medals.2bpp", $2a0, $30
+; 	INCBIN "gfx/medals.2bpp", $270, $30
+; 	INCBIN "gfx/medals.2bpp", $390, $30
+; 	INCBIN "gfx/medals.2bpp", $360, $30
+; 	INCBIN "gfx/medals.2bpp", $330, $10
+; 	INCBIN "gfx/medals.2bpp", $450, $30
+; 	INCBIN "gfx/medals.2bpp", $420, $30
+; 	INCBIN "gfx/medals.2bpp", $3f0, $20
 
 NintendoGfx::
 	dw 24
@@ -640,33 +640,33 @@ GameBoyLinkGfx::
 	dw 109
 	INCBIN "gfx/link/link_scene.2bpp"
 
-GameBoyPrinterGfx::
-	dw 93
-	INCBIN "gfx/link/printer_scene.2bpp"
+; GameBoyPrinterGfx::
+; 	dw 93
+; 	INCBIN "gfx/link/printer_scene.2bpp"
 
-Colosseum1Gfx::
-	dw 96
-	INCBIN "gfx/booster_packs/colosseum1.2bpp"
+; Colosseum1Gfx::
+; 	dw 96
+; 	INCBIN "gfx/booster_packs/colosseum1.2bpp"
 
-Colosseum2Gfx::
-	dw 86
-	INCBIN "gfx/booster_packs/colosseum2.2bpp"
+; Colosseum2Gfx::
+; 	dw 86
+; 	INCBIN "gfx/booster_packs/colosseum2.2bpp"
 
-Evolution1Gfx::
-	dw 96
-	INCBIN "gfx/booster_packs/evolution1.2bpp"
+; Evolution1Gfx::
+; 	dw 96
+; 	INCBIN "gfx/booster_packs/evolution1.2bpp"
 
-Evolution2Gfx::
-	dw 86
-	INCBIN "gfx/booster_packs/evolution2.2bpp"
+; Evolution2Gfx::
+; 	dw 86
+; 	INCBIN "gfx/booster_packs/evolution2.2bpp"
 
-Mystery1Gfx::
-	dw 96
-	INCBIN "gfx/booster_packs/mystery1.2bpp"
+; Mystery1Gfx::
+; 	dw 96
+; 	INCBIN "gfx/booster_packs/mystery1.2bpp"
 
-Mystery2Gfx::
-	dw 86
-	INCBIN "gfx/booster_packs/mystery2.2bpp"
+; Mystery2Gfx::
+; 	dw 86
+; 	INCBIN "gfx/booster_packs/mystery2.2bpp"
 
 RonaldGfx::
 	dw 36
@@ -676,9 +676,9 @@ CopyrightGfx::
 	dw 36
 	INCBIN "gfx/copyright.2bpp"
 
-OWClerkGfx::
-	dw $8
-	INCBIN "gfx/overworld_sprites/clerk.2bpp"
+; OWClerkGfx::
+; 	dw $8
+; 	INCBIN "gfx/overworld_sprites/clerk.2bpp"
 
 DuelSparkGfx::
 	dw $3
@@ -690,13 +690,13 @@ DuelHealGfx::
 
 SECTION "Gfx 7", ROMX
 
-Laboratory1Gfx::
-	dw 96
-	INCBIN "gfx/booster_packs/laboratory1.2bpp"
+; Laboratory1Gfx::
+; 	dw 96
+; 	INCBIN "gfx/booster_packs/laboratory1.2bpp"
 
-Laboratory2Gfx::
-	dw 86
-	INCBIN "gfx/booster_packs/laboratory2.2bpp"
+; Laboratory2Gfx::
+; 	dw 86
+; 	INCBIN "gfx/booster_packs/laboratory2.2bpp"
 
 CharizardIntro1Gfx::
 	dw 96
@@ -734,9 +734,9 @@ CompaniesGfx::
 	dw 49
 	INCBIN "gfx/companies.2bpp"
 
-OWRonaldGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/ronald.2bpp"
+; OWRonaldGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/ronald.2bpp"
 
 AnimData5::
 	frame_table AnimFrameTable1
@@ -762,13 +762,13 @@ TitleScreenCGBGfx::
 	dw 212
 	INCBIN "gfx/titlescreen/title_screen_cgb.2bpp"
 
-OWDrMasonGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/doctormason.2bpp"
+; OWDrMasonGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/doctormason.2bpp"
 
-OverworldMapOAMGfx::
-	dw $8
-	INCBIN "gfx/overworld_map_oam.2bpp"
+; OverworldMapOAMGfx::
+; 	dw $8
+; 	INCBIN "gfx/overworld_map_oam.2bpp"
 
 DuelWaterDropGfx::
 	dw $3
@@ -892,9 +892,9 @@ MichaelGfx::
 	dw 36
 	INCBIN "gfx/duelists/michael.2bpp"
 
-OWLegendaryCardGfx::
-	dw $a
-	INCBIN "gfx/overworld_sprites/legendary_card.2bpp"
+; OWLegendaryCardGfx::
+; 	dw $a
+; 	INCBIN "gfx/overworld_sprites/legendary_card.2bpp"
 
 DuelDrainGfx::
 	dw $2
@@ -946,125 +946,125 @@ AaronGfx::
 	dw 36
 	INCBIN "gfx/duelists/aaron.2bpp"
 
-OWIshiharaGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/ishihara.2bpp"
+; OWIshiharaGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/ishihara.2bpp"
 
-OWImakuniGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/imakuni.2bpp"
+; OWImakuniGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/imakuni.2bpp"
 
-OWNikkiGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/nikki.2bpp"
+; OWNikkiGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/nikki.2bpp"
 
-OWRickGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/rick.2bpp"
+; OWRickGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/rick.2bpp"
 
-OWKenGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/ken.2bpp"
+; OWKenGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/ken.2bpp"
 
-OWAmyGfx::
-	dw $1b
-	INCBIN "gfx/overworld_sprites/amy.2bpp"
+; OWAmyGfx::
+; 	dw $1b
+; 	INCBIN "gfx/overworld_sprites/amy.2bpp"
 
-OWIsaacGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/isaac.2bpp"
+; OWIsaacGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/isaac.2bpp"
 
-OWMitchGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/mitch.2bpp"
+; OWMitchGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/mitch.2bpp"
 
-OWGeneGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/gene.2bpp"
+; OWGeneGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/gene.2bpp"
 
-OWMurrayGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/murray.2bpp"
+; OWMurrayGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/murray.2bpp"
 
-OWCourtneyGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/courtney.2bpp"
+; OWCourtneyGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/courtney.2bpp"
 
-OWSteveGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/steve.2bpp"
+; OWSteveGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/steve.2bpp"
 
-OWJackGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/jack.2bpp"
+; OWJackGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/jack.2bpp"
 
-OWRodGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/rod.2bpp"
+; OWRodGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/rod.2bpp"
 
-OWBoyGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/youngster.2bpp"
+; OWBoyGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/youngster.2bpp"
 
-OWLadGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/lad.2bpp"
+; OWLadGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/lad.2bpp"
 
-OWSpecsGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/specs.2bpp"
+; OWSpecsGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/specs.2bpp"
 
-OWButchGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/butch.2bpp"
+; OWButchGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/butch.2bpp"
 
-OWManiaGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/mania.2bpp"
+; OWManiaGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/mania.2bpp"
 
-OWJoshuaGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/joshua.2bpp"
+; OWJoshuaGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/joshua.2bpp"
 
-OWHoodGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/hood.2bpp"
+; OWHoodGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/hood.2bpp"
 
-OWTechGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/tech.2bpp"
+; OWTechGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/tech.2bpp"
 
-OWChapGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/chap.2bpp"
+; OWChapGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/chap.2bpp"
 
-OWManGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/man.2bpp"
+; OWManGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/man.2bpp"
 
-OWPappyGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/pappy.2bpp"
+; OWPappyGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/pappy.2bpp"
 
-OWGirlGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/girl.2bpp"
+; OWGirlGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/girl.2bpp"
 
-OWLass1Gfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/lass1.2bpp"
+; OWLass1Gfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/lass1.2bpp"
 
-OWLass2Gfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/lass2.2bpp"
+; OWLass2Gfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/lass2.2bpp"
 
-OWLass3Gfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/lass3.2bpp"
+; OWLass3Gfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/lass3.2bpp"
 
-OWSwimmerGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/swimmer.2bpp"
+; OWSwimmerGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/swimmer.2bpp"
 
 DuelGlowGfx::
 	dw $b
@@ -1074,7 +1074,7 @@ DuelSmallStarGfx::
 	dw $4
 	INCBIN "gfx/duel/anims/small_star.2bpp"
 
-BoosterOAMPal::
+Palette117::
 	db 0
 	db 1
 
@@ -1085,21 +1085,21 @@ BoosterOAMPal::
 
 SECTION "Gfx 11", ROMX
 
-OWGalGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/gal.2bpp"
+; OWGalGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/gal.2bpp"
 
-OWWomanGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/woman.2bpp"
+; OWWomanGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/woman.2bpp"
 
-OWGrannyGfx::
-	dw $14
-	INCBIN "gfx/overworld_sprites/granny.2bpp"
+; OWGrannyGfx::
+; 	dw $14
+; 	INCBIN "gfx/overworld_sprites/granny.2bpp"
 
-OWTorchGfx::
-	dw $16
-	INCBIN "gfx/overworld_sprites/torch.2bpp"
+; OWTorchGfx::
+; 	dw $16
+; 	INCBIN "gfx/overworld_sprites/torch.2bpp"
 
 DuelParalysisGfx::
 	dw $06
@@ -1319,17 +1319,17 @@ LinkOAMGfx::
 	dw $0b
 	INCBIN "gfx/link/link_oam.2bpp"
 
-PrinterOAMGfx::
-	dw $06
-	INCBIN "gfx/link/printer_oam.2bpp"
+; PrinterOAMGfx::
+; 	dw $06
+; 	INCBIN "gfx/link/printer_oam.2bpp"
 
 CardPopOAMGfx::
 	dw $16
 	INCBIN "gfx/link/card_pop_oam.2bpp"
 
-BoosterPackOAMGfx::
-	dw $20
-	INCBIN "gfx/booster_packs/oam.2bpp"
+; BoosterPackOAMGfx::
+; 	dw $20
+; 	INCBIN "gfx/booster_packs/oam.2bpp"
 
 PressStartGfx::
 	dw $14
@@ -1372,7 +1372,7 @@ SECTION "Anims 2", ROMX
 SECTION "Anims 3", ROMX
 	INCLUDE "data/duel/animations/anims3.asm"
 
-GlowPal::
+Palette31::
 	db 1, %11010010
 	db 1
 
@@ -1381,7 +1381,7 @@ GlowPal::
 	rgb 31, 24,  6
 	rgb 11,  3,  0
 
-PlayerPicPal::
+Palette119::
 	db 0
 	db 1
 
@@ -2053,14 +2053,7 @@ MrMimeCardGfx::
 
 JynxCardGfx::
 	INCBIN "gfx/cards/jynx.2bpp"
-	vc_patch Lighten_Jynx_purple_color
-IF DEF(_VC)
-	INCBIN "gfx/cards/jynx.pal", 0, 6
-	rgb 19, 10, 18
-ELSE
 	INCBIN "gfx/cards/jynx.pal"
-ENDC
-	vc_patch_end
 
 MewtwoLv53CardGfx::
 	INCBIN "gfx/cards/mewtwo1.2bpp"

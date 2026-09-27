@@ -37,15 +37,24 @@ s0a00c:: ; a00c
 sPlayerName:: ; a010
 	ds NAME_BUFFER_LENGTH
 
-	ds $e0
+sPlayerPortrait:: ;A020	
+	ds $1
 
-sCardAndDeckSaveData::
+sOnlineWins::
+    ds $2
+
+sOnlineLosses::
+    ds $2
+
+	ds $db;$df 223-4 = 219
+
+;sCardAndDeckSaveData::
 
 ; for each card, how many (0-127) the player owns
 ; CARD_NOT_OWNED ($80) indicates that the player has not yet seen the card
-sCardCollection:: ; a100
-	ds $100
-
+; sCardCollection:: ; a100
+; 	ds $100
+sCardAndDeckSaveData::
 sBuiltDecks::
 sDeck1:: deck_struct sDeck1 ; a200
 sDeck2:: deck_struct sDeck2 ; a254
@@ -190,8 +199,8 @@ sChallengeHallNPC:: ; b817
 sb818:: ; b818
 	ds $4
 
-sOWMapEvents:: ; b81c
-	ds NUM_MAP_EVENTS
+; sOWMapEvents:: ; b81c
+; 	ds NUM_MAP_EVENTS
 
 sb827:: ; b827
 	ds $1
@@ -212,7 +221,7 @@ sPCPackSelection:: ; b82c
 	ds $1
 
 sPCPacks:: ; b82d
-	ds NUM_PC_PACKS
+	ds $f;NUM_PC_PACKS
 
 sDefaultSong:: ; b83c
 	ds $1
@@ -307,23 +316,6 @@ sChallengeMachineEnd:: ; ba69
 sCardPopNameList:: ; bb00
 	ds CARDPOP_NAME_LIST_SIZE
 
-; saved data of the current duel, including 4-byte header
-; see SaveDuelDataToDE
-sCurrentDuel:: ; bc00
-
-; set to TRUE when saving duel data
-sCurrentDuelValid:: ; bc00
-	ds $1
-
-sCurrentDuelChecksum:: ; bc01
-	ds $2
-
-sCurrentDuelType:: ; bc03
-	ds $1
-
-sCurrentDuelData:: ; bc04
-	ds SAVE_DUEL_DATA_SIZE
-
 SECTION "SRAM1", SRAM
 
 UNION
@@ -355,7 +347,7 @@ NEXTU
 ; buffer used to store the deck configuration
 ; from the Auto Deck Machines
 ; intentionally uses the same address as sSavedDecks
-; since TryBuildDeckMachineDeck uses the same
+; since BuildDeckMachineDeck uses the same
 ; address in SRAM whether it's an auto deck or a saved deck
 ; the difference is whether SRAM0 or SRAM1 are loaded
 sAutoDecks::
@@ -380,27 +372,18 @@ sBackupGeneralSaveData:: ; b800
 ; byte 2 = total number of cards to collect
 ;  (doesn't count Phantom cards unless they
 ;   have been collected already)
-sAlbumProgress:: ; b8fe
+; sAlbumProgress:: ; b8fe
 	ds $2
 
 	ds $300
 
-; see sCurrentDuel
-sBackupCurrentDuel:: ; bc00
-	ds SAVE_DUEL_SIZE
+; saved data of the current duel, including a two-byte checksum
+; see SaveDuelDataToDE
+sCurrentDuel:: ; bc00
+	ds $1
+sCurrentDuelChecksum:: ; bc01
+	ds $2
+sCurrentDuelData:: ; bc04
+	ds $33b
 
 SECTION "SRAM3", SRAM
-
-; temp buffers for duel snapshot data
-; see SaveDuelStateToSRAM
-sDuelBuffer0:: ; a000
-	ds $400
-
-sDuelBuffer1:: ; a400
-	ds $400
-
-sDuelBuffer2:: ; a800
-	ds $400
-
-sDuelBuffer3:: ; ac00
-	ds $400

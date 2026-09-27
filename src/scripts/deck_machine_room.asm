@@ -1,43 +1,43 @@
-DeckMachineRoomAfterDuel:
-	ld hl, .after_duel_table
-	call FindEndOfDuelScript
-	ret
+; DeckMachineRoomAfterDuel:
+; 	ld hl, .after_duel_table
+; 	call FindEndOfDuelScript
+; 	ret
 
-.after_duel_table
-	db NPC_AARON
-	db NPC_AARON
-	dw Script_BeatAaron
-	dw Script_LostToAaron
-	db $00
+; .after_duel_table
+; 	db NPC_AARON
+; 	db NPC_AARON
+; 	dw Script_BeatAaron
+; 	dw Script_LostToAaron
+; 	db $00
 
-DeckMachineRoomCloseTextBox:
-	ld a, MAP_EVENT_FIGHTING_DECK_MACHINE
-.asm_d8af
-	push af
-	farcall ApplyOWMapEventChangeIfEventSet
-	pop af
-	inc a
-	cp MAP_EVENT_FIRE_DECK_MACHINE + 1
-	jr c, .asm_d8af
-	ret
+; DeckMachineRoomCloseTextBox:
+; 	ld a, MAP_EVENT_FIGHTING_DECK_MACHINE
+; .asm_d8af
+; 	push af
+; 	farcall Func_80b89
+; 	pop af
+; 	inc a
+; 	cp MAP_EVENT_FIRE_DECK_MACHINE + 1
+; 	jr c, .asm_d8af
+; 	ret
 
-Script_Tech6:
-	start_script
-	test_if_event_false EVENT_RECEIVED_LEGENDARY_CARDS
-	print_variable_npc_text Text05f7, Text05f8
-	quit_script_fully
+; Script_Tech6:
+; 	start_script
+; 	test_if_event_false EVENT_RECEIVED_LEGENDARY_CARDS
+; 	print_variable_npc_text Text05f7, Text05f8
+; 	quit_script_fully
 
-Script_Tech7:
-	start_script
-	test_if_event_false EVENT_RECEIVED_LEGENDARY_CARDS
-	print_variable_npc_text Text05f9, Text05fa
-	quit_script_fully
+; Script_Tech7:
+; 	start_script
+; 	test_if_event_false EVENT_RECEIVED_LEGENDARY_CARDS
+; 	print_variable_npc_text Text05f9, Text05fa
+; 	quit_script_fully
 
-Script_Tech8:
-	start_script
-	test_if_event_not_equal EVENT_ALL_DECK_MACHINE_FLAGS, $ff
-	print_variable_npc_text Text05fb, Text05fc
-	quit_script_fully
+; Script_Tech8:
+; 	start_script
+; 	test_if_event_not_equal EVENT_ALL_DECK_MACHINE_FLAGS, $ff
+; 	print_variable_npc_text Text05fb, Text05fc
+; 	quit_script_fully
 
 Script_Aaron:
 	start_script

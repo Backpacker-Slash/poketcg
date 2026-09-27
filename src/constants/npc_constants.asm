@@ -182,13 +182,13 @@ DEF NUM_PICS EQU const_value
 	const NPC_GUIDE                       ; $64
 	const NPC_TECH7                       ; $65
 	const NPC_TECH8                       ; $66
-	const NPC_TORCH                       ; $67
-	const NPC_LEGENDARY_CARD_TOP_LEFT     ; $68
-	const NPC_LEGENDARY_CARD_TOP_RIGHT    ; $69
-	const NPC_LEGENDARY_CARD_LEFT_SPARK   ; $6a
-	const NPC_LEGENDARY_CARD_BOTTOM_LEFT  ; $6b
-	const NPC_LEGENDARY_CARD_BOTTOM_RIGHT ; $6c
-	const NPC_LEGENDARY_CARD_RIGHT_SPARK  ; $6d
+	; const NPC_TORCH                       ; $67
+	; const NPC_LEGENDARY_CARD_TOP_LEFT     ; $68
+	; const NPC_LEGENDARY_CARD_TOP_RIGHT    ; $69
+	; const NPC_LEGENDARY_CARD_LEFT_SPARK   ; $6a
+	; const NPC_LEGENDARY_CARD_BOTTOM_LEFT  ; $6b
+	; const NPC_LEGENDARY_CARD_BOTTOM_RIGHT ; $6c
+	; const NPC_LEGENDARY_CARD_RIGHT_SPARK  ; $6d
 	const NPC_6E                          ; $6e (unused)
 	const NPC_6F                          ; $6f (unused)
 	const NPC_MURRAY2                     ; $70

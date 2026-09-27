@@ -43,46 +43,46 @@ DEF SPRITE_ANIM_FLAG_UNSKIPPABLE EQU 1 << SPRITE_ANIM_FLAG_UNSKIPPABLE_F
 DEF SPRITE_FRAME_OFFSET_SIZE EQU 4
 
 	const_def
-	const SPRITE_OW_PLAYER          ; $00
-	const SPRITE_OW_RONALD          ; $01
-	const SPRITE_OW_DRMASON         ; $02
-	const SPRITE_OW_ISHIHARA        ; $03
-	const SPRITE_OW_IMAKUNI         ; $04
-	const SPRITE_OW_NIKKI           ; $05
-	const SPRITE_OW_RICK            ; $06
-	const SPRITE_OW_KEN             ; $07
-	const SPRITE_OW_AMY             ; $08
-	const SPRITE_OW_ISAAC           ; $09
-	const SPRITE_OW_MITCH           ; $0a
-	const SPRITE_OW_GENE            ; $0b
-	const SPRITE_OW_MURRAY          ; $0c
-	const SPRITE_OW_COURTNEY        ; $0d
-	const SPRITE_OW_STEVE           ; $0e
-	const SPRITE_OW_JACK            ; $0f
-	const SPRITE_OW_ROD             ; $10
-	const SPRITE_OW_BOY             ; $11
-	const SPRITE_OW_LAD             ; $12
-	const SPRITE_OW_SPECS           ; $13
-	const SPRITE_OW_BUTCH           ; $14
-	const SPRITE_OW_MANIA           ; $15
-	const SPRITE_OW_JOSHUA          ; $16
-	const SPRITE_OW_HOOD            ; $17
-	const SPRITE_OW_TECH            ; $18
-	const SPRITE_OW_CHAP            ; $19
-	const SPRITE_OW_MAN             ; $1a
-	const SPRITE_OW_PAPPY           ; $1b
-	const SPRITE_OW_GIRL            ; $1c
-	const SPRITE_OW_LASS1           ; $1d
-	const SPRITE_OW_LASS2           ; $1e
-	const SPRITE_OW_LASS3           ; $1f
-	const SPRITE_OW_SWIMMER         ; $20
-	const SPRITE_OW_CLERK           ; $21
-	const SPRITE_OW_GAL             ; $22
-	const SPRITE_OW_WOMAN           ; $23
-	const SPRITE_OW_GRANNY          ; $24
-	const SPRITE_OW_MAP_OAM         ; $25
-	const SPRITE_OW_TORCH           ; $26
-	const SPRITE_OW_LEGENDARY_CARD  ; $27
+	; const SPRITE_OW_PLAYER          ; $00
+	; const SPRITE_OW_RONALD          ; $01
+	; const SPRITE_OW_DRMASON         ; $02
+	; const SPRITE_OW_ISHIHARA        ; $03
+	; const SPRITE_OW_IMAKUNI         ; $04
+	; const SPRITE_OW_NIKKI           ; $05
+	; const SPRITE_OW_RICK            ; $06
+	; const SPRITE_OW_KEN             ; $07
+	; const SPRITE_OW_AMY             ; $08
+	; const SPRITE_OW_ISAAC           ; $09
+	; const SPRITE_OW_MITCH           ; $0a
+	; const SPRITE_OW_GENE            ; $0b
+	; const SPRITE_OW_MURRAY          ; $0c
+	; const SPRITE_OW_COURTNEY        ; $0d
+	; const SPRITE_OW_STEVE           ; $0e
+	; const SPRITE_OW_JACK            ; $0f
+	; const SPRITE_OW_ROD             ; $10
+	; const SPRITE_OW_BOY             ; $11
+	; const SPRITE_OW_LAD             ; $12
+	; const SPRITE_OW_SPECS           ; $13
+	; const SPRITE_OW_BUTCH           ; $14
+	; const SPRITE_OW_MANIA           ; $15
+	; const SPRITE_OW_JOSHUA          ; $16
+	; const SPRITE_OW_HOOD            ; $17
+	; const SPRITE_OW_TECH            ; $18
+	; const SPRITE_OW_CHAP            ; $19
+	; const SPRITE_OW_MAN             ; $1a
+	; const SPRITE_OW_PAPPY           ; $1b
+	; const SPRITE_OW_GIRL            ; $1c
+	; const SPRITE_OW_LASS1           ; $1d
+	; const SPRITE_OW_LASS2           ; $1e
+	; const SPRITE_OW_LASS3           ; $1f
+	; const SPRITE_OW_SWIMMER         ; $20
+	; const SPRITE_OW_CLERK           ; $21
+	; const SPRITE_OW_GAL             ; $22
+	; const SPRITE_OW_WOMAN           ; $23
+	; const SPRITE_OW_GRANNY          ; $24
+	; const SPRITE_OW_MAP_OAM         ; $25
+	; const SPRITE_OW_TORCH           ; $26
+	; const SPRITE_OW_LEGENDARY_CARD  ; $27
 	const SPRITE_DUEL_GLOW          ; $28
 	const SPRITE_DUEL_PARALYSIS     ; $29
 	const SPRITE_DUEL_SLEEP         ; $2a
@@ -140,15 +140,15 @@ DEF SPRITE_FRAME_OFFSET_SIZE EQU 4
 	const SPRITE_DUEL_DRAIN         ; $5e
 	const SPRITE_DUEL_SMALL_GLOW    ; $5f
 	const SPRITE_DUEL_BALL          ; $60
-	const SPRITE_DUEL_CAT_PAW       ; $61
+	const SPRITE_DUEL_CAT_POW       ; $61
 	const SPRITE_DUEL_WAVE          ; $62
 	const SPRITE_DUEL_CARD          ; $63
 	const SPRITE_DUEL_COIN          ; $64
 	const SPRITE_DUEL_RESULT        ; $65
 	const SPRITE_LINK               ; $66
-	const SPRITE_PRINTER            ; $67
-	const SPRITE_CARD_POP           ; $68
-	const SPRITE_BOOSTER_PACK_OAM   ; $69
+	; const SPRITE_PRINTER            ; $67
+	; const SPRITE_CARD_POP           ; $68
+	; const SPRITE_BOOSTER_PACK_OAM   ; $69
 	const SPRITE_PRESS_START        ; $6a
 	const SPRITE_GRASS              ; $6b
 	const SPRITE_FIRE               ; $6c

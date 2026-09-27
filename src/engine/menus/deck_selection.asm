@@ -62,7 +62,7 @@ EmptyScreenAndLoadFontDuelAndHandCardsIcons:
 	ld [wTileMapFill], a
 	call EmptyScreen
 	call ZeroObjectPositions
-	ld a, TRUE
+	ld a, $1
 	ld [wVBlankOAMCopyToggle], a
 	call LoadSymbolsFont
 	call LoadDuelCardSymbolTiles
@@ -80,7 +80,7 @@ PrepareMenuGraphics:
 	ld [wTileMapFill], a
 	call ZeroObjectPositions
 	call EmptyScreen
-	ld a, TRUE
+	ld a, $1
 	ld [wVBlankOAMCopyToggle], a
 	call LoadCursorTile
 	call LoadSymbolsFont
@@ -135,7 +135,7 @@ DeckSelectionMenu:
 	call HandleMenuInput
 	jr nc, .loop_input
 	ldh a, [hCurMenuItem]
-	cp MENU_CANCEL
+	cp $ff
 	ret z ; B btn returns
 ; A btn pressed on a deck
 	ld [wCurDeck], a
@@ -162,17 +162,17 @@ HandleStartButtonInDeckSelectionMenu:
 	ld a, [wCurMenuItem]
 	ld [wCurDeck], a
 	call CheckIfCurDeckIsValid
-	jp nc, .valid_deck ; can be jr
+	jr nc, .valid_deck ; can be jr
 
 ; not a valid deck, cancel
-	ld a, MENU_CANCEL
+	ld a, $ff ; cancel
 	call PlaySFXConfirmOrCancel
 	call PrintThereIsNoDeckHereText
 	scf
 	ret
 
 .valid_deck
-	ld a, MENU_CONFIRM
+	ld a, $1
 	call PlaySFXConfirmOrCancel
 	call GetPointerToDeckCards
 	push hl
@@ -217,7 +217,7 @@ DeckSelectionSubMenu:
 	call DoFrame
 	call HandleCheckMenuInput
 	jp nc, .loop_input
-	cp MENU_CANCEL
+	cp $ff
 	jr nz, .option_selected
 ; B btn pressed
 ; erase cursor and go back
@@ -253,9 +253,9 @@ DeckSelectionSubMenu:
 	jr nc, .asm_8ec4
 	call EnableSRAM
 	ld hl, wCurDeckCards
-	call DecrementDeckCardsInCollection
+	;call DecrementDeckCardsInCollection
 	call GetPointerToDeckCards
-	call AddDeckToCollection
+	;call AddDeckToCollection
 	ld e, l
 	ld d, h
 	ld hl, wCurDeckCards

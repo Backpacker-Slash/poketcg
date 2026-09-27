@@ -236,14 +236,13 @@ AIDecide_Potion_Phase10:
 	sub d
 	jr c, .count_prizes
 	jr z, .count_prizes
-	; avoids Arena KO, don't play it on this Trainer Phase
 	or a
 	ret
 
-.count_prizes
 ; using Potion on active card does not prevent a KO.
 ; if player is at last prize, start loop with active card.
 ; otherwise start loop at first bench Pokémon.
+.count_prizes
 	call SwapTurn
 	call CountPrizes
 	call SwapTurn
@@ -262,7 +261,7 @@ AIDecide_Potion_Phase10:
 	call GetTurnDuelistVariable
 	cp $ff
 	ret z
-	call .CheckIfHasAttackWithBoostIfTakenDamageFlag
+	call .check_boost_if_taken_damage
 	jr c, .has_boost_damage
 	call GetCardDamageAndMaxHP
 	cp 20 ; if damage >= 20
@@ -278,20 +277,18 @@ AIDecide_Potion_Phase10:
 	jr z, .active_card
 
 ; bench card
-; if player is on last prize card then use Potion
-; otherwise only 70% chance to use Potion
 	push de
 	call SwapTurn
 	call CountPrizes
 	call SwapTurn
 	dec a
 	or a
-	jr z, .no_random_chance
-	; 70% chance to use Potion
+	jr z, .check_random
 	ld a, 10
 	call Random
 	cp 3
-.no_random_chance
+; 7/10 chance of returning carry.
+.check_random
 	pop de
 	jr c, .no_carry
 	ld a, e
@@ -313,7 +310,7 @@ AIDecide_Potion_Phase10:
 
 ; return carry if either of the attacks are usable
 ; and have the BOOST_IF_TAKEN_DAMAGE effect.
-.CheckIfHasAttackWithBoostIfTakenDamageFlag:
+.check_boost_if_taken_damage
 	push de
 	xor a ; FIRST_ATTACK_OR_PKMN_POWER
 	ld [wSelectedAttack], a
@@ -321,7 +318,7 @@ AIDecide_Potion_Phase10:
 	jr c, .second_attack
 	ld a, ATTACK_FLAG3_ADDRESS | BOOST_IF_TAKEN_DAMAGE_F
 	call CheckLoadedAttackFlag
-	jr c, .true
+	jr c, .set_carry
 .second_attack
 	ld a, SECOND_ATTACK
 	ld [wSelectedAttack], a
@@ -329,12 +326,12 @@ AIDecide_Potion_Phase10:
 	jr c, .false
 	ld a, ATTACK_FLAG3_ADDRESS | BOOST_IF_TAKEN_DAMAGE_F
 	call CheckLoadedAttackFlag
-	jr c, .true
+	jr c, .set_carry
 .false
 	pop de
 	or a
 	ret
-.true
+.set_carry
 	pop de
 	scf
 	ret
@@ -364,7 +361,7 @@ AIPlay_SuperPotion:
 ; active card next turn after using Super Potion.
 ; if it cannot, return carry.
 ; also take into account whether attack is high recoil.
-AIDecide_SuperPotion_Phase08:
+AIDecide_SuperPotion1:
 	farcall AIDecideWhetherToRetreat
 	jr c, .no_carry
 	call AICheckIfAttackIsHighRecoil
@@ -372,7 +369,7 @@ AIDecide_SuperPotion_Phase08:
 	xor a ; PLAY_AREA_ARENA
 	ldh [hTempPlayAreaLocation_ff9d], a
 	ld e, a
-	call .CheckIfHasEnergies
+	call .check_attached_energy
 	ret nc
 	farcall CheckIfDefendingPokemonCanKnockOut
 	jr nc, .no_carry
@@ -404,7 +401,7 @@ AIDecide_SuperPotion_Phase08:
 	ret
 
 ; returns carry if card has energies attached.
-.CheckIfHasEnergies:
+.check_attached_energy
 	call GetPlayAreaCardAttachedEnergies
 	ld a, [wTotalAttachedEnergies]
 	or a
@@ -416,7 +413,7 @@ AIDecide_SuperPotion_Phase08:
 ; output:
 ;	a = card to use Super Potion on;
 ;	carry set if Super Potion should be used.
-AIDecide_SuperPotion_Phase11:
+AIDecide_SuperPotion2:
 	xor a ; PLAY_AREA_ARENA
 	ldh [hTempPlayAreaLocation_ff9d], a
 	farcall CheckIfDefendingPokemonCanKnockOut
@@ -442,10 +439,10 @@ AIDecide_SuperPotion_Phase11:
 	or a
 	ret
 
-.count_prizes
 ; using Super Potion on active card does not prevent a KO.
 ; if player is at last prize, start loop with active card.
 ; otherwise start loop at first bench Pokémon.
+.count_prizes
 	call SwapTurn
 	call CountPrizes
 	call SwapTurn
@@ -457,7 +454,7 @@ AIDecide_SuperPotion_Phase11:
 ; find Play Area Pokémon with more than 30 damage.
 ; skip Pokémon if it doesn't have any energy attached,
 ; has a BOOST_IF_TAKEN_DAMAGE attack,
-; or if discarding makes any of its attacks unusable.
+; or if discarding makes any attack of its attacks unusable.
 .start_from_active
 	ld e, PLAY_AREA_ARENA
 .loop
@@ -467,11 +464,11 @@ AIDecide_SuperPotion_Phase11:
 	cp $ff
 	ret z
 	ld d, a
-	call .CheckIfHasEnergies
+	call .check_attached_energy
 	jr nc, .next
-	call .CheckIfHasAttackWithBoostIfTakenDamageFlag
+	call .check_boost_if_taken_damage
 	jr c, .next
-	call .CheckIfDiscardingMakesAttacksUnusable
+	call .check_energy_cost
 	jr c, .next
 	call GetCardDamageAndMaxHP
 	cp 40 ; if damage >= 40
@@ -487,8 +484,6 @@ AIDecide_SuperPotion_Phase11:
 	jr z, .active_card
 
 ; bench card
-; if player is on last prize card then use Super Potion
-; otherwise only 70% chance to use Super Potion
 	push de
 	call SwapTurn
 	call CountPrizes
@@ -496,10 +491,10 @@ AIDecide_SuperPotion_Phase11:
 	dec a
 	or a
 	jr z, .check_random
-	; 70% chance to use Super Potion
 	ld a, 10
 	call Random
 	cp 3
+; 7/10 chance of returning carry.
 .check_random
 	pop de
 	jr c, .no_carry
@@ -521,7 +516,7 @@ AIDecide_SuperPotion_Phase11:
 	ret
 
 ; returns carry if card has energies attached.
-.CheckIfHasEnergies:
+.check_attached_energy
 	call GetPlayAreaCardAttachedEnergies
 	ld a, [wTotalAttachedEnergies]
 	or a
@@ -531,7 +526,7 @@ AIDecide_SuperPotion_Phase11:
 
 ; return carry if either of the attacks are usable
 ; and have the BOOST_IF_TAKEN_DAMAGE effect.
-.CheckIfHasAttackWithBoostIfTakenDamageFlag:
+.check_boost_if_taken_damage
 	push de
 	xor a ; FIRST_ATTACK_OR_PKMN_POWER
 	ld [wSelectedAttack], a
@@ -559,7 +554,7 @@ AIDecide_SuperPotion_Phase11:
 
 ; returns carry if discarding energy card renders any attack unusable,
 ; given that they have enough energy to be used before discarding.
-.CheckIfDiscardingMakesAttacksUnusable:
+.check_energy_cost
 	push de
 	xor a ; FIRST_ATTACK_OR_PKMN_POWER
 	ld [wSelectedAttack], a
@@ -591,10 +586,10 @@ AIDecide_SuperPotion_Phase11:
 	scf
 	ret
 
+; AI always attaches a Defender card to the Active Pokémon.
 AIPlay_Defender:
 	ld a, [wAITrainerCardToPlay]
 	ldh [hTempCardIndex_ff9f], a
-	; AI always attaches a Defender card to the Active Pokémon.
 	xor a ; PLAY_AREA_ARENA
 	ldh [hTemp_ffa0], a
 	ld a, OPPACTION_EXECUTE_TRAINER_EFFECTS
@@ -604,7 +599,7 @@ AIPlay_Defender:
 ; returns carry if using Defender can prevent a KO
 ; by the defending Pokémon.
 ; this takes into account both attacks and whether they're useable.
-AIDecide_Defender_Phase13:
+AIDecide_Defender1:
 	xor a ; PLAY_AREA_ARENA
 	ldh [hTempPlayAreaLocation_ff9d], a
 	farcall CheckIfAnyAttackKnocksOutDefendingCard
@@ -688,7 +683,7 @@ AIDecide_Defender_Phase13:
 
 ; return carry if using Defender prevents Pokémon
 ; from being knocked out by an attack with recoil.
-AIDecide_Defender_Phase14:
+AIDecide_Defender2:
 	ld a, ATTACK_FLAG1_ADDRESS | HIGH_RECOIL_F
 	call CheckLoadedAttackFlag
 	jr c, .recoil
@@ -775,7 +770,7 @@ AIPlay_PlusPower:
 ; returns carry if using a PlusPower can KO defending Pokémon
 ; if active card cannot KO without the boost.
 ; outputs in a the attack to use.
-AIDecide_PlusPower_Phase13:
+AIDecide_PlusPower1:
 ; this is mistakenly duplicated
 	xor a ; PLAY_AREA_ARENA
 	ldh [hTempPlayAreaLocation_ff9d], a
@@ -820,26 +815,27 @@ AIDecide_PlusPower_Phase13:
 ; if neither can KO, return no carry.
 	xor a ; FIRST_ATTACK_OR_PKMN_POWER
 	ld [wSelectedAttack], a
-	call .CheckAttackWithPluspower
-	jr c, .first_atk_kos_with_pluspower
+	call .check_ko_with_pluspower
+	jr c, .kos_with_pluspower_1
 	ld a, SECOND_ATTACK
 	ld [wSelectedAttack], a
-	call .CheckAttackWithPluspower
-	jr c, .second_atk_kos_with_pluspower
+	call .check_ko_with_pluspower
+	jr c, .kos_with_pluspower_2
 
 .no_carry
 	or a
 	ret
 
-.first_atk_kos_with_pluspower
-	call .MrMimeDamageCheck
+; first attack can KO with PlusPower.
+.kos_with_pluspower_1
+	call .check_mr_mime
 	jr nc, .no_carry
 	xor a ; FIRST_ATTACK_OR_PKMN_POWER
 	scf
 	ret
-
-.second_atk_kos_with_pluspower
-	call .MrMimeDamageCheck
+; second attack can KO with PlusPower.
+.kos_with_pluspower_2
+	call .check_mr_mime
 	jr nc, .no_carry
 	ld a, SECOND_ATTACK
 	scf
@@ -847,7 +843,7 @@ AIDecide_PlusPower_Phase13:
 
 ; return carry if attack is useable and KOs
 ; defending Pokémon with PlusPower boost.
-.CheckAttackWithPluspower:
+.check_ko_with_pluspower
 	farcall CheckIfSelectedAttackIsUnusable
 	jr c, .unusable
 	ld a, [wSelectedAttack]
@@ -874,7 +870,7 @@ AIDecide_PlusPower_Phase13:
 
 ; returns carry if PlusPower boost does
 ; not exceed 30 damage when facing Mr. Mime.
-.MrMimeDamageCheck:
+.check_mr_mime
 	ld a, [wDamage]
 	add 10 ; add PlusPower boost
 	cp 30 ; no danger in preventing damage
@@ -891,20 +887,19 @@ AIDecide_PlusPower_Phase13:
 	scf
 	ret
 
-; returns carry 30% of the time if:
-; - selected attack is useable
-; - can't KO without PlusPower boost
-; - can damage Mr. Mime even with PlusPower boost
-; - has a minimum damage > 0.
+; returns carry 7/10 of the time
+; if selected attack is useable, can't KO without PlusPower boost
+; can damage Mr. Mime even with PlusPower boost
+; and has a minimum damage > 0.
 ; outputs in a the attack to use.
-AIDecide_PlusPower_Phase14:
+AIDecide_PlusPower2:
 	xor a ; PLAY_AREA_ARENA
 	ldh [hTempPlayAreaLocation_ff9d], a
-	call .CheckAttackDoesntKO
+	call .check_can_ko
 	jr nc, .no_carry
 	call .check_random
 	jr nc, .no_carry
-	call .MrMimeDamageCheck
+	call .check_mr_mime
 	jr nc, .no_carry
 	scf
 	ret
@@ -914,7 +909,7 @@ AIDecide_PlusPower_Phase14:
 
 ; returns carry if PlusPower boost does
 ; not exceed 30 damage when facing Mr. Mime.
-.MrMimeDamageCheck:
+.check_mr_mime
 	ld a, [wDamage]
 	add 10 ; add PlusPower boost
 	cp 30 ; no danger in preventing damage
@@ -932,7 +927,7 @@ AIDecide_PlusPower_Phase14:
 	ret
 
 ; return carry if attack is useable but cannot KO.
-.CheckAttackDoesntKO:
+.check_can_ko
 	farcall CheckIfSelectedAttackIsUnusable
 	jr c, .unusable
 	ld a, [wSelectedAttack]
@@ -951,7 +946,7 @@ AIDecide_PlusPower_Phase14:
 	or a
 	ret
 
-; return carry 30% of the time if
+; return carry 7/10 of the time if
 ; attack is useable and minimum damage > 0.
 .check_random
 	farcall CheckIfSelectedAttackIsUnusable
@@ -961,7 +956,6 @@ AIDecide_PlusPower_Phase14:
 	ld a, [wAIMinDamage]
 	cp 10
 	jr c, .unusable
-	; 30% chance to return carry
 	ld a, 10
 	call Random
 	cp 3
@@ -1009,19 +1003,19 @@ AIDecide_Switch:
 	jr nc, .switch
 
 .check_cost_amount
-	; use Switch if retreat cost is 3 or more
 	xor a ; PLAY_AREA_ARENA
 	ldh [hTempPlayAreaLocation_ff9d], a
 	call GetPlayAreaCardRetreatCost
 	cp 3
+	; jump if retreat cost >= 3
 	jr nc, .switch
 
-	; use Switch if not enough energies for retreat cost
 	push af
 	ld e, PLAY_AREA_ARENA
 	farcall CountNumberOfEnergyCardsAttached
 	pop bc
 	cp b
+	; jump if energy cards attached < retreat cost
 	jr c, .switch
 	ret
 
@@ -1055,7 +1049,7 @@ AIDecide_GustOfWind:
 	and AI_FLAG_USED_GUST_OF_WIND
 	ret nz
 
-	farcall CanArenaCardUseNonResidualAttack
+	farcall CheckIfActivePokemonCanUseAnyNonResidualAttack
 	ret nc ; no non-residual attack can be used
 
 	xor a ; PLAY_AREA_ARENA
@@ -1667,9 +1661,9 @@ AIPlay_SuperEnergyRemoval:
 AIDecide_SuperEnergyRemoval:
 	ld e, PLAY_AREA_BENCH_1
 .loop_1
-; first find a Pokémon in Play Area card with a basic energy card
+; first find an Arena card with a color energy card
 ; to discard for card effect
-; return immediately if none found
+; return immediately if no Arena cards
 	ld a, DUELVARS_ARENA_CARD
 	add e
 	call GetTurnDuelistVariable
@@ -1684,9 +1678,9 @@ AIDecide_SuperEnergyRemoval:
 	inc e
 	jr .loop_1
 
-; returns carry if an energy card other than Double Colorless
+; returns carry if an energy card other than double colorless
 ; is found attached to the card in play area location e
-.LookForNonDoubleColorless:
+.LookForNonDoubleColorless
 	ld a, e
 	call CreateArenaOrBenchEnergyCardList
 	ld hl, wDuelTempList
@@ -1814,7 +1808,7 @@ AIDecide_SuperEnergyRemoval:
 ; returns carry if the number of energy cards attached
 ; is fewer than 2, or if all energy combined yields
 ; fewer than 2 energy
-.CheckIfFewerThanTwoEnergyCards:
+.CheckIfFewerThanTwoEnergyCards
 	call GetPlayAreaCardAttachedEnergies
 	ld a, [wTotalAttachedEnergies]
 	cp 2
@@ -1831,7 +1825,7 @@ AIDecide_SuperEnergyRemoval:
 	inc hl
 	dec b
 	jr nz, .loop_5
-	ld b, [hl] ; colorless
+	ld b, [hl]
 	srl b
 	add b
 	cp 2
@@ -1839,7 +1833,7 @@ AIDecide_SuperEnergyRemoval:
 
 ; returns carry if this card does not
 ; have enough energy for either of its attacks
-.CheckIfNotEnoughEnergyToAttack:
+.CheckIfNotEnoughEnergyToAttack
 	push de
 	xor a ; FIRST_ATTACK_OR_PKMN_POWER
 	ld [wSelectedAttack], a
@@ -1882,7 +1876,7 @@ AIDecide_SuperEnergyRemoval:
 ; stores in wce06 the highest damaging attack
 ; for the card in play area location in e
 ; and stores this card's location in wce08
-.FindHighestDamagingAttack:
+.FindHighestDamagingAttack
 	push de
 	ld a, e
 	ldh [hTempPlayAreaLocation_ff9d], a
@@ -1943,7 +1937,7 @@ AIPlay_PokemonBreeder:
 
 AIDecide_PokemonBreeder:
 	call IsPrehistoricPowerActive
-	jp c, .dont_use
+	jp c, .done
 
 	ld a, 7
 	ld hl, wce08
@@ -1992,7 +1986,7 @@ AIDecide_PokemonBreeder:
 	push de
 	call CheckIfCanEvolveInto_BasicToStage2
 	pop de
-	call nc, .CalculateFitness
+	call nc, .can_evolve
 	pop bc
 	pop hl
 	inc e
@@ -2000,7 +1994,7 @@ AIDecide_PokemonBreeder:
 	jr nz, .loop_play_area_1
 	jr .loop_hand_1
 
-.CalculateFitness:
+.can_evolve
 	ld a, DUELVARS_ARENA_CARD_HP
 	add e
 	call GetTurnDuelistVariable
@@ -2009,12 +2003,12 @@ AIDecide_PokemonBreeder:
 	ld b, a
 
 ; count number of energy cards attached and keep
-; the lowest 4 bits (capped at 15)
+; the lowest 4 bits (capped at $0f)
 	call GetPlayAreaCardAttachedEnergies
 	ld a, [wTotalAttachedEnergies]
-	cp 16
+	cp $10
 	jr c, .not_maxed_out
-	ld a, 15
+	ld a, %00001111
 .not_maxed_out
 	or b
 
@@ -2049,7 +2043,7 @@ AIDecide_PokemonBreeder:
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
 	call GetTurnDuelistVariable
 	ld c, a
-	ld e, PLAY_AREA_ARENA
+	ld e, $00
 	ld d, $00
 
 ; find highest score in wce08
@@ -2063,7 +2057,7 @@ AIDecide_PokemonBreeder:
 ; store this score to wce06
 	ld a, [hl]
 	ld [wce06], a
-; store this Play Area location to wce07
+; store this PLay Area location to wce07
 	ld a, e
 	ld [wce07], a
 
@@ -2117,7 +2111,7 @@ AIDecide_PokemonBreeder:
 	call CheckIfCanEvolveInto_BasicToStage2
 	pop de
 	call nc, .HandleDragoniteLv41Evolution
-	call nc, .CalculateFitness
+	call nc, .can_evolve
 
 ; not possible to evolve or returned carry
 ; when handling DragoniteLv41 evolution
@@ -2144,7 +2138,7 @@ AIDecide_PokemonBreeder:
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
 	call GetTurnDuelistVariable
 	ld c, a
-	ld e, PLAY_AREA_ARENA
+	ld e, $00
 	ld d, $00
 
 ; find highest score in wce08 with at least
@@ -2168,7 +2162,7 @@ AIDecide_PokemonBreeder:
 ; store the score in wce06
 	ld a, b
 	ld [wce06], a
-; store this Play Area location to wce07
+; store this PLay Area location to wce07
 	ld a, e
 	ld [wce07], a
 
@@ -2179,7 +2173,7 @@ AIDecide_PokemonBreeder:
 
 	ld a, [wce07]
 	cp $ff
-	jr z, .dont_use
+	jr z, .done
 
 ; a card to evolve was found
 ; store the deck index of the stage 2 card
@@ -2195,7 +2189,7 @@ AIDecide_PokemonBreeder:
 	scf
 	ret
 
-.dont_use
+.done
 	or a
 	ret
 
@@ -2204,7 +2198,7 @@ AIDecide_PokemonBreeder:
 ;   number of damage counters in Play Area is under 8;
 ; - the card that is evolving is Arena card and has under 5
 ;   damage counters or has less than 3 energy cards attached.
-.HandleDragoniteLv41Evolution:
+.HandleDragoniteLv41Evolution
 	push af
 	push bc
 	push de
@@ -2311,88 +2305,89 @@ AIDecide_ProfessorOak:
 	cp WONDERS_OF_SCIENCE_DECK_ID
 	jp z, .HandleWondersOfScienceDeck
 
-; general deck AI logic for Professor Oak
-.general_logic
-	; do not play if cards in deck <= 14
+; return if cards in deck <= 14
+.check_cards_deck
 	ld a, [hl]
 	cp DECK_SIZE - 14
 	ret nc
 
 ; initialize score
-	ld a, 30
+	ld a, $1e
 	ld [wce06], a
 
-.general_logic_got_initial_score
+; check number of cards in hand
+.check_cards_hand
 	ld a, DUELVARS_NUMBER_OF_CARDS_IN_HAND
 	call GetTurnDuelistVariable
 	cp 4
-	jr nc, .at_least_4_hand_cards
-	; < 4 hand cards, encourage
+	jr nc, .more_than_3_cards
+
+; less than 4 cards in hand
 	ld a, [wce06]
-	add 50
+	add $32
 	ld [wce06], a
 	jr .check_energy_cards
-.at_least_4_hand_cards
+
+.more_than_3_cards
 	cp 9
 	jr c, .check_energy_cards
-	; >= 9 hand cards, discourage
+
+; more than 8 cards
 	ld a, [wce06]
-	sub 30
+	sub $1e
 	ld [wce06], a
 
 .check_energy_cards
 	farcall CreateEnergyCardListFromHand
 	jr nc, .handle_blastoise
-	; no energy cards, encourage
+
+; no energy cards in hand
 	ld a, [wce06]
-	add 40
+	add $28
 	ld [wce06], a
 
 .handle_blastoise
-	; is there Muk in play?
 	ld a, MUK
 	call CountPokemonWithActivePkmnPowerInBothPlayAreas
 	jr c, .check_hand
-	; if not, does AI have Blastoise lv52 in play?
+
+; no Muk in Play Area
 	ld a, BLASTOISE
 	call CountTurnDuelistPokemonWithActivePkmnPower
 	jr nc, .check_hand
-	; if yes, does AI have any Water Energy cards in hand?
+
+; at least one Blastoise in AI Play Area
 	ld a, WATER_ENERGY
 	farcall LookForCardIDInHand
 	jr nc, .check_hand
-	; nope, then encourage
+
+; no Water energy in hand
 	ld a, [wce06]
-	add 10
+	add $0a
 	ld [wce06], a
 
 .check_hand
-; loops through hand cards and encourages
-; if it finds any Basic Pokémon cards
 	call CreateHandCardList
 	ld hl, wDuelTempList
 .loop_hand
 	ld a, [hli]
 	cp $ff
-	jr z, .check_evolutions
+	jr z, .check_evolution
 
-	; skip card if it's an Energy card
 	call LoadCardDataToBuffer1_FromDeckIndex
 	ld a, [wLoadedCard1Type]
 	cp TYPE_ENERGY
 	jr c, .loop_hand ; bug, should be jr nc
 
-	; skip card if it's not Basic
 	ld a, [wLoadedCard1Stage]
 	or a
 	jr nz, .loop_hand
 
-	; has a Basic card, encourage
 	ld a, [wce06]
-	add 10
+	add $0a
 	ld [wce06], a
 
-.check_evolutions
+.check_evolution
 	xor a
 	ld [wce0f], a
 	ld [wce0f + 1], a
@@ -2401,21 +2396,26 @@ AIDecide_ProfessorOak:
 	call GetTurnDuelistVariable
 	ld d, a
 	ld e, PLAY_AREA_ARENA
+
 .loop_play_area
 	push de
 	call .LookForEvolution
 	pop de
 	jr nc, .not_in_hand
-	; there's a card in hand that can evolve it
-	ld a, TRUE
+
+; there's a card in hand that can evolve
+	ld a, $01
 	ld [wce0f], a
+
 .not_in_hand
-	; check if a card that can evolve was found at all
-	; if yes, then set wce0f + 1 to TRUE
+; check if a card that can evolve was found at all
+; if not, go to the next card in the Play Area
 	ld a, [wce08]
-	cp TRUE
+	cp $01
 	jr nz, .next_play_area
-	ld a, TRUE
+
+; if it was found, set wce0f + 1 to $01
+	ld a, $01
 	ld [wce0f + 1], a
 
 .next_play_area
@@ -2423,23 +2423,25 @@ AIDecide_ProfessorOak:
 	dec d
 	jr nz, .loop_play_area
 
-	; if an evolution card was found...
+; if a card was found that evolves...
 	ld a, [wce0f + 1]
 	or a
 	jr z, .check_score
-	; ...but that card is not in the hand...
+
+; ...but that card is not in the hand...
 	ld a, [wce0f]
 	or a
 	jr nz, .check_score
-	; ...add to the score
+
+; ...add to the score
 	ld a, [wce06]
-	add 10
+	add $0a
 	ld [wce06], a
 
+; only return carry if score >  $3c
 .check_score
-	; only use Professor Oak if score is >= 60
 	ld a, [wce06]
-	ld b, 60
+	ld b, $3c
 	cp b
 	jr nc, .set_carry
 	or a
@@ -2451,16 +2453,16 @@ AIDecide_ProfessorOak:
 
 ; return carry if there's a card in the hand that
 ; can evolve the card in Play Area location in e.
-; sets wce08 to TRUE if any card is found that can
+; sets wce08 to $01 if any card is found that can
 ; evolve regardless of card location.
-.LookForEvolution:
+.LookForEvolution
 	xor a
 	ld [wce08], a
-	ld d, 0 ; deck index
+	ld d, 0
 
-; loop through all cards to check if there's
+; loop through the whole deck to check if there's
 ; a card that can evolve this Pokemon.
-.loop_find_evolution
+.loop_deck_evolution
 	push de
 	call CheckIfCanEvolveInto
 	pop de
@@ -2469,23 +2471,23 @@ AIDecide_ProfessorOak:
 	inc d
 	ld a, DECK_SIZE
 	cp d
-	jr nz, .loop_find_evolution
-	; no evolutions found in hand
+	jr nz, .loop_deck_evolution
+
 	or a
 	ret
 
-; a card was found that can evolve, set wce08 to TRUE
+; a card was found that can evolve, set wce08 to $01
 ; and if the card is in the hand, return carry.
-; otherwise resume looping through all cards
+; otherwise resume looping through deck.
 .can_evolve
-	ld a, TRUE
+	ld a, $01
 	ld [wce08], a
 	ld a, DUELVARS_CARD_LOCATIONS
 	add d
 	call GetTurnDuelistVariable
 	cp CARD_LOCATION_HAND
 	jr nz, .evolution_not_in_hand
-	; is in hand
+
 	scf
 	ret
 
@@ -2571,11 +2573,11 @@ AIDecide_ProfessorOak:
 	jr c, .found_mysterious_fossil
 	ld a, $50
 	ld [wce06], a
-	jp .general_logic_got_initial_score
+	jp .check_cards_hand
 .found_mysterious_fossil
 	ld a, $1e
 	ld [wce06], a
-	jp .general_logic_got_initial_score
+	jp .check_cards_hand
 
 ; handles Wonders of Science AI logic.
 ; if there's either Grimer or Muk in hand,
@@ -2590,7 +2592,7 @@ AIDecide_ProfessorOak:
 
 	ld a, DUELVARS_NUMBER_OF_CARDS_NOT_IN_DECK
 	call GetTurnDuelistVariable
-	jp .general_logic
+	jp .check_cards_deck
 
 .found_grimer_or_muk
 	or a
@@ -2611,7 +2613,7 @@ AIPlay_EnergyRetrieval:
 	cp $ff
 	jr z, .asm_20e68
 	ld a, $ff
-	ldh [hTempRetreatCostCards + 1], a
+	ldh [$ffa3], a
 .asm_20e68
 	ld a, OPPACTION_EXECUTE_TRAINER_EFFECTS
 	bank1call AIMakeDecision
@@ -2862,21 +2864,21 @@ AIPlay_SuperEnergyRetrieval:
 	ld a, [wce1a]
 	ldh [hTempPlayAreaLocation_ffa1], a
 	ld a, [wce1b]
-	ldh [hTempRetreatCostCards + 0], a
+	ldh [hTempRetreatCostCards], a
 	ld a, [wce1c]
-	ldh [hTempRetreatCostCards + 1], a
+	ldh [$ffa3], a
 	cp $ff
 	jr z, .asm_20fbb
 	ld a, [wce1d]
-	ldh [hTempRetreatCostCards + 2], a
+	ldh [$ffa4], a
 	cp $ff
 	jr z, .asm_20fbb
 	ld a, [wce1e]
-	ldh [hTempRetreatCostCards + 3], a
+	ldh [$ffa5], a
 	cp $ff
 	jr z, .asm_20fbb
 	ld a, $ff
-	ldh [hTempRetreatCostCards + 4], a
+	ldh [$ffa6], a
 .asm_20fbb
 	ld a, OPPACTION_EXECUTE_TRAINER_EFFECTS
 	bank1call AIMakeDecision
@@ -2915,8 +2917,8 @@ AIDecide_SuperEnergyRetrieval:
 	call FindAndRemoveCardFromList
 	call FindDuplicateCards
 	jp c, .no_carry
-	ld [wce08], a
 
+	ld [wce08], a
 	ld a, CARD_LOCATION_DISCARD_PILE
 	call FindBasicEnergyCardsInLocation
 	jp c, .no_carry
@@ -3035,13 +3037,13 @@ AIDecide_SuperEnergyRetrieval:
 .third_energy_2
 	ld a, [wce1d]
 	cp $ff
-	jr nz, .fourth_energy_2
+	jr nz, .fourth_energy
 	ld a, b
 	ld [wce1d], a
 	call RemoveCardFromList
 	jr .loop_energy_cards_2
 
-.fourth_energy_2
+.fourth_energy
 	ld a, b
 	ld [wce1e], a
 	jr .set_carry
@@ -3072,10 +3074,10 @@ AIDecide_SuperEnergyRetrieval:
 FindAndRemoveCardFromList:
 	push hl
 	ld b, a
-.loop
+.loop_duplicate
 	ld a, [hli]
 	cp b
-	jr nz, .loop
+	jr nz, .loop_duplicate
 	call RemoveCardFromList
 	pop hl
 	ret
@@ -3287,7 +3289,7 @@ AIDecide_EnergySearch:
 
 ; return carry if cards in wDuelTempList are not
 ; useful to any of the Play Area Pokemon
-.CheckForUsefulEnergyCards:
+.CheckForUsefulEnergyCards
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
 	call GetTurnDuelistVariable
 	ld d, a
@@ -3338,7 +3340,7 @@ AIDecide_EnergySearch:
 ; checks whether there are useful energies
 ; only for Fire and Lightning type Pokemon cards
 ; in Play Area. If none found, return carry.
-.CheckUsefulFireOrLightningEnergy:
+.CheckUsefulFireOrLightningEnergy
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
 	call GetTurnDuelistVariable
 	ld d, a
@@ -3401,7 +3403,7 @@ AIDecide_EnergySearch:
 ; checks whether there are useful energies
 ; only for Grass type Pokemon cards
 ; in Play Area. If none found, return carry.
-.CheckUsefulGrassEnergy:
+.CheckUsefulGrassEnergy
 ; unreferenced
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
 	call GetTurnDuelistVariable
@@ -3466,22 +3468,21 @@ AIPlay_Pokedex:
 	ld a, [wce1b]
 	ldh [hTempPlayAreaLocation_ffa1], a
 	ld a, [wce1c]
-	ldh [hTempRetreatCostCards + 0], a
+	ldh [hTempRetreatCostCards], a
 	ld a, [wce1d]
-	ldh [hTempRetreatCostCards + 1], a
+	ldh [$ffa3], a
 	ld a, [wce1e]
-	ldh [hTempRetreatCostCards + 2], a
+	ldh [$ffa4], a
 	ld a, $ff
-	ldh [hTempRetreatCostCards + 3], a
+	ldh [$ffa5], a
 	ld a, OPPACTION_EXECUTE_TRAINER_EFFECTS
 	bank1call AIMakeDecision
 	ret
 
 AIDecide_Pokedex:
-; return if counter hasn't reached 6 yet
 	ld a, [wAIPokedexCounter]
 	cp 5 + 1
-	jr c, .no_carry
+	jr c, .no_carry ; return if counter hasn't reached 6 yet
 
 ; return no carry if number of cards in deck <= 4
 	ld a, DUELVARS_NUMBER_OF_CARDS_NOT_IN_DECK
@@ -3642,9 +3643,8 @@ PickPokedexCards_Unreferenced:
 ; prioritizes energy cards, then Pokemon cards, then Trainer cards.
 ; stores the resulting order in wce1a.
 PickPokedexCards:
-	; reset counter
 	xor a
-	ld [wAIPokedexCounter], a
+	ld [wAIPokedexCounter], a ; reset counter
 
 	ld a, DUELVARS_NUMBER_OF_CARDS_NOT_IN_DECK
 	call GetTurnDuelistVariable
@@ -3679,8 +3679,9 @@ PickPokedexCards:
 	ld a, $ff
 	ld [wce08 + 5], a
 
-; find energy
 	ld de, wce1a
+
+; find energy
 	ld hl, wce08
 	ld c, -1
 	ld b, $00
@@ -3759,7 +3760,7 @@ PickPokedexCards:
 	scf
 	ret
 
-.GetCardType:
+.GetCardType
 	push bc
 	push de
 	call GetCardIDFromDeckIndex
@@ -3779,7 +3780,7 @@ AIDecide_FullHeal:
 	ld a, DUELVARS_ARENA_CARD_STATUS
 	call GetTurnDuelistVariable
 
-	; skip if no status on arena card
+; skip if no status on arena card
 	or a ; NO_STATUS
 	jr z, .no_carry
 
@@ -3798,8 +3799,7 @@ AIDecide_FullHeal:
 
 .asleep
 ; set carry if any of the following
-; cards are in own Play Area.
-; bug, should be checking player's Play Area instead
+; cards are in the Play Area.
 	ld a, GASTLY_LV8
 	ld b, PLAY_AREA_ARENA
 	call LookForCardIDInPlayArea_Bank8
@@ -3911,14 +3911,14 @@ AIDecide_MrFuji:
 	jr z, .next
 
 ; a = damage counters
-; b = max HP
+; b = hp left
 	call CalculateBDividedByA_Bank8
 	cp 20
 	jr nc, .next
 
 ; here, HP left in counters is less than twice
 ; the number of damage counters, that is:
-; remaining HP < 1/3 max HP
+; HP < 1/3 max HP
 
 ; if value is less than the one found before, store this one.
 	ld hl, wce08
@@ -4041,9 +4041,8 @@ AIDecide_ScoopUp:
 
 ; this deck will use Scoop Up on a benched ArticunoLv37.
 ; it checks if the defending Pokemon is a Snorlax,
-; (interestingly does not check for Muk in play.)
-; will also use Scoop Up on Arena ArticunoLv37 or Chansey
-; if they will be KO'd by the player
+; but interestingly does not check for Muk in both Play Areas.
+; will also use Scoop Up on
 .HandleLegendaryArticuno
 ; if less than 3 Play Area Pokemon cards, skip.
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
@@ -4175,7 +4174,7 @@ AIDecide_Maintenance:
 	jr c, .no_carry
 
 ; list out all the hand cards and remove
-; wAITrainerCardToPlay from list. Then find any duplicate cards.
+; wAITrainerCardToPlay from list.Then find any duplicate cards.
 	call CreateHandCardList
 	ld hl, wDuelTempList
 	ld a, [wAITrainerCardToPlay]
@@ -4287,12 +4286,12 @@ AIDecide_Recycle:
 .loop_1
 	ld a, [hli]
 	cp $ff
-	jr z, .pick_most_important_card
+	jr z, .done
 
 	ld b, a
 	call LoadCardDataToBuffer1_FromDeckIndex
 
-	; 1: Double Colorless Energy
+; double colorless
 	cp DOUBLE_COLORLESS_ENERGY
 	jr nz, .chansey
 	ld a, b
@@ -4300,7 +4299,6 @@ AIDecide_Recycle:
 	jr .loop_1
 
 .chansey
-	; 2: Chansey
 	cp CHANSEY
 	jr nz, .tauros
 	ld a, b
@@ -4308,7 +4306,6 @@ AIDecide_Recycle:
 	jr .loop_1
 
 .tauros
-	; 3: Taurus
 	cp TAUROS
 	jr nz, .jigglypuff
 	ld a, b
@@ -4316,7 +4313,6 @@ AIDecide_Recycle:
 	jr .loop_1
 
 .jigglypuff
-	; 4: Jigglypuff
 	cp JIGGLYPUFF_LV12
 	jr nz, .loop_1
 	ld a, b
@@ -4326,15 +4322,15 @@ AIDecide_Recycle:
 ; loop through wce08 and set carry
 ; on the first that was found in Discard Pile.
 ; if none were found, return no carry.
-.pick_most_important_card
+.done
 	ld hl, wce08
 	ld b, 5
-.loop_find
+.loop_found
 	ld a, [hli]
 	cp $ff
 	jr nz, .set_carry
 	dec b
-	jr nz, .loop_find
+	jr nz, .loop_found
 .no_carry
 	or a
 	ret
@@ -4346,7 +4342,7 @@ AIDecide_Recycle:
 .loop_2
 	ld a, [hli]
 	cp $ff
-	jr z, .pick_most_important_card
+	jr z, .done
 
 	ld b, a
 	call LoadCardDataToBuffer1_FromDeckIndex
@@ -4541,16 +4537,9 @@ AIPlay_Gambler:
 	ld a, [wCurrentAIFlags]
 	or AI_FLAG_MODIFIED_HAND
 	ld [wCurrentAIFlags], a
-
-	; Imakuni?'s deck uses regular RNG
 	ld a, [wOpponentDeckID]
 	cp IMAKUNI_DECK_ID
-	jr z, .no_cheated_rng
-
-	; for all other decks, RNG is cheated to
-	; always yield heads in the coin toss
-
-	; backup RNG
+	jr z, .asm_2186a
 	ld hl, wRNG1
 	ld a, [hli]
 	ld [wce06], a
@@ -4558,8 +4547,6 @@ AIPlay_Gambler:
 	ld [wce08], a
 	ld a, [hl]
 	ld [wce0f], a
-
-	; use cheated RNG
 	ld a, $50
 	ld [hld], a
 	ld [hld], a
@@ -4568,8 +4555,6 @@ AIPlay_Gambler:
 	ldh [hTempCardIndex_ff9f], a
 	ld a, OPPACTION_EXECUTE_TRAINER_EFFECTS
 	bank1call AIMakeDecision
-
-	; restore RNG
 	ld hl, wRNG1
 	ld a, [wce06]
 	ld [hli], a
@@ -4578,8 +4563,7 @@ AIPlay_Gambler:
 	ld a, [wce0f]
 	ld [hl], a
 	ret
-
-.no_cheated_rng
+.asm_2186a
 	ld a, [wAITrainerCardToPlay]
 	ldh [hTempCardIndex_ff9f], a
 	ld a, OPPACTION_EXECUTE_TRAINER_EFFECTS
@@ -4703,7 +4687,7 @@ AIDecide_PokemonFlute:
 .loop_1
 	ld a, [hli]
 	cp $ff
-	jr z, .check_result
+	jr z, .done
 
 	ld b, a
 	call SwapTurn
@@ -4731,7 +4715,7 @@ AIDecide_PokemonFlute:
 	ld [wce08], a
 	jr .loop_1
 
-.check_result
+.done
 ; if lowest HP found >= 50, return no carry
 	ld a, [wce06]
 	cp 50

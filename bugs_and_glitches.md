@@ -12,8 +12,6 @@ Fixes are written in the `diff` format.
 
 ## Contents
 - [Game engine](#game-engine)
-  - [Pressing Down+A in Play Area screen ends a duel](#pressing-downa-in-play-area-screen-ends-a-duel)
-  - [Duel may be saved in an invalid state](#duel-may-be-saved-in-an-invalid-state)
   - [AI wrongfully adds score twice for attaching energy to Arena card](#ai-wrongfully-adds-score-twice-for-attaching-energy-to-arena-card)
   - [Cards in AI decks that are not supposed to be placed as Prize cards are ignored](#cards-in-ai-decks-that-are-not-supposed-to-be-placed-as-prize-cards-are-ignored)
   - [AI score modifiers for retreating are never used](#ai-score-modifiers-for-retreating-are-never-used)
@@ -32,9 +30,6 @@ Fixes are written in the `diff` format.
   - [AI does not pay attention to Acid effect when retreating](#ai-does-not-pay-attention-to-acid-effect-when-retreating)
   - [AI has flawed logic when considering MewLv8 as a target for switching](#ai-has-flawed-logic-when-considering-mewlv8-as-a-target-for-switching)
   - [AI has flawed logic when considering the Earthquake attack](#ai-has-flawed-logic-when-considering-the-earthquake-attack)
-  - [AI has flawed logic when considering evolutions](#ai-has-flawed-logic-when-considering-evolutions)
-  - [AI might disregard AI info flags](#ai-might-disregard-ai-info-flags)
-  - [Attack damage is not correctly halved](#attack-damage-is-not-correctly-halved)
   - [Phantom Venusaur will never be obtained through Card Pop!](#phantom-venusaur-will-never-be-obtained-through-card-pop)
 - [Graphics](#graphics)
   - [Water Club master room uses the wrong void color](#water-club-master-room-uses-the-wrong-void-color)
@@ -61,59 +56,6 @@ Fixes are written in the `diff` format.
   - [Missing acute accents](#missing-acute-accents)
 
 ## Game engine
-
-### Pressing Down+A in Play Area screen ends a duel
-
-The infamous "Duel Escape" glitch allows the player to exit any duel currently being played, and retains the same duel result as the last result the player obtained (winning the duel by default if no duel has been played up to that point). The reason for this happening is technical (you can read more about it in [this Pastebin](https://pastebin.com/QnYGzNey) by entrpntr), but it basically boils down to the game jumping to an out-of-bounds address in a table because it doesn't expect a D-pad input and an A press on the same frame when viewing the Play Area screen.
-
-The following is a possible fix to this bug, which makes the game ignore the A press altogether when this situation occurs.
-
-**Fix:** Edit `OpenInPlayAreaScreen_HandleInput` in [src/engine/menus/play_area.asm](https://github.com/pret/poketcg/blob/master/src/engine/menus/play_area.asm):
-```diff
-OpenInPlayAreaScreen_HandleInput:
-	...
-
-.dpad_processed
-	ld a, SFX_CURSOR
-	ld [wMenuInputSFX], a
-	xor a
-	ld [wCheckMenuCursorBlinkCounter], a
-+	jr .no_a_or_b_btn
-+
-.check_button
--	; bug, it's not guaranteed that [wInPlayAreaCurPosition]
--	; is in a valid Play Area item here
--	; in fact, pressing Down+A under some circumstances
--	; allows the "Duel Escape" glitch to occur
-	ldh a, [hKeysPressed]
-	and PAD_A | PAD_B
-	jr z, .no_a_or_b_btn
-```
-
-### Duel may be saved in an invalid state
-
-Under specific circumstances, the player may end the duel in the middle of a turn before attacking (e.g. using Zapdos' Peal of Thunder and KO'ing the opponent's last Pokémon). However, when redrawing the main duel interface the game always saves the current game state, even if the duel is finished. This makes it so that if a reset is done at this point, the duel is resumed with an invalid state and all manner of [glitched mishaps occur](https://glitchcity.wiki/wiki/Zapdos_LV68_glitch).
-
-**Fix:** Edit `PrintDuelMenuAndHandleInput` in [src/engine/duel/core.asm](https://github.com/pret/poketcg/blob/master/src/engine/duel/core.asm):
-```diff
-PrintDuelMenuAndHandleInput:
-	call DrawWideTextBox
-	ld hl, DuelMenuData
-	call PlaceTextItems
-.menu_items_printed
--	; bug, saving here can be problematic since in specific circumstances the duel may be over,
--	; and reloading it from here will lead to an invalid duel state
--	call SaveDuelData
-
-	ld a, [wDuelFinished]
-	or a
-	ret nz
-+
-+	call SaveDuelData
-+
-	ld a, [wCurrentDuelMenuItem]
-	call SetMenuItem
-```
 
 ### AI wrongfully adds score twice for attaching energy to Arena card
 
@@ -366,13 +308,12 @@ AIDecide_PokemonTrader_PowerGenerator:
 
 ### AI Full Heal has flawed logic for sleep
 
-The AI has the following checks when it is deciding whether to play Full Heal and its Active card is asleep in [src/engine/duel/ai/trainer_cards.asm](https://github.com/pret/poketcg/blob/master/src/engine/duel/ai/trainer_cards.asm):
+The AI has the following checks when it is deciding whether to play Full Heal and its Active card is asleep in in [src/engine/duel/ai/trainer_cards.asm](https://github.com/pret/poketcg/blob/master/src/engine/duel/ai/trainer_cards.asm):
 
 ```
 .asleep
 ; set carry if any of the following
-; cards are in own Play Area.
-; bug, should be checking player's Play Area instead
+; cards are in the Play Area.
 	ld a, GASTLY_LV8
 	ld b, PLAY_AREA_ARENA
 	call LookForCardIDInPlayArea_Bank8
@@ -395,8 +336,7 @@ AIDecide_FullHeal:
 	...
 .asleep
 ; set carry if any of the following
--; cards are in the Play Area.
-+; cards are in the player's Play Area.
+; cards are in the Play Area.
 	ld a, GASTLY_LV8
 -	ld b, PLAY_AREA_ARENA
 -	call LookForCardIDInPlayArea_Bank8
@@ -680,7 +620,7 @@ AIDecideBenchPokemonToSwitchTo:
 	jr z, .raise_score
 	cp MEW_LV8
 	jr nz, .check_if_has_bench_utility
-+	call SwapTurn
++	call Swap Turn
 	ld a, DUELVARS_ARENA_CARD
 -	call GetNonTurnDuelistVariable
 +	call GetTurnDuelistVariable
@@ -739,146 +679,6 @@ HandleSpecialAIAttacks:
 	jp z, .zero_score
 	ld a, $80
 	ret
-```
-
-### AI has flawed logic when considering evolutions
-
-When considering evolving a Pokémon, the AI checks if, after evolving, it would be knocked out by the player's card. However, the difference in HP isn't taken into account, so the AI might not consider cases where evolving would actually avoid a KO by the player. We'll fix this by temporarily storing the HP difference between pre-evolution and evolution, and then temporarily adding it to the card's HP when running damage calculations.
-
-**Fix:** Edit `AIDecideEvolution` in [src/engine/duel/ai/hand_pokemon.asm](https://github.com/pret/poketcg/blob/master/src/engine/duel/ai/hand_pokemon.asm):
-```diff
-AIDecideEvolution:
-	...
-	call CheckIfCanEvolveInto
-	pop bc
-	push bc
-	jp c, .done_bench_pokemon
-
-; store this Play Area location in wTempAI
-; and initialize the AI score
-	ld a, b
-	ld [wTempAI], a
-	ldh [hTempPlayAreaLocation_ff9d], a
-+
-+	; store HP difference between cards
-+	ld a, [wLoadedCard1HP] ; evolution card
-+	ld hl, wLoadedCard2HP ; pre-evolution card
-+	sub [hl]
-+	ld [wEvolutionHPDifference], a
-+
-	ld a, $80
-	ld [wAIScore], a
-	call AIDecideSpecialEvolutions
-	...
-```
-
-Then add further down:
-```diff
-AIDecideEvolution:
-	...
-	ld a, [wTempAI]
-	or a
-	jr nz, .check_mr_mime
-+	; temporarily change HP
-+	ld a, DUELVARS_ARENA_CARD_HP
-+	call GetTurnDuelistVariable
-+	push af
-+	push hl
-+	ld b, a
-+	ld a, [wEvolutionHPDifference]
-+	add b
-+	ld [hl], a
-	xor a ; PLAY_AREA_ARENA
-	ldh [hTempPlayAreaLocation_ff9d], a
-	call CheckIfDefendingPokemonCanKnockOut
-+	pop hl
-+	pop bc
-+	ld [hl], b
-	jr nc, .check_mr_mime
-	ld a, 5
-	call AIDiscourage
-	...
-```
-
-We'll need to define this `wEvolutionHPDifference` variable in [src/wram.asm](https://github.com/pret/poketcg/blob/master/src/wram.asm):
-```diff
- wCurCardCanKO:: ; cdf4
-        ds $1
- 
--       ds $4
-+       ds $3
-+
-+; stores HP difference between a pre-evolution
-+; and its evolution, for AI damage calculations
-+wEvolutionHPDifference:: ; cdf8
-+       ds $1
- 
- wSamePokemonCardID:: ; cdf9
-        ds $1
-```
-
-### AI might disregard AI info flags
-
-Some card data has AI flags to slightly nudge the AI when it scores a particular evolution card or retreating to a particular Pokémon. But these checks are wrong since they don't consider that this data might have the `HAS_EVOLUTION` flag set.
-
-**Fix:** Edit [src/engine/duel/ai/hand_pokemon.asm](https://github.com/pret/poketcg/blob/master/src/engine/duel/ai/hand_pokemon.asm):
-```diff
-AIDecideEvolution:
-	...
-	ld a, [wLoadedCard1ID]
-	cp MYSTERIOUS_FOSSIL
-	jr z, .mysterious_fossil
-	ld a, [wLoadedCard1AIInfo]
--	; bug, should mask out HAS_EVOLUTION flag first
-+	and $0f
-	cp AI_INFO_ENCOURAGE_EVO
-	jr nz, .pikachu_deck
-	ld a, 2
-	call AIEncourage
-	jr .pikachu_deck
-	...
-```
-
-And edit [src/engine/duel/ai/retreat.asm](https://github.com/pret/poketcg/blob/master/src/engine/duel/ai/retreat.asm):
-```diff
-AIDecideBenchPokemonToSwitchTo:
-	...
-; if wLoadedCard1AIInfo == AI_INFO_BENCH_UTILITY,
-; lower AI score
-.check_if_has_bench_utility
-	ld a, [wLoadedCard1AIInfo]
--	; bug, should mask out HAS_EVOLUTION flag first
-+	and $0f
-	cp AI_INFO_BENCH_UTILITY
-	jr nz, .mysterious_fossil_or_clefairy_doll
-	ld a, 2
-	call AIDiscourage
-	...
-```
-### Attack damage is not correctly halved
-
-Electabuzz's Light Screen and Kabuto's Kabuto Armor both have the effect of halving any damage received. However, in the extremely rare case that damage is over 255, this halving doesn't work.
-
-**Fix:** Edit [src/home/substatus.asm](https://github.com/pret/poketcg/blob/master/src/home/substatus.asm):
-```diff
-HandleDamageReductionExceptSubstatus2::
-	...
-.halve_damage
--	sla d ; bug, should be sra d
-+	sra d
-	rr e
-	bit 0, e
-	ret z
-
-	...
-
-.kabuto_armor
--	sla d ; bug, should be sra d
-+	sra d
-	rr e
-	bit 0, e
-	ret z
-	...
 ```
 
 ### Phantom Venusaur will never be obtained through Card Pop!
@@ -982,6 +782,7 @@ Characters that are assigned the green NPC palette have incorrect profile frame 
 	db 8, 8, 19, %011 | OAM_PAL1
 
 ...
+
 
 .data_a94ae
 	db 4 ; size

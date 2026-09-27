@@ -12,9 +12,9 @@ ValidateGeneralSaveData::
 
 ; adds card with card ID in register a to collection
 ; and updates album progress in RAM
-AddCardToCollectionAndUpdateAlbumProgress::
-	farcall _AddCardToCollectionAndUpdateAlbumProgress
-	ret
+; AddCardToCollectionAndUpdateAlbumProgress::
+; 	farcall _AddCardToCollectionAndUpdateAlbumProgress
+; 	ret
 
 SaveGame::
 	push af

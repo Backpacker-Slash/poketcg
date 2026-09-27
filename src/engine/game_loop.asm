@@ -8,6 +8,7 @@ GameLoop::
 	call EnableInt_Timer
 	call EnableSRAM
 	ld a, [sTextSpeed]
+	; ld a, TEXT_SPEED_5
 	ld [wTextSpeed], a
 	ld a, [sSkipDelayAllowed]
 	ld [wSkipDelayAllowed], a
@@ -15,10 +16,11 @@ GameLoop::
 	ld a, 1
 	ld [wUppercaseHalfWidthLetters], a
 	ei
-	farcall StubbedUnusedSaveDataValidation
 	ldh a, [hKeysHeld]
 	cp PAD_A | PAD_B
 	jr z, .ask_erase_backup_ram
+	ld a, $ff
+	ld [wLastSelectedStartMenuItem], a
 	farcall _GameLoop
 	jr GameLoop
 .ask_erase_backup_ram

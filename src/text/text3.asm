@@ -1069,10 +1069,8 @@ PlayerStatusNameText:
 	text "Name <RAMNAME>"
 	done
 
-PlayerStatusAlbumText:
-	text "Album           "
-	half2full
-	textfw "/"
+PlayerOnlineLossesText:
+	text "Online Duels Losses: <RAMNUM>"
 	done
 
 PlayerStatusPlayTimeText:
@@ -1082,11 +1080,11 @@ PlayerStatusPlayTimeText:
 	done
 
 PlayerDiaryTitleText:
-	text "<RAMNAME>'s diary"
+	text "<RAMNAME>'s profile"
 	done
 
-PlayerDiaryMedalsWonText:
-	text "Master Medals Won "
+PlayerOnlineWinsText:
+	text "Online Duels Won:   <RAMNUM>"
 	done
 
 PlayerDiarySaveQuestionText:
@@ -1275,55 +1273,68 @@ NewGameText:
 
 CardPopContinueDiaryNewGameText:
 	text "CARD POP!"
-	line "CONTINUE FROM DIARY"
-	line "NEW GAME"
+	line "DUEL"
+	line "DECKBUILDER"
 	done
 
-CardPopContinueDiaryNewGameContinueDuelText:
-	text "CARD POP!"
-	line "CONTINUE FROM DIARY"
-	line "New Game"
-	line "CONTINUE DUEL"
+StartMenuTextItems:
+	text "PROFILE"
+	line "DUEL"
+	line "DECKBUILDER"
+	line "DECK VAULT"
 	done
 
-WhenYouCardPopWithFriendText:
-	text ""
-IF DEF(_VC)
-.StartSkip:
-ENDC
-	db   "When you CARD POP! with a friend,"
+ProfileText:
+	text "Check your stats!,"
 	line "you will each receive a new card!"
-IF DEF(_VC)
-.EndSkip:
-ENDC
 	done
 
-ContinueFromDiarySummaryText:
-	text "  <RAMNAME>  <RAMTEXT>"
-	line "      Master Medals Won "
-	half2full
-	textfw "<RAMNUM>"
-	text ""
-	line "      Album           "
-	half2full
-	textfw "/"
-	text ""
-	line "      Play time         "
-	half2full
-	textfw ":"
-	text ""
+DuelText:
+	text "Duel a friend online,"
+	line "or challenge an NPC"
 	done
 
-StartANewGameText:
-	text "Start a New Game."
-	line ""
+DeckBuilderText:
+	text "Construct your Decks,"
+	line "All the Cards are here"
 	done
 
-TheGameWillContinueFromThePointInTheDuelText:
-	text "The Game will continue from "
-	line "the point in the duel at"
-	line "which the power was turned OFF."
-	done
+DeckVaultText:
+	text "Manage your Deck lists,"
+	line "store up to 60 decks"
+	done	
+
+; WhenYouCardPopWithFriendText:
+; 	text "When you CARD POP! with a friend,"
+; 	line "you will each receive a new card!"
+; 	done
+
+; ContinueFromDiarySummaryText:
+; 	text "  <RAMNAME>  <RAMTEXT>"
+; 	line "      Master Medals Won "
+; 	half2full
+; 	textfw "<RAMNUM>"
+; 	text ""
+; 	line "      Album           "
+; 	half2full
+; 	textfw "/"
+; 	text ""
+; 	line "      Play time         "
+; 	half2full
+; 	textfw ":"
+; 	text ""
+; 	done
+
+; StartANewGameText:
+; 	text "Start a New Game."
+; 	line ""
+; 	done
+
+; TheGameWillContinueFromThePointInTheDuelText:
+; 	text "The Game will continue from "
+; 	line "the point in the duel at"
+; 	line "which the power was turned OFF."
+; 	done
 
 SavedDataAlreadyExistsText:
 	text "Saved data already exists."
@@ -1992,11 +2003,7 @@ Mail1Part1Text:
 	line "Pack! By doing so, you will be able "
 	line "to collect the same cards, making it"
 	line "easier for you to build your Deck."
-	line ""
-IF DEF(_VC)
-.StartSkip:
-ENDC
-	db   "Another method for collecting "
+	line "Another method for collecting "
 	line "cards is to use CARD POP!"
 	line "When you and a friend use CARD POP!,"
 	line "you will each receive a new card!"
@@ -2007,11 +2014,7 @@ ENDC
 	line "Trading Card Game for Game Boy,"
 	line "and CARD POP! with them to"
 	line "get new cards!"
-	line ""
-IF DEF(_VC)
-.EndSkip:
-ENDC
-	db   "Oh, here's something for you..."
+	line "Oh, here's something for you..."
 	done
 
 Mail1Part2Text:

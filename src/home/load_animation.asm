@@ -13,6 +13,9 @@ ClearSpriteAnimations::
 	ret
 
 HandleAllSpriteAnimations::
+	ld a, [wSkipAnimations]
+	or a	; cp FALSE
+	ret nz
 	ldh a, [hBankROM]
 	push af
 	ld a, BANK(_HandleAllSpriteAnimations)
@@ -139,14 +142,14 @@ DrawSpriteAnimationFrame::
 
 ; Loads a pointer to the current animation frame into SPRITE_ANIM_FRAME_DATA_POINTER using
 ; the current frame's offset
-; [wWhichAnimationFrame] - current frame in the animation
+; [wd4ca] - current frame offset
 ; wTempPointer* - Pointer to current Animation
 GetAnimationFramePointer::
 	ldh a, [hBankROM]
 	push af
 	push hl
 	push hl
-	ld a, [wWhichAnimationFrame]
+	ld a, [wd4ca]
 	cp $ff
 	jr nz, .useLoadedOffset
 	ld de, SpriteNullAnimationPointer
@@ -162,7 +165,7 @@ GetAnimationFramePointer::
 	ld a, [hli]
 
 	push af
-	ld a, [wWhichAnimationFrame]
+	ld a, [wd4ca]
 	rlca
 	ld e, [hl]
 	add e
@@ -263,9 +266,15 @@ LoadScene::
 	ld a, [wSceneSpriteIndex]
 	ret
 
+; DrawCurrentPortrait::
+
+
 ; draws player's portrait at b,c
 DrawPlayerPortrait::
-	ld a, PLAYER_PIC
+	; ld a, PLAYER_PIC
+	ld a, [wPlayerPortrait]
+; NUM_PICS
+
 	ld [wCurPortrait], a
 	ld a, TILEMAP_PLAYER
 ;	fallthrough
@@ -289,13 +298,31 @@ DrawOpponentPortrait::
 	ld a, TILEMAP_OPPONENT
 	jr DrawPortrait
 
-Func_3e31::
-	ldh a, [hBankROM]
-	push af
-	call HandleAllSpriteAnimations
-	ld a, BANK(DoLoadedFramesetSubgroupsFrame)
-	call BankswitchROM
-	call DoLoadedFramesetSubgroupsFrame
-	pop af
-	call BankswitchROM
-	ret
+; Func_3e31::
+; 	ldh a, [hBankROM]
+; 	push af
+; 	call HandleAllSpriteAnimations
+; 	ld a, BANK(DoLoadedFramesetSubgroupsFrame)
+; 	call BankswitchROM
+; 	call DoLoadedFramesetSubgroupsFrame
+; 	pop af
+; 	call BankswitchROM
+; 	ret
+
+; FinishQueuedAnimations::
+; 	ldh a, [hBankROM]
+; 	push af
+; 	ld a, BANK(ClearAndDisableQueuedAnimations)
+; 	call BankswitchROM
+; 	call ClearAndDisableQueuedAnimations
+; 	jr c, .skip_clear_frame_func
+; 	xor a
+; 	ld [wDoFrameFunction + 0], a
+; 	ld [wDoFrameFunction + 1], a
+; .skip_clear_frame_func
+; 	call ZeroObjectPositions
+; 	ld a, 1
+; 	ld [wVBlankOAMCopyToggle], a
+; 	pop af
+; 	call BankswitchROM
+; 	ret

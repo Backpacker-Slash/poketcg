@@ -187,10 +187,8 @@ WriteToTextHeader::
 	ldh a, [hBankROM]
 	ld [hli], a
 	ld [hl], c
-	vc_hook Skip_Start_menu_Card_Pop_text
 	inc hl
 	ld [hl], b
-	vc_hook Skip_Doctor_Mason_mail_Card_Pop_text
 	ret
 
 ; same as WriteToTextHeader, except it then increases wWhichTextHeader to
@@ -293,9 +291,7 @@ ProcessTextHeader::
 	call ProcessSpecialTextCharacter
 .processed_char
 	call WriteToTextHeader
-	vc_hook Unknown_skip_Card_Pop_text_1
 	or a
-	vc_hook Unknown_skip_Card_Pop_text_2
 	ret
 .tx_end
 	ld a, [wWhichTextHeader]
@@ -398,15 +394,15 @@ GetTextOffsetFromTextID::
 	ret
 
 ; if [wFontWidth] == HALF_WIDTH:
-;   convert number in hl to text (ascii) format and write it to wStringBuffer
+;   convert the number at hl to text (ascii) format and write it to wStringBuffer
 ;   return c = 4 - leading_zeros
 ; if [wFontWidth] == FULL_WIDTH:
-;   convert number in hl to TX_SYMBOL format and write it to wStringBuffer
+;   convert the number at hl to TX_SYMBOL text format and write it to wStringBuffer
 ;   replace leading zeros with SYM_SPACE
 TwoByteNumberToText_CountLeadingZeros::
 	ld a, [wFontWidth]
 	or a ; FULL_WIDTH
-	jp z, TwoByteNumberToTxSymbol_PadSpace
+	jp z, TwoByteNumberToTxSymbol_TrimLeadingZeros
 	ld de, wStringBuffer
 	push de
 	call TwoByteNumberToText
