@@ -261,6 +261,8 @@
         // ============================================================
         // RAM OFFSETS (Base address = $C000)
         // ============================================================
+        const OFFSET_PLAYER_DUELVARS = 0x0200;   // $C200 (wPlayerDuelVariables, 256 bytes)
+        const OFFSET_OPPONENT_DUELVARS = 0x0300; // $C300 (wOpponentDuelVariables, 256 bytes)
         const OFFSET_PLAYER_DECK = 0x0400;       // $C400 (wPlayerDeck)
         const OFFSET_OPPONENT_DECK = 0x0480;     // $C480 (wOpponentDeck)
         const OFFSET_NAME_BUFFER = 0x0500;       // $C500 (wNameBuffer in WRAM0)
@@ -295,6 +297,7 @@
         // ============================================================
         let isHost = false;
         let deckSynced = false;
+        let boardSetupSynced = false;
         let module = null;
         let emulatorPtr = null;
         let audio = null;
@@ -628,8 +631,23 @@
                 });
             }
 
+            // State 2: Board Setup (Active & Bench Pokemon) Complete
+            if (p1 === 2 && !boardSetupSynced && connection?.open) {
+                boardSetupSynced = true;
+                log("Local player completed board setup! Sending initial duel variables to opponent...");
+
+                // Read local player's wPlayerDuelVariables ($C200 - $C2FF, 256 bytes)
+                const myDuelvars = Array.from(wram.subarray(OFFSET_PLAYER_DUELVARS, OFFSET_PLAYER_DUELVARS + 0x0100));
+
+                connection.send({
+                    type: 'board_setup_sync',
+                    duelvars: myDuelvars
+                });
+            }
+
             if (p1 === 0 && p2 === 0) {
                 deckSynced = false;
+                boardSetupSynced = false;
             }
         }
 
@@ -864,7 +882,11 @@
                 if (d.type === 'p1_ready_sync') {
                     const wram = getWram();
                     if (wram) {
-                        wram[OFFSET_P2_READY] = d.ready;
+                        // Note: state 2 (board setup) is exclusively set by board_setup_sync
+                        // along with the opponent's duel variables to avoid race conditions.
+                        if (d.ready !== 2) {
+                            wram[OFFSET_P2_READY] = d.ready;
+                        }
                         if (d.avatar !== undefined) {
                             wram[OFFSET_OPPONENT_AVATAR] = d.avatar;
                         }
@@ -906,7 +928,25 @@
                     return;
                 }
 
-                // 5. PACKET ACK
+                // 5. BOARD SETUP SYNC: Inject opponent's initial duelvars into $C300-$C3FF and set wP2_Ready = 2
+                if (d.type === 'board_setup_sync') {
+                    const wram = getWram();
+                    if (wram && d.duelvars && Array.isArray(d.duelvars)) {
+                        const oppDuelvars = new Uint8Array(d.duelvars);
+                        // Inject into wOpponentDuelVariables ($C300)
+                        wram.set(oppDuelvars, OFFSET_OPPONENT_DUELVARS);
+                        // Force duelist type to DUELIST_TYPE_LINK_OPP (0x01) so game knows it's the remote opponent!
+                        wram[OFFSET_OPPONENT_DUELVARS + 0xF1] = 0x01;
+
+                        // Signal State 2 to Game Boy code to exit .wait_opp_setup loop
+                        wram[OFFSET_P2_READY] = 2;
+                        log(`Injected opponent board setup (${oppDuelvars.length} bytes into $C300). Set wP2_Ready = 2.`);
+                        addChatMessage('SYSTEM', 'Opponent completed board setup.');
+                    }
+                    return;
+                }
+
+                // 6. PACKET ACK
                 if (d.type === 'packet_received_by_opp') {
                     const wram = getWram();
                     if (wram) {

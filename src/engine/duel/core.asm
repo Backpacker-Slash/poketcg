@@ -1830,13 +1830,21 @@ HandleDuelSetup:
 	ldh [hWhoseTurn], a
 	call ChooseInitialArenaAndBenchPokemon
 	call SwapTurn
+	ld a, [wDuelType]
+	cp DUELTYPE_LINK
+	jr nz, .skip_link_type
+	; Ensure opponent turn knows it is DUELIST_TYPE_LINK_OPP
+	ld a, DUELVARS_DUELIST_TYPE
+	call GetTurnDuelistVariable
+	ld [hl], DUELIST_TYPE_LINK_OPP
+.skip_link_type
 	call ChooseInitialArenaAndBenchPokemon
 	call SwapTurn
 	; jp c, .error
 	call DrawPlayAreaToPlacePrizeCards
 	ldtx hl, PlacingThePrizesText
 	call DrawWideTextBox_WaitForInput
-	call ExchangeRNG
+	; call ExchangeRNG
 
 	; ld a, [wDuelInitialPrizes]
 	ld a, PRIZES_6
@@ -1878,7 +1886,7 @@ HandleDuelSetup:
 	ldtx hl, YouPlaySecondText
 .play_first
 	call DrawWideTextBox_WaitForInput
-	call ExchangeRNG
+	; call ExchangeRNG
 	or a
 	ret
 
@@ -1896,7 +1904,7 @@ HandleDuelSetup:
 	ldtx hl, YouPlayFirstText
 .play_second
 	call DrawWideTextBox_WaitForInput
-	call ExchangeRNG
+	; call ExchangeRNG
 	or a
 	ret
 
@@ -1966,12 +1974,19 @@ HandleDuelSetup:
 ; also transmits the turn holder's duelvars to the other duelist in a link duel.
 ; called twice, once for each duelist.
 ChooseInitialArenaAndBenchPokemon:
+	ld a, [wDuelType]
+	cp DUELTYPE_LINK
+	jr nz, .not_link
+	ldh a, [hWhoseTurn]
+	cp OPPONENT_TURN
+	jr z, .exchange_duelvars
+.not_link
 	ld a, DUELVARS_DUELIST_TYPE
 	call GetTurnDuelistVariable
-	cp DUELIST_TYPE_PLAYER
-	jr z, .choose_arena
 	cp DUELIST_TYPE_LINK_OPP
 	jr z, .exchange_duelvars
+	cp DUELIST_TYPE_PLAYER
+	jr z, .choose_arena
 
 ; AI opponent's turn
 	push af
@@ -1987,33 +2002,19 @@ ChooseInitialArenaAndBenchPokemon:
 .exchange_duelvars
 	ldtx hl, TransmittingDataText
 	call DrawWideTextBox_PrintText
-	call ExchangeRNG
+	call EnableLCD
 
-	; call wait_byte_exchange
+.wait_opp_setup
+	call DoFrame
+	ld a, [wP2_Ready]
+	cp 2
+	jr nz, .wait_opp_setup
 
-	ld hl, wPlayerDuelVariables
-	ld de, wOpponentDuelVariables
-	ld c, (wOpponentDuelVariables - wPlayerDuelVariables) / 2
-	call SerialExchangeBytes
-
-	call wait_byte_exchange
-
-	; jr c, .error
-	ld hl, wPlayerDuelVariables
-	ld de, wOpponentDuelVariables
-	ld c, (wOpponentDuelVariables - wPlayerDuelVariables) / 2
-	call SerialExchangeBytes
-
-	call wait_byte_exchange
-
-	; jr c, .error
 	ld a, DUELVARS_DUELIST_TYPE
 	call GetTurnDuelistVariable
 	ld [hl], DUELIST_TYPE_LINK_OPP
 	or a
 	ret
-; .error
-; 	jp DuelTransmissionError
 
 ; player's turn (either AI or link duel)
 ; prompt (force) the player to choose a basic Pokemon card to place in the arena
@@ -2079,6 +2080,9 @@ ChooseInitialArenaAndBenchPokemon:
 	ld a, PRACTICEDUEL_VERIFY_INITIAL_PLAY
 	call DoPracticeDuelAction
 	jr c, .bench_loop
+	; signal board setup complete (State 2)
+	ld a, 2
+	ld [wP1_Ready], a
 	or a
 	ret
 
