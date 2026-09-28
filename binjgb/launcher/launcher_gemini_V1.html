@@ -268,6 +268,9 @@
         const OFFSET_NAME_BUFFER = 0x0500;       // $C500 (wNameBuffer in WRAM0)
         const OFFSET_P1_READY = 0x05FD;          // $C5FD (wP1_Ready)
         const OFFSET_P2_READY = 0x05FE;          // $C5FE (wP2_Ready)
+        const OFFSET_RNG = 0x0ACA;               // $CACA (wRNG1, wRNG2, wRNGCounter)
+        const OFFSET_OPP_RNG = 0x0BE2;           // $CBE2 (wOppRNG1, wOppRNG2, wOppRNGCounter)
+        const OFFSET_WHOSE_TURN = 0x0C05;        // $CC05 (wWhoseTurn: $C2 = player, $C3 = opp)
 
         const OFFSET_SERIAL_OP = 0x0B74;         // $CB74 (wSerialOp)
         const OFFSET_SERIAL_SEND_STATE = 0x0B75; // $CB75 (wSerialSendState)
@@ -298,6 +301,7 @@
         let isHost = false;
         let deckSynced = false;
         let boardSetupSynced = false;
+        let lastLocalRng = [0, 0, 0];
         let module = null;
         let emulatorPtr = null;
         let audio = null;
@@ -566,6 +570,7 @@
             }
 
             syncRamLogic();
+            syncRngLogic();
             handleSerialSendQueue();
             handleSerialPacketState();
 
@@ -652,6 +657,33 @@
         }
 
         // ============================================================
+        // RNG AUTOMATIC SYNCHRONIZATION
+        // ============================================================
+        function syncRngLogic() {
+            const wram = getWram();
+            if (!wram || !connection?.open) return;
+
+            const p1 = wram[OFFSET_P1_READY];
+            const p2 = wram[OFFSET_P2_READY];
+            if (p1 !== 2 || p2 !== 2) return;
+
+            // Only the turn holder broadcasts spontaneous RNG updates ($C2 = Player's turn)
+            const whoseTurn = wram[OFFSET_WHOSE_TURN];
+            if (whoseTurn === 0xC2) {
+                const r0 = wram[OFFSET_RNG];
+                const r1 = wram[OFFSET_RNG + 1];
+                const r2 = wram[OFFSET_RNG + 2];
+                if (r0 !== lastLocalRng[0] || r1 !== lastLocalRng[1] || r2 !== lastLocalRng[2]) {
+                    lastLocalRng = [r0, r1, r2];
+                    connection.send({
+                        type: 'rng_sync',
+                        rng: [r0, r1, r2]
+                    });
+                }
+            }
+        }
+
+        // ============================================================
         // RECEIVE-SIDE SERIAL STATE
         // ============================================================
         function handleSerialPacketState() {
@@ -678,12 +710,15 @@
                 const packet = Array.from(wram.subarray(OFFSET_SERIAL_SEND_BUF, OFFSET_SERIAL_SEND_BUF + bytesToSend));
                 wram[OFFSET_SERIAL_SEND_TOGGLE] = 0;
 
+                const currentRng = [wram[OFFSET_RNG], wram[OFFSET_RNG + 1], wram[OFFSET_RNG + 2]];
+
                 connection.send({
                     type: 'serial_packet',
-                    payload: packet
+                    payload: packet,
+                    rng: currentRng
                 });
 
-                log(`Packet sent (${packet.length} bytes): [${packet.join(', ')}]`);
+                log(`Packet sent (${packet.length} bytes): [${packet.join(', ')}] (RNG: [${currentRng.join(',')}])`);
             }
         }
 
@@ -770,14 +805,18 @@
                 document.body.appendChild(debugEl);
             }
 
+            const whoseTurn = wram[OFFSET_WHOSE_TURN];
+            const whoseTurnStr = whoseTurn === 0xC2 ? 'PLAYER' : (whoseTurn === 0xC3 ? 'OPPONENT' : '0x' + whoseTurn.toString(16));
             debugEl.innerHTML = `
-                <div>wSerialOp : 0x${wram[OFFSET_SERIAL_OP].toString(16).padStart(2, '0')}</div>
-                <div>P1_READY : ${wram[OFFSET_P1_READY]}</div>
-                <div>P2_READY : ${wram[OFFSET_P2_READY]}</div>
-                <div>SEND_QUEUE: ${wram[OFFSET_SERIAL_SEND_TOGGLE]} bytes</div>
-                <div>RECV_QUEUE: ${wram[OFFSET_SERIAL_RECV_COUNT]} bytes</div>
-                <div>SEND_STATE: ${wram[OFFSET_SERIAL_SEND_STATE]}</div>
-                <div>RECV_STATE: ${wram[OFFSET_SERIAL_RECV_STATE]}</div>
+                <div>wSerialOp  : 0x${wram[OFFSET_SERIAL_OP].toString(16).padStart(2, '0')}</div>
+                <div>wWhoseTurn : 0x${whoseTurn.toString(16).padStart(2, '0')} (${whoseTurnStr})</div>
+                <div>RNG        : [${wram[OFFSET_RNG]}, ${wram[OFFSET_RNG + 1]}, ${wram[OFFSET_RNG + 2]}]</div>
+                <div>P1_READY   : ${wram[OFFSET_P1_READY]}</div>
+                <div>P2_READY   : ${wram[OFFSET_P2_READY]}</div>
+                <div>SEND_QUEUE : ${wram[OFFSET_SERIAL_SEND_TOGGLE]} bytes</div>
+                <div>RECV_QUEUE : ${wram[OFFSET_SERIAL_RECV_COUNT]} bytes</div>
+                <div>SEND_STATE : ${wram[OFFSET_SERIAL_SEND_STATE]}</div>
+                <div>RECV_STATE : ${wram[OFFSET_SERIAL_RECV_STATE]}</div>
             `;
         }
 
@@ -956,10 +995,34 @@
                     return;
                 }
 
-                // 6. SERIAL PACKET
+                // 7. RNG SYNC
+                if (d.type === 'rng_sync') {
+                    const wram = getWram();
+                    if (wram && d.rng && Array.isArray(d.rng)) {
+                        wram[OFFSET_RNG] = d.rng[0];
+                        wram[OFFSET_RNG + 1] = d.rng[1];
+                        wram[OFFSET_RNG + 2] = d.rng[2];
+                        wram[OFFSET_OPP_RNG] = d.rng[0];
+                        wram[OFFSET_OPP_RNG + 1] = d.rng[1];
+                        wram[OFFSET_OPP_RNG + 2] = d.rng[2];
+                    }
+                    return;
+                }
+
+                // 8. SERIAL PACKET
                 if (d.type === 'serial_packet') {
                     const wram = getWram();
                     if (wram && d.payload) {
+                        // Pre-synchronize RNG before injecting packet so OppActions execute with identical random seed
+                        if (d.rng && Array.isArray(d.rng)) {
+                            wram[OFFSET_RNG] = d.rng[0];
+                            wram[OFFSET_RNG + 1] = d.rng[1];
+                            wram[OFFSET_RNG + 2] = d.rng[2];
+                            wram[OFFSET_OPP_RNG] = d.rng[0];
+                            wram[OFFSET_OPP_RNG + 1] = d.rng[1];
+                            wram[OFFSET_OPP_RNG + 2] = d.rng[2];
+                        }
+
                         const bytes = new Uint8Array(d.payload);
                         wram.set(bytes, OFFSET_SERIAL_RECV_BUF);
                         wram[OFFSET_SERIAL_RECV_COUNT] = bytes.length;

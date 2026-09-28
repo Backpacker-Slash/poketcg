@@ -127,14 +127,14 @@ MainDuelLoop:
 	call HandleTurn
 
 .between_turns
-	call ExchangeRNG
+	;call exchangeRNG
 	ld a, [wDuelFinished]
 	or a
 	jr nz, .duel_finished
 	call UpdateSubstatusConditions_EndOfTurn
 	call HandleBetweenTurnsEvents
 	call FinishQueuedAnimations
-	call ExchangeRNG
+	;call exchangeRNG
 	ld a, [wDuelFinished]
 	or a
 	jr nz, .duel_finished
@@ -252,7 +252,7 @@ MainDuelLoop:
 	call HandleDuelSetup
 	jp MainDuelLoop
 .link_duel
-	call ExchangeRNG
+	;call exchangeRNG
 	ld h, PLAYER_TURN
 	ld a, [wSerialOp]
 	cp $29
@@ -1844,7 +1844,7 @@ HandleDuelSetup:
 	call DrawPlayAreaToPlacePrizeCards
 	ldtx hl, PlacingThePrizesText
 	call DrawWideTextBox_WaitForInput
-	; call ExchangeRNG
+	; ;call exchangeRNG
 
 	; ld a, [wDuelInitialPrizes]
 	ld a, PRIZES_6
@@ -1886,7 +1886,7 @@ HandleDuelSetup:
 	ldtx hl, YouPlaySecondText
 .play_first
 	call DrawWideTextBox_WaitForInput
-	; call ExchangeRNG
+	; ;call exchangeRNG
 	or a
 	ret
 
@@ -1904,7 +1904,7 @@ HandleDuelSetup:
 	ldtx hl, YouPlayFirstText
 .play_second
 	call DrawWideTextBox_WaitForInput
-	; call ExchangeRNG
+	; ;call exchangeRNG
 	or a
 	ret
 
@@ -2169,7 +2169,7 @@ DisplayNoBasicPokemonInHandScreenAndText:
 PrintReturnCardsToDeckDrawAgain:
 	ldtx hl, ReturnCardsToDeckAndDrawAgainText
 	call DrawWideTextBox_WaitForInput
-	call ExchangeRNG
+	;call exchangeRNG
 	ret
 
 ; display a bare list of seven hand cards of the turn duelist, and the duelist's name above
@@ -3088,7 +3088,7 @@ ReturnWrongAction:
 	ret
 
 ; display BOXMSG_PLAYERS_TURN or BOXMSG_OPPONENTS_TURN and print
-; DuelistTurnText in a textbox. also call ExchangeRNG.
+; DuelistTurnText in a textbox. also ;call exchangeRNG.
 DisplayDuelistTurnScreen:
 	call EmptyScreen
 	ld c, BOXMSG_PLAYERS_TURN
@@ -3101,7 +3101,7 @@ DisplayDuelistTurnScreen:
 	call DrawDuelBoxMessage
 	ldtx hl, DuelistTurnText
 	call DrawWideTextBox_WaitForInput
-	call ExchangeRNG
+	;call exchangeRNG
 	ret
 
 Unknown_54e2: ; unreferenced
@@ -3678,7 +3678,7 @@ TurnDuelistTakePrizes:
 	call SerialSend8Bytes
 
 .return_has_prizes
-	call ExchangeRNG
+	;call exchangeRNG
 	ld a, DUELVARS_PRIZES
 	call GetTurnDuelistVariable
 	or a
@@ -6682,7 +6682,7 @@ OppAction_PlayTrainerCard:
 	call LoadNonPokemonCardEffectCommands
 	call DisplayUsedTrainerCardDetailScreen
 	call PrintUsedTrainerCardDescription
-	call ExchangeRNG
+	;call exchangeRNG
 	ld a, $01
 	ld [wSkipDuelistIsThinkingDelay], a
 	ret
@@ -6697,7 +6697,7 @@ OppAction_ExecuteTrainerCardEffectCommands:
 	call DrawDuelMainScene
 	ldh a, [hTempCardIndex_ff9f]
 	call MoveHandCardToDiscardPile
-	call ExchangeRNG
+	;call exchangeRNG
 	call DrawDuelMainScene
 	ret
 
@@ -6719,7 +6719,7 @@ OppAction_BeginUseAttack:
 	and CNF_SLP_PRZ
 	cp CONFUSED
 	jr z, .has_status
-	call ExchangeRNG
+	;call exchangeRNG
 	ret
 
 ; we make it here is attacker is affected by
@@ -6728,7 +6728,7 @@ OppAction_BeginUseAttack:
 	call DrawDuelMainScene
 	call PrintPokemonsAttackText
 	call WaitForWideTextBoxInput
-	call ExchangeRNG
+	;call exchangeRNG
 	call HandleSandAttackOrSmokescreenSubstatus
 	ret nc ; return if attack is successful (won the coin toss)
 	call ClearNonTurnTemporaryDuelvars
@@ -6747,7 +6747,7 @@ OppAction_UseAttack:
 	call DisplayOpponentUsedAttackScreen
 	call PrintPokemonsAttackText
 	call WaitForWideTextBoxInput
-	call ExchangeRNG
+	;call exchangeRNG
 	ld a, $01
 	ld [wSkipDuelistIsThinkingDelay], a
 	ret
@@ -6798,7 +6798,7 @@ OppAction_UsePokemonPower:
 	ld [wTxRam2_b + 1], a
 	ldtx hl, WillUseThePokemonPowerText
 	call DrawWideTextBox_WaitForInput_Bank1
-	call ExchangeRNG
+	;call exchangeRNG
 	ld a, $01
 	ld [wSkipDuelistIsThinkingDelay], a
 	ret
@@ -7475,7 +7475,7 @@ ReplaceKnockedOutPokemon:
 	bank1call DrawDuelMainScene
 	ldtx hl, ThereAreNoPokemonInPlayAreaText
 	call DrawWideTextBox_WaitForInput
-	call ExchangeRNG
+	;call exchangeRNG
 	scf
 	ret
 
@@ -7513,7 +7513,7 @@ ReplaceKnockedOutPokemon:
 	call GetTurnDuelistVariable
 	ldtx hl, DuelistPlacedACardText
 	bank1call DisplayCardDetailScreen
-	call ExchangeRNG
+	;call exchangeRNG
 	or a
 	ret
 
@@ -7547,7 +7547,7 @@ Func_6fa5:
 	bank1call DrawDuelMainScene
 	ldtx hl, TookAllThePrizesText
 	call DrawWideTextBox_WaitForInput
-	call ExchangeRNG
+	;call exchangeRNG
 	call SwapTurn
 	scf
 	ret
@@ -7974,7 +7974,7 @@ _TossCoin::
 	ld a, DUELVARS_DUELIST_TYPE
 	call GetTurnDuelistVariable
 	ld [wCoinTossDuelistType], a
-	call ExchangeRNG
+	;call exchangeRNG
 	xor a
 	ld [wCoinTossNumHeads], a
 
@@ -8150,7 +8150,7 @@ _TossCoin::
 	ld hl, wCoinTossTotalNum
 	cp [hl]
 	jp c, .toss_next_coin
-	call ExchangeRNG
+	;call exchangeRNG
 	call FinishQueuedAnimations
 	call ResetAnimationQueue
 

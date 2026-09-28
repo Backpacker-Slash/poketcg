@@ -1363,7 +1363,7 @@ ProcessPlayedPokemonCard::
 	call LoadTxRam2
 	ldtx hl, HavePokemonPowerText
 	call DrawWideTextBox_WaitForInput
-	call ExchangeRNG
+	;call exchangeRNG
 	ld a, [wLoadedCard1ID]
 	cp MUK
 	jr z, .use_pokemon_power
@@ -1373,7 +1373,7 @@ ProcessPlayedPokemonCard::
 	call DisplayUsePokemonPowerScreen
 	ldtx hl, UnableToUsePkmnPowerDueToToxicGasText
 	call DrawWideTextBox_WaitForInput
-	call ExchangeRNG
+	;call exchangeRNG
 	ret
 
 .use_pokemon_power
@@ -1402,7 +1402,7 @@ ProcessPlayedPokemonCard::
 	ld [hl], a
 	ldtx hl, WillUseThePokemonPowerText
 	call DrawWideTextBox_WaitForInput
-	call ExchangeRNG
+	;call exchangeRNG
 	call ResetAttackAnimationIsPlaying
 	ld a, EFFECTCMDTYPE_PKMN_POWER_TRIGGER
 	call TryExecuteEffectCommandFunction
@@ -1534,7 +1534,7 @@ UseAttackOrPokemonPower::
 	jp c, HandleConfusionDamageToSelf
 	call DrawDuelMainScene_PrintPokemonsAttackText
 	call WaitForWideTextBoxInput
-	call ExchangeRNG
+	;call exchangeRNG
 	ld a, EFFECTCMDTYPE_REQUIRE_SELECTION
 	call TryExecuteEffectCommandFunction
 	ld a, OPPACTION_ATTACK_ANIM_AND_DAMAGE
@@ -1657,7 +1657,7 @@ UsePokemonPower::
 	jr c, ReturnCarry
 	ld a, OPPACTION_USE_PKMN_POWER
 	call SetOppAction_SerialSendDuelData
-	call ExchangeRNG
+	;call exchangeRNG
 	ld a, OPPACTION_EXECUTE_PKMN_POWER_EFFECT
 	call SetOppAction_SerialSendDuelData
 	ld a, EFFECTCMDTYPE_BEFORE_DAMAGE
@@ -1685,7 +1685,7 @@ SendAttackDataToLinkOpponent::
 	ldh [hTemp_ffa0], a
 	ld a, OPPACTION_BEGIN_ATTACK
 	call SetOppAction_SerialSendDuelData
-	call ExchangeRNG
+	;call exchangeRNG
 	pop af
 	ldh [hTempCardIndex_ff9f], a
 	pop af
@@ -1773,7 +1773,7 @@ PlayTrainerCard::
 	ld a, OPPACTION_PLAY_TRAINER
 	call SetOppAction_SerialSendDuelData
 	call DisplayUsedTrainerCardDetailScreen
-	call ExchangeRNG
+	;call exchangeRNG
 	ld a, EFFECTCMDTYPE_DISCARD_ENERGY
 	call TryExecuteEffectCommandFunction
 	ld a, EFFECTCMDTYPE_REQUIRE_SELECTION
@@ -1784,7 +1784,7 @@ PlayTrainerCard::
 	call TryExecuteEffectCommandFunction
 	ldh a, [hTempCardIndex_ff9f]
 	call MoveHandCardToDiscardPile
-	call ExchangeRNG
+	;call exchangeRNG
 .done
 	or a
 	ret
@@ -2220,7 +2220,7 @@ Func_1bb4::
 	ldh [hTempPlayAreaLocation_ff9d], a
 	call PrintFailedEffectText
 	call WaitForWideTextBoxInput
-	call ExchangeRNG
+	;call exchangeRNG
 	ret
 
 ; prints one of the ThereWasNoEffectFrom*Text if wEffectFailed contains EFFECT_FAILED_NO_EFFECT,

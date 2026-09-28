@@ -96,14 +96,14 @@ _SetUpAndStartLinkDuel:
 	; ld [wNPCDuelPrizes], a
 
 .prizes_decided
-	call ExchangeRNG	
+	;call exchangeRNG	
 	; ld a, PRIZES_6
 	; ld [wNPCDuelPrizes], a
 	; call EmptyScreen ;; for test only
 
 	; ld a, $1
 	; ld [wSerialOp], a
-	; call ExchangeRNG
+	; ;call exchangeRNG
 	; ld a, $2
 	; ld [wSerialOp], a
 
@@ -145,7 +145,7 @@ _SetUpAndStartLinkDuel:
 
 	pop af
 	ldh [hWhoseTurn], a
-	call ExchangeRNG
+	;call exchangeRNG
 	; call wait_byte_exchange
 	bank1call StartDuel_VSLinkOpp
 	; call SwitchToCGBDoubleSpeed

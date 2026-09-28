@@ -148,7 +148,7 @@ Func_2c0a8:
 	ret
 
 ShuffleCardsInDeck:
-	call ExchangeRNG
+	;call exchangeRNG
 	bank1call PlayDeckShuffleAnimation
 	call ShuffleDeck
 	ret
@@ -2648,7 +2648,7 @@ Heal_RemoveDamageEffect:
 	ld [hl], a
 	ldh a, [hPlayAreaEffectTarget]
 	call DrawPlayAreaScreenToShowChanges
-	call ExchangeRNG
+	;call exchangeRNG
 	ret
 
 PetalDance_AIEffect:
@@ -4534,7 +4534,7 @@ Curse_TransferDamageEffect:
 
 .done
 	call SwapTurn
-	call ExchangeRNG
+	;call exchangeRNG
 	bank1call HandleDestinyBondAndBetweenTurnKnockOuts
 	ret
 
@@ -7090,7 +7090,7 @@ PealOfThunder_InitialEffect:
 	ret
 
 PealOfThunder_RandomlyDamageEffect:
-	call ExchangeRNG
+	;call exchangeRNG
 	ld de, 30 ; damage to inflict
 	call RandomlyDamagePlayAreaPokemon
 	bank1call HandleDestinyBondAndBetweenTurnKnockOuts
@@ -7142,7 +7142,7 @@ RandomlyDamagePlayAreaPokemon:
 	ret
 
 BigThunderEffect:
-	call ExchangeRNG
+	;call exchangeRNG
 	ld de, 70 ; damage to inflict
 	call RandomlyDamagePlayAreaPokemon
 	ret
@@ -8602,7 +8602,7 @@ CatPunchEffect:
 	ret
 
 MorphEffect:
-	call ExchangeRNG
+	;call exchangeRNG
 	call .PickRandomBasicPokemonFromDeck
 	jr nc, .successful
 	ldtx hl, AttackUnsuccessfulText

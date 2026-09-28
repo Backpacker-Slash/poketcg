@@ -542,6 +542,9 @@ SerialSendBytes::
     pop de
     pop bc
 	ld b, $0
+    ; Reset send state to PACKET_IDLE before signaling new packet
+    xor a
+    ld [wSerialSendState], a
     ; Signal packet ready.
     ; BC still contains original packet length.
     ld a, c
@@ -832,30 +835,8 @@ DuelTransmissionError::
 	ret
 
 ; exchange RNG during a link duel between both games
+; Synchronized cleanly via WebRTC / JavaScript transport
 ExchangeRNG::
-	ld a, [wDuelType]
-	cp DUELTYPE_LINK
-	ret nz
-; 	 z, .link_duel
-; 	ret
-; .link_duel
-	ld a, DUELVARS_DUELIST_TYPE
-	call GetTurnDuelistVariable
-	or a ; cp DUELIST_TYPE_PLAYER
-	jr z, .player_turn
-; link opponent's turn
-	ld hl, wOppRNG1
-	ld de, wRNG1
-	jr .exchange
-.player_turn
-	ld hl, wRNG1
-	ld de, wOppRNG1
-.exchange
-	ld bc, 3 ; wRNG1, wRNG2, and wRNGCounter
-	call SerialExchangeBytes
-	; jp c, DuelTransmissionError
-	call wait_byte_exchange
-
 	ret
 
 ; sets hOppActionTableIndex to an AI action specified in register a.
@@ -876,24 +857,10 @@ SetOppAction_SerialSendDuelData::
 	ld bc, 10
 	call SerialSendBytes
 	call wait_byte_exchange
-
-
-
-; .wait	
-; 	ld a, [wSerialFlags]
-; 	cp PACKET_RECEIVED_BY_OPP
-; 	jr nz, .wait_DoFrame
-; 	xor a
-; 	ld [wSerialFlags], a
-	call ExchangeRNG
-	; call wait_byte_exchange	
 .not_link
 	pop bc
 	pop hl
 	ret
-; .wait_DoFrame
-; 	call DoFrame
-; 	jr .wait
 
 ; receive 10 bytes of data from wSerialRecvBuf and store them into hOppActionTableIndex,
 ; hTempCardIndex_ff9f, hTemp_ffa0, and hTempPlayAreaLocation_ffa1,
@@ -904,9 +871,6 @@ SerialRecvDuelData::
 	ld hl, hOppActionTableIndex
 	ld bc, 10
 	call SerialRecvBytes
-	call wait_byte_exchange	
-	call ExchangeRNG
-	; call wait_byte_exchange		
 	pop bc
 	pop hl
 	ret
